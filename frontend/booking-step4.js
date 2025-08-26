@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
       decks: [
         { id: "muhuel3-1", name: "평상 1", top: "50%", left: "20%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel3-2", name: "평상 2", top: "51%", left: "33%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel3-3", name: "평상 3", top: "50%", left: "45%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel3-4", name: "평상 4", top: "50.5%", left: "57%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel3-3", name: "평상 3", top: "50%", left: "44%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel3-4", name: "평상 4", top: "50.5%", left: "56%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel3-5", name: "평상 5", top: "51.5%", left: "68.5%", width: "7%", height: "6%", capacity: 8, isBooked: false },
         { id: "muhuel3-6", name: "평상 6", top: "51.5%", left: "81%", width: "7%", height: "6%", capacity: 8, isBooked: false }
       ]
