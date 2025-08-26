@@ -10,13 +10,11 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* 간단한 이미지 슬라이더를 위한 스타일 */
         .slider-wrapper {
             display: flex;
-            overflow-x: auto; /* 이미지가 많을 경우 가로 스크롤 */
+            overflow-x: auto;
             scroll-snap-type: x mandatory;
             gap: 1rem;
-            /* 이미지가 잘리지 않도록 배경색 추가 */
             background-color: #f9fafb;
             padding: 1rem 0;
             border-radius: 0.5rem;
@@ -29,7 +27,6 @@
             width: 100%;
             height: auto;
             max-height: 400px;
-            /* --- 수정된 부분: 이미지가 잘리지 않도록 contain으로 변경 --- */
             object-fit: contain;
             border-radius: 0.5rem;
         }
@@ -37,20 +34,14 @@
 </head>
 <body class="bg-gray-50">
 
-    <!-- 전체 컨테이너 -->
     <div class="container mx-auto max-w-3xl my-8 px-4">
-        <!-- 헤더 -->
         <header class="text-center mb-10">
             <a href="index.html" class="text-3xl font-bold text-gray-800">쉬어가~ 계곡</a>
         </header>
 
-        <!-- 후기 상세 내용 -->
         <main class="bg-white p-8 rounded-lg shadow-md">
             <div id="view-mode">
-                <!-- 제목 -->
                 <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4">...</h1>
-                
-                <!-- 작성자, 날짜, 조회수, 별점 정보 -->
                 <div class="detail-meta text-sm text-gray-500 flex items-center flex-wrap gap-x-2 mb-6">
                     <span id="detail-author"></span>
                     <span>|</span>
@@ -60,33 +51,21 @@
                     <span>|</span>
                     <span id="detail-rating" class="text-yellow-500"></span>
                 </div>
-                
-                <!-- 구분선 -->
                 <hr class="border-gray-200">
-
-                <!-- 첨부 사진 (슬라이더 구조) -->
                 <div id="detail-images-container" class="py-8" style="display: none;">
                     <div class="slider-wrapper">
-                        <!-- 이미지가 여기에 동적으로 추가됩니다. -->
                     </div>
                 </div>
-                
-                <!-- 본문 내용 -->
                 <div class="detail-content text-gray-800 leading-relaxed" id="detail-content">
                     <p>... 내용을 불러오는 중 ...</p>
                 </div>
-                
-                <!-- 구분선 -->
                 <hr class="border-gray-200 mt-8">
             </div>
 
-            <!-- 하단 버튼 영역 -->
             <div class="detail-footer mt-6 flex justify-between items-center">
-                <!-- 목록으로 버튼 -->
                 <a href="review.html" class="list-btn bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition">
                     목록으로
                 </a>
-                <!-- 수정/삭제 버튼 -->
                 <div class="detail-actions flex gap-2">
                     <a href="#" id="edit-btn" class="edit-btn text-sm text-gray-600 hover:text-blue-600 transition">수정</a>
                     <a href="#" id="delete-btn" class="delete-btn text-sm text-gray-600 hover:text-red-600 transition">삭제</a>
@@ -95,74 +74,6 @@
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const API_BASE_URL = 'https://o70albxd7n.onrender.com';
-            const params = new URLSearchParams(window.location.search);
-            const reviewId = params.get('id');
-
-            if (!reviewId) {
-                document.body.innerHTML = `<div class="text-center p-8">잘못된 접근입니다. <a href="review.html" class="text-blue-500">목록으로 돌아가기</a></div>`;
-                return;
-            }
-            
-            function displayReview(review) {
-                document.getElementById('detail-title').textContent = review.title;
-                document.getElementById('detail-author').textContent = review.author;
-                document.getElementById('detail-date').textContent = new Date(review.date).toISOString().split('T')[0];
-                document.getElementById('detail-views').textContent = review.views;
-                document.getElementById('detail-rating').textContent = '⭐'.repeat(review.rating || 0);
-                document.getElementById('detail-content').innerHTML = `<p>${(review.content || '').replace(/\n/g, '<br>')}</p>`;
-
-                const sliderWrapper = document.querySelector('.slider-wrapper');
-                const imagesContainer = document.getElementById('detail-images-container');
-                
-                sliderWrapper.innerHTML = '';
-                
-                if (review.images && review.images.length > 0) {
-                    imagesContainer.style.display = 'block';
-                    review.images.forEach(imageUrl => {
-                        const slideDiv = document.createElement('div');
-                        slideDiv.className = 'slide';
-                        slideDiv.innerHTML = `<img src="${imageUrl}" alt="후기 이미지" loading="lazy">`;
-                        sliderWrapper.appendChild(slideDiv);
-                    });
-                } else {
-                    imagesContainer.style.display = 'none';
-                }
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`);
-                if (!response.ok) throw new Error('후기를 불러오는 데 실패했습니다.');
-                const currentReview = await response.json();
-                displayReview(currentReview);
-
-                const editBtn = document.getElementById('edit-btn');
-                editBtn.href = `review_edit.html?id=${reviewId}`;
-
-                const deleteBtn = document.getElementById('delete-btn');
-                deleteBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    if (confirm('정말로 이 후기를 삭제하시겠습니까?')) {
-                        try {
-                            const deleteResponse = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
-                                method: 'DELETE',
-                            });
-                            if (!deleteResponse.ok) throw new Error('삭제에 실패했습니다.');
-                            
-                            alert('후기가 삭제되었습니다.');
-                            window.location.href = 'review.html';
-                        } catch (err) {
-                            alert(err.message);
-                        }
-                    }
-                });
-
-            } catch (error) {
-                document.getElementById('view-mode').innerHTML = `<p class="text-center text-red-500">${error.message}</p>`;
-            }
-        });
-    </script>
+    <script src="review_detail.js"></script>
 </body>
 </html>
