@@ -118,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
     "제6곡 옥류동": {
       image_url: "./images/muhuel/muhuel_6.png",
       decks: [
-        { id: "muhuel6-1", name: "평상 1", top: "41%", left: "24%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel6-2", name: "평상 2", top: "41%", left: "36%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel6-3", name: "평상 3", top: "39%", left: "46%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel6-4", name: "평상 4", top: "38%", left: "59%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel6-5", name: "평상 5", top: "38%", left: "71%", width: "7%", height: "6%", capacity: 4, isBooked: false }
+        { id: "muhuel6-1", name: "평상 1", top: "39.8%", left: "24%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel6-2", name: "평상 2", top: "40%", left: "36%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel6-3", name: "평상 3", top: "38.6%", left: "46%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel6-4", name: "평상 4", top: "37.8%", left: "59.2%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel6-5", name: "평상 5", top: "37.8%", left: "71.5%", width: "7%", height: "6%", capacity: 4, isBooked: false }
       ]
     }
   };
