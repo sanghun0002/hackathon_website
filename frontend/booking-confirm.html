@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>예약 정보 확인 및 입력</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <header class="main-header"><div class="logo">쉬어가~ 계곡</div></header>
+    <main class="booking-container">
+        <h1 class="text-3xl font-bold text-center mb-6">최종 예약 정보 확인</h1>
+        <div id="final-booking-summary" class="bg-white p-6 rounded-lg shadow mb-6">
+            <p class="text-center text-gray-500">예약 정보를 불러오는 중...</p>
+        </div>
+        <form id="confirm-form" class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">예약자 정보를 입력해주세요.</h2>
+            <div class="mb-4">
+                <label for="user-name" class="block mb-2">이름</label>
+                <input type="text" id="user-name" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="user-phone" class="block mb-2">전화번호</label>
+                <input type="tel" id="user-phone" class="w-full p-2 border rounded" placeholder="010-1234-5678" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-full">예약 완료하기</button>
+        </form>
+    </main>
+    <script src="booking-final.js"></script>
+</body>
+</html>
