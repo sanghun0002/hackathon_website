@@ -19,17 +19,18 @@
             <div class="step active"><span>구역 선택</span></div>
             <div class="step"><span>평상 선택</span></div>
         </div>
-    </main>
-    <div class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
-        <div class="text-center mb-6">
-            <p class="text-gray-600">
-                <span id="selected-valley-display" class="font-bold text-blue-600"></span>의 구역을 선택해주세요.
-            </p>
+            <div class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-center mb-6">
+                <p class="text-gray-600">
+                    <span id="selected-valley-display" class="font-bold text-blue-600"></span>의 구역을 선택해주세요.
+                </p>
+            </div>
+            <div id="image-map-container" class="relative">
+                <p id="loading-message" class="text-center text-gray-500">지도를 불러오는 중...</p>
+            </div>  
         </div>
-        <div id="image-map-container" class="relative">
-            <p id="loading-message" class="text-center text-gray-500">지도를 불러오는 중...</p>
-        </div>  
-    </div>
+    </main>
+
     <div class="buttons">
         <a href="booking-step2.html" class="btn btn-secondary">← 이전</a>
         <button id="next-step-btn" class="btn btn-primary" disabled>다음 →</button>
