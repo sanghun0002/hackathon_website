@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "5-1", name: "평상 1", top: "67.5%", left: "38%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "5-2", name: "평상 2", top: "60%", left: "50.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "5-3", name: "평상 3", top: "53%", left: "59.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "5-4", name: "평상 4", top: "47%", left: "67%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "5-4", name: "평상 4", top: "47%", left: "69%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "5-5", name: "평상 5", top: "43.5%", left: "76%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "5-6", name: "평상 6", top: "36.5%", left: "85%", width: "6%", height: "6%", capacity: 6, isBooked: false }
       ]
