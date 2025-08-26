@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
       decks: [
         { id: "2-1", name: "평상 1", top: "40%", left: "16%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-2", name: "평상 2", top: "37%", left: "25%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-3", name: "평상 3", top: "38%", left: "30%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-3", name: "평상 3", top: "38%", left: "31.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-4", name: "평상 4", top: "42%", left: "38.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-5", name: "평상 5", top: "45%", left: "48%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-5", name: "평상 5", top: "46%", left: "47%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-6", name: "평상 6", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-7", name: "평상 7", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-8", name: "평상 8", top: "65%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: false }
