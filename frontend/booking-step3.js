@@ -24,19 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  let selectedValley = localStorage.getItem('selectedValley');
+ let selectedValley = localStorage.getItem('selectedValley');
   const displayElement = document.getElementById('selected-valley-display');
   const mapContainer = document.getElementById('image-map-container');
   const nextBtn = document.getElementById('next-step-btn');
   const loadingMsg = document.getElementById('loading-message');
 
+  // 보정(공백 차이 등)
   if (!allValleyData[selectedValley]) {
     const key = Object.keys(allValleyData).find(
       k => k.replace(/\s/g, '') === (selectedValley || '').replace(/\s/g, '')
     );
     if (key) selectedValley = key;
   }
-
   if (!selectedValley || !allValleyData[selectedValley]) {
     alert('이전 단계에서 유효한 계곡을 선택해주세요.');
     window.location.href = 'booking-step2.html';
@@ -46,20 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const valley = allValleyData[selectedValley];
   displayElement.textContent = selectedValley;
 
+  // 선택 상태 관리
+  let selectedSectionName = null;
+  let prevSelectedBtn = null;
+
+  // 다음 버튼 클릭 시에만 이동
+  nextBtn.addEventListener('click', () => {
+    if (!selectedSectionName) {
+      alert('구역을 먼저 선택해주세요.');
+      return;
+    }
+    localStorage.setItem('selectedSection', selectedSectionName);
+    window.location.href = 'booking-step4.html';
+  });
+
   const img = new Image();
   img.id = 'valley-map-image';
   img.alt = `${selectedValley} 구역 지도`;
   img.src = valley.image_url;
   img.className = 'block max-w-full h-auto select-none';
 
-  // 2) 이미지 로드 성공 시
   img.onload = () => {
-    // 로딩 메시지 제거 (있을 때만)
     if (loadingMsg) loadingMsg.remove();
 
-    // 클릭 영역 생성
     valley.sections.forEach(section => {
-      // 접근성과 포커스를 위해 button 사용 권장
       const area = document.createElement('button');
       area.type = 'button';
       area.className = 'section-clickable-area';
@@ -72,29 +82,27 @@ document.addEventListener('DOMContentLoaded', () => {
       area.style.left = section.left;
       area.style.width = section.width;
       area.style.height = section.height;
-
-      // (선택) 좌표를 중심 기준으로 쓸 경우 주석 해제
       area.style.transform = 'translate(-50%, -50%)';
-
-      // 항상 이미지 위로
       area.style.zIndex = '10';
 
-      // 클릭 핸들러
+      // 클릭 시: 선택만 저장/강조 + 다음 버튼 활성화
       area.addEventListener('click', () => {
-        localStorage.setItem('selectedSection', section.name);
+        if (prevSelectedBtn) {
+          prevSelectedBtn.classList.remove('selected');
+          prevSelectedBtn.setAttribute('aria-pressed', 'false');
+        }
+        area.classList.add('selected');
+        area.setAttribute('aria-pressed', 'true');
+        prevSelectedBtn = area;
 
-        // 즉시 이동 패턴
-        window.location.href = 'booking-step4.html';
-
-        // 버튼 패턴을 쓸 경우:
-        // if (nextBtn) nextBtn.disabled = false;
+        selectedSectionName = section.name;
+        nextBtn.disabled = false;
       });
 
       mapContainer.appendChild(area);
     });
   };
 
-  // 3) 이미지 로드 실패 시
   img.onerror = () => {
     if (loadingMsg) {
       loadingMsg.textContent = '지도를 불러오지 못했습니다. 이미지 경로를 확인해주세요.';
@@ -104,6 +112,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // 컨테이너는 이미 HTML에서 relative, 이미지만 붙이면 됨
   mapContainer.appendChild(img);
 });
