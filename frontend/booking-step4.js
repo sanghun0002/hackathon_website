@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
       image_url: "./images/samgyeri/samgyeri_part2.png",
       decks: [
         { id: "2-1", name: "평상 1", top: "40%", left: "17%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-2", name: "평상 2", top: "37%", left: "20%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-3", name: "평상 3", top: "38%", left: "22%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-2", name: "평상 2", top: "37%", left: "24%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-3", name: "평상 3", top: "38%", left: "29%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-4", name: "평상 4", top: "43%", left: "38.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-5", name: "평상 5", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-6", name: "평상 6", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
