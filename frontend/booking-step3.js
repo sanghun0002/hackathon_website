@@ -15,13 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     "삼계리 계곡": {
       image_url: "/images/map_samgyeri.png",
       sections: [
-            { name: "삼계리 1구역", top: "13%", left: "75%", width: "5%", height: "5%" },
-            { name: "삼계리 2구역", top: "20%", left: "72%", width: "5%", height: "5%" },
-            { name: "삼계리 3구역", top: "18%", left: "57%", width: "5%", height: "5%" },
-            { name: "삼계리 4구역", top: "28%", left: "53%", width: "5%", height: "5%" },
-            { name: "삼계리 5구역", top: "40%", left: "50%", width: "5%", height: "5%" },
-            { name: "삼계리 6구역", top: "78%", left: "23%", width: "5%", height: "5%" },
-            { name: "삼계리 7구역", top: "87%", left: "13%", width: "5%", height: "5%" }
+            { name: "삼계리 1구역", top: "86%", left: "61%", width: "5%", height: "5%" },
+            { name: "삼계리 2구역", top: "74%", left: "58%", width: "5%", height: "5%" },
+            { name: "삼계리 3구역", top: "49%", left: "55%", width: "5%", height: "5%" },
+            { name: "삼계리 4구역", top: "41%", left: "46%", width: "5%", height: "5%" },
+            { name: "삼계리 5구역", top: "38%", left: "34%", width: "5%", height: "5%" }
       ]
     }
   };
