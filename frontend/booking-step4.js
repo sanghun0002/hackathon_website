@@ -74,13 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
     "제2곡 한강대": {
       image_url: "./images/muhuel/muhuel_2.png",
       decks: [
-        { id: "muhuel2-1", name: "평상 1", top: "49%", left: "20%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-2", name: "평상 2", top: "47%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-3", name: "평상 3", top: "50%", left: "40%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-4", name: "평상 4", top: "49%", left: "50%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-5", name: "평상 5", top: "50%", left: "60%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-6", name: "평상 6", top: "53%", left: "70%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-7", name: "평상 7", top: "55%", left: "80%", width: "6%", height: "6%", capacity: 8, isBooked: false }
+        { id: "muhuel2-1", name: "평상 1", top: "49%", left: "20%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-2", name: "평상 2", top: "47%", left: "32%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-3", name: "평상 3", top: "48%", left: "43%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-4", name: "평상 4", top: "47%", left: "53%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-5", name: "평상 5", top: "49%", left: "65%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-6", name: "평상 6", top: "51%", left: "75%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-7", name: "평상 7", top: "52%", left: "87%", width: "7%", height: "6%", capacity: 8, isBooked: false }
       ]
     },
     "제3곡 무학정": {
