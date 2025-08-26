@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 💻 백엔드 서버 주소를 여기에 설정 ---
     // PC에서 실행 중인 ngrok 주소나 IP 주소를 입력하세요.
     // 예시: const backendUrl = 'https://1a2b-3c4d.ngrok-free.app/predict';
-    const backendUrl = '여기에_백엔드_서버_주소를_입력하세요/predict';
+    const backendUrl = 'https://image-analyzer-wduj.onrender.com/predict';
 
     // 사진을 선택(촬영)하면 미리보기를 보여주는 기능
     if (imageInput) {
