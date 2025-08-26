@@ -24,15 +24,15 @@
         <!-- 공지사항 상세 내용 -->
         <main class="bg-white p-8 rounded-lg shadow-md">
             <!-- 제목 -->
-            <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4">우천시 예약 취소 정책</h1>
+            <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4"></h1>
             
             <!-- 작성자, 날짜, 조회수 정보 -->
             <div class="detail-meta text-sm text-gray-500 flex items-center space-x-2 mb-6">
-                <span id="detail-department">운영팀</span>
+                <span id="detail-department"></span>
                 <span>|</span>
-                <span id="detail-date">2025-08-03</span>
+                <span id="detail-date"></span>
                 <span>|</span>
-                <span>조회수 <span id="detail-views">80</span></span>
+                <span>조회수 <span id="detail-views"></span></span>
             </div>
             
             <!-- 구분선 -->
@@ -40,9 +40,6 @@
             
             <!-- 본문 내용 -->
             <div class="detail-content text-gray-800 leading-relaxed py-8" id="detail-content">
-                <p>기상청 예보 기준, 방문 예정일의 강수 확률이 70% 이상일 경우 위약금 없이 예약을 취소할 수 있습니다.</p>
-                <p class="mt-4">취소는 방문 하루 전까지 가능합니다.</p>
-                <p class="mt-4">자세한 내용은 유선으로 문의해주시기 바랍니다.</p>
             </div>
             
             <!-- 구분선 -->
@@ -63,32 +60,9 @@
         </main>
     </div>
 
-    <!-- 실제 데이터를 불러오는 스크립트 -->
-    <script>
-        // 이 스크립트는 예시이며, 실제로는 notice_detail.js에서
-        // URL 파라미터 등을 이용해 서버에서 데이터를 가져와야 합니다.
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const noticeId = urlParams.get('id'); // 예: notice_detail.html?id=1
-
-            // noticeId를 기반으로 서버에 데이터를 요청하고 아래 내용을 채웁니다.
-            // 지금은 예시 데이터를 직접 넣습니다.
-            const noticeData = {
-                title: "우천시 예약 취소 정책",
-                department: "운영팀",
-                date: "2025-08-03",
-                views: 80,
-                content: `<p>기상청 예보 기준, 방문 예정일의 강수 확률이 70% 이상일 경우 위약금 없이 예약을 취소할 수 있습니다.</p>
-                          <p class="mt-4">취소는 방문 하루 전까지 가능합니다.</p>
-                          <p class="mt-4">자세한 내용은 유선으로 문의해주시기 바랍니다.</p>`
-            };
-            
-            document.getElementById('detail-title').textContent = noticeData.title;
-            document.getElementById('detail-department').textContent = noticeData.department;
-            document.getElementById('detail-date').textContent = noticeData.date;
-            document.getElementById('detail-views').textContent = noticeData.views;
-            document.getElementById('detail-content').innerHTML = noticeData.content;
-        });
-    </script>
+    <!-- ▼▼▼ [수정된 부분] ▼▼▼ -->
+    <!-- 기존의 인라인 <script> 블록을 삭제하고, 외부 스크립트 파일을 연결합니다. -->
+    <script src="notice_detail.js"></script>
+    
 </body>
 </html>
