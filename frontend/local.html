@@ -29,6 +29,12 @@
             border-radius: 0.5rem; 
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
         }
+
+        /* [수정된 부분] 지도 컨테이너를 Flexbox로 만들어 내부 지도를 중앙 정렬 */
+        #map-container {
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex justify-center">
