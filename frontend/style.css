@@ -411,13 +411,15 @@ body {
 }
 /* booking-step4.css */
 .deck-dot {
-  border: 2px solid white;
+  border: none;
   border-radius: 9999px;
   transition: transform .15s, box-shadow .15s, background-color .15s, opacity .15s; }
 .deck-dot:focus {
   outline: none; box-shadow: 0 0 0 4px rgba(37,99,235,.25);}
+  .deck-dot.available {
+  background-color: rgba(16, 185, 129, 0.6); }
 .deck-dot.unavailable {
-  opacity: .55; filter: grayscale(35%);
+  background-color: rgba(156, 163, 175, 0.6);
   cursor: not-allowed;
   pointer-events: none; }
 .deck-dot.selected {
