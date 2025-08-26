@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "2-3", name: "평상 3", top: "38%", left: "31.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-4", name: "평상 4", top: "42%", left: "38.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
         { id: "2-5", name: "평상 5", top: "46%", left: "46.5%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-6", name: "평상 6", top: "48%", left: "49%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-7", name: "평상 7", top: "50%", left: "52%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-8", name: "평상 8", top: "53%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: false }
+        { id: "2-6", name: "평상 6", top: "49%", left: "53%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-7", name: "평상 7", top: "52%", left: "58%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-8", name: "평상 8", top: "55%", left: "62%", width: "6%", height: "6%", capacity: 4, isBooked: false }
       ]
     },
     "삼계리 3구역": {
