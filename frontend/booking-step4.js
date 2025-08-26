@@ -182,6 +182,6 @@ sectionData.decks.forEach(deck => {
       alert('평상을 먼저 선택해주세요.');
       return;
     }
-    window.location.href = 'booking-payment.html';
+    window.location.href = 'booking-confirm.html';
   });
 });
