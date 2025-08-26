@@ -6,9 +6,9 @@
     <title>내 주변 맛집, 놀거리 & 숙박 찾기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- autoload=false 파라미터를 추가하여 수동으로 로드하도록 변경 -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=18a27bfefd7b461ecd35f7533947ff19&libraries=services&autoload=false"></script>
     <style>
+        /* 페이지 기본 여백 제거 및 전체 너비 설정 */
         html, body {
             width: 100%;
             margin: 0;
@@ -21,7 +21,14 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #map { width: 200%; height: 800px; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        
+        /* 지도 너비를 100%로, 높이를 600px로 수정 */
+        #map { 
+            width: 100%; 
+            height: 600px; 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex justify-center">
@@ -42,7 +49,6 @@
                 </button>
             </div>
 
-            <!-- 카테고리 선택 버튼 -->
             <div id="category-selector" class="flex flex-wrap justify-center gap-4 mb-8 hidden">
                 <button data-category="맛집" class="category-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition">🍜 맛집</button>
                 <button data-category="놀거리" class="category-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition">🎡 놀거리</button>
@@ -242,7 +248,6 @@
 
                 placeList.appendChild(card);
                 
-                // --- 수정된 부분: 이미지 사이즈 비율 수정 ---
                 let markerImageSrc = 'images/marker_red.png';
                 if (place.category === '맛집') {
                     markerImageSrc = 'images/marker_red.png';
@@ -252,7 +257,7 @@
                     markerImageSrc = 'images/marker_green.png';
                 }
 
-                const imageSize = new kakao.maps.Size(29, 42); // 올바른 비율로 수정
+                const imageSize = new kakao.maps.Size(29, 42);
                 const markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize);
 
                 const marker = new kakao.maps.Marker({
