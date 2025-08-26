@@ -43,10 +43,10 @@ let notices = [
 ];
 let nextNoticeId = 4;
 
-// 후기 데이터 (예시 데이터 포함)
+// 후기 데이터 (password 필드 추가)
 let reviews = [
-    { id: 1, title: "계곡 바로 앞이라 너무 좋았어요!", author: "김철수", rating: 5, date: "2025-08-15", views: 45, content: "물놀이하고 바로 들어와서 쉴 수 있어서 최고였습니다.", images: [] },
-    { id: 2, title: "가족들과 좋은 시간 보냈습니다.", author: "이영희", rating: 4, date: "2025-08-12", views: 88, content: "부모님 모시고 갔는데 다들 만족하셨어요.", images: [] },
+    { id: 1, title: "계곡 바로 앞이라 너무 좋았어요!", author: "김철수", rating: 5, date: "2025-08-15", views: 45, content: "물놀이하고 바로 들어와서 쉴 수 있어서 최고였습니다.", images: [], password: "1111" },
+    { id: 2, title: "가족들과 좋은 시간 보냈습니다.", author: "이영희", rating: 4, date: "2025-08-12", views: 88, content: "부모님 모시고 갔는데 다들 만족하셨어요.", images: [], password: "2222" },
 ];
 let nextReviewId = 3;
 
@@ -133,18 +133,22 @@ app.delete('/api/notices/:id', (req, res) => {
 
 
 // ===============================================================
-// ===== 후기(Review) API =====
+// ===== 후기(Review) API (비밀번호 기능 추가됨) =====
 // ===============================================================
 
-// GET: 모든 후기 목록 조회
+// GET: 모든 후기 목록 조회 (보안을 위해 password 필드 제외)
 app.get('/api/reviews', (req, res) => {
     const sortedReviews = [...reviews].sort((a, b) => b.id - a.id);
-    res.json({ reviews: sortedReviews });
+    const safeReviews = sortedReviews.map(({ password, ...review }) => review);
+    res.json({ reviews: safeReviews });
 });
 
-// POST: 새 후기 작성 (이미지 포함)
+// POST: 새 후기 작성 (password 필드 추가)
 app.post('/api/reviews', upload.array('images', 5), (req, res) => {
-    const { title, author, rating, content } = req.body;
+    const { title, author, rating, content, password } = req.body;
+    if (!password) {
+        return res.status(400).json({ message: '비밀번호는 필수입니다.' });
+    }
     const images = req.files ? req.files.map(file => file.path) : [];
 
     const newReview = {
@@ -154,47 +158,45 @@ app.post('/api/reviews', upload.array('images', 5), (req, res) => {
         date: new Date().toISOString().split('T')[0],
         views: 0,
         content,
-        images
+        images,
+        password
     };
     reviews.unshift(newReview);
     res.status(201).json(newReview);
 });
 
-// GET: 특정 ID의 후기 상세 조회
+// GET: 특정 ID의 후기 상세 조회 (보안을 위해 password 필드 제외)
 app.get('/api/reviews/:id', (req, res) => {
     const review = reviews.find(r => r.id === parseInt(req.params.id));
     if (review) {
         review.views++;
-        res.json(review);
+        const { password, ...safeReview } = review;
+        res.json(safeReview);
     } else {
         res.status(404).json({ message: '후기를 찾을 수 없습니다.' });
     }
 });
 
-// PUT: 특정 ID의 후기 수정 (파일과 텍스트 동시 처리)
+// PUT: 특정 ID의 후기 수정 (기존과 동일)
 app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
     const reviewIndex = reviews.findIndex(r => r.id === parseInt(req.params.id));
-    
     if (reviewIndex === -1) {
         return res.status(404).json({ message: '수정할 후기를 찾을 수 없습니다.' });
     }
 
     const { title, author, rating, content, imagesToDelete } = req.body;
     
-    // 1. 기존 이미지에서 삭제할 이미지 제거
     let currentImages = reviews[reviewIndex].images;
     if (imagesToDelete) {
         const deleteList = JSON.parse(imagesToDelete);
         currentImages = currentImages.filter(url => !deleteList.includes(url));
     }
 
-    // 2. 새로 업로드된 이미지 추가
     if (req.files) {
         const newImageUrls = req.files.map(file => file.path);
         currentImages = [...currentImages, ...newImageUrls];
     }
 
-    // 3. 최종 데이터 업데이트
     reviews[reviewIndex] = {
         ...reviews[reviewIndex],
         title,
@@ -207,16 +209,36 @@ app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
     res.json(reviews[reviewIndex]);
 });
 
-// DELETE: 특정 ID의 후기 삭제
+// DELETE: 특정 ID의 후기 삭제 (비밀번호 확인 로직 추가)
 app.delete('/api/reviews/:id', (req, res) => {
+    const { password } = req.body;
     const reviewIndex = reviews.findIndex(r => r.id === parseInt(req.params.id));
-    if (reviewIndex !== -1) {
-        reviews.splice(reviewIndex, 1);
-        res.status(200).json({ message: '삭제 완료' });
+
+    if (reviewIndex === -1) {
+        return res.status(404).json({ message: '삭제할 후기를 찾을 수 없습니다.' });
+    }
+    if (reviews[reviewIndex].password !== password) {
+        return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+    }
+    
+    reviews.splice(reviewIndex, 1);
+    res.status(200).json({ message: '삭제 완료' });
+});
+
+// [신규] 수정 전 비밀번호 확인 API
+app.post('/api/reviews/:id/verify', (req, res) => {
+    const { password } = req.body;
+    const review = reviews.find(r => r.id === parseInt(req.params.id));
+    if (!review) {
+        return res.status(404).json({ message: '후기를 찾을 수 없습니다.' });
+    }
+    if (review.password === password) {
+        res.status(200).json({ success: true, message: '인증 성공' });
     } else {
-        res.status(404).json({ message: '후기를 찾을 수 없습니다.' });
+        res.status(403).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
     }
 });
+
 
 // ===============================================================
 // ===== 서버 실행 =====
