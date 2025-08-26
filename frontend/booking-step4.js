@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
       image_url: "./images/samgyeri/samgyeri_part1.png",
       decks: [
         { id: "1-1", name: "평상 1", top: "60%", left: "43%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "1-2", name: "평상 2", top: "65%", left: "54%", width: "6%", height: "6%", capacity: 4, isBooked: true },
+        { id: "1-2", name: "평상 2", top: "64.5%", left: "54%", width: "6%", height: "6%", capacity: 4, isBooked: true },
         { id: "1-3", name: "평상 3", top: "64%", left: "66%", width: "6%", height: "6%", capacity: 6, isBooked: false }
       ]
     },
@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
       image_url: "./images/samgyeri/samgyeri_part2.png",
       decks: [
         { id: "2-1", name: "평상 1", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "2-2", name: "평상 2", top: "65%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: false }
+        { id: "2-2", name: "평상 2", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-3", name: "평상 3", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-4", name: "평상 4", top: "48%", left: "40%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-5", name: "평상 5", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-6", name: "평상 6", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-7", name: "평상 7", top: "40%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "2-8", name: "평상 8", top: "65%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: false }
       ]
     },
     "삼계리 3구역": {
