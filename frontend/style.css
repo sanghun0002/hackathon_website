@@ -423,9 +423,6 @@ body {
   transition: transform .15s, box-shadow .15s, background-color .15s, opacity .15s; }
 .deck-dot:focus {
   outline: none; box-shadow: 0 0 0 4px rgba(37,99,235,.25);}
-
-.deck-dot.available { }
-
 .deck-dot.unavailable {
   opacity: .55; filter: grayscale(35%);
   cursor: not-allowed; /* X 모양 커서 */
