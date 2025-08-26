@@ -103,6 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "muhuel4-4", name: "평상 4", top: "43.5%", left: "59.8%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel4-5", name: "평상 5", top: "45.6%", left: "70.8%", width: "7%", height: "6%", capacity: 4, isBooked: false }
       ]
+    },
+    "제5곡 사인암": {
+      image_url: "./images/muhuel/muhuel_5.png",
+      decks: [
+        { id: "muhuel5-1", name: "평상 1", top: "45%", left: "29.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel5-2", name: "평상 2", top: "46%", left: "40%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel5-3", name: "평상 3", top: "44.2%", left: "49.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel5-4", name: "평상 4", top: "43.5%", left: "59.8%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel5-5", name: "평상 5", top: "45.6%", left: "70.8%", width: "7%", height: "6%", capacity: 4, isBooked: false }
+      ]
     }
   };
 
