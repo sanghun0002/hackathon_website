@@ -1,28 +1,20 @@
+// review_write.js (수정)
 document.addEventListener('DOMContentLoaded', () => {
-    // 실제 운영 서버 주소로 적용했습니다.
     const API_BASE_URL = 'https://o70albxd7n.onrender.com';
-
     const form = document.getElementById('review-form');
     const imageInput = document.getElementById('images');
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const ratingInput = document.querySelector('input[name="rating"]:checked');
-        if (!ratingInput) {
-            return alert('평점을 선택해주세요.');
-        }
-
-        const passwordInput = document.getElementById('password');
-        if (!passwordInput.value) {
-            return alert('비밀번호를 입력해주세요.');
-        }
+        if (!ratingInput) return alert('평점을 선택해주세요.');
 
         const formData = new FormData();
         formData.append('title', document.getElementById('title').value);
         formData.append('author', document.getElementById('author').value);
         formData.append('rating', ratingInput.value);
         formData.append('content', document.getElementById('content').value);
-        formData.append('password', passwordInput.value);  // 비밀번호 포함
+        formData.append('password', document.getElementById('password').value); // password 추가
 
         for (const file of imageInput.files) {
             formData.append('images', file);
