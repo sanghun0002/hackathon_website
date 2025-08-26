@@ -82,6 +82,7 @@
         let polygons = [];
         let markers = [];
         let selectedValleyInfo = null; // 선택된 계곡 정보를 임시 저장할 변수
+        let previousSelectedItem = null;
 
         // '다음' 버튼 클릭 이벤트 리스너 추가
         nextStepBtn.addEventListener('click', () => {
@@ -188,6 +189,7 @@
 
             selectedRegionNameSpan.textContent = regionName;
             valleyList.innerHTML = '';
+            previousSelectedItem = null;
 
             const valleys = valleyData[regionName];
             if (valleys && valleys.length > 0) {
@@ -203,9 +205,16 @@
 
                     // 리스트 아이템 클릭 시
                     li.onclick = () => {
-                        // 선택된 계곡 정보를 변수에 임시 저장
+                        // 이전에 선택된 항목의 클래스 제거
+                        if (previousSelectedItem) {
+                            previousSelectedItem.classList.remove('selected');
+                        }
+                        // 현재 클릭된 항목에 'selected' 클래스 추가
+                        li.classList.add('selected');
+                        // 현재 항목을 이전 선택 항목으로 저장
+                        previousSelectedItem = li;
+
                         selectedValleyInfo = { region: regionName, name: valley.name };
-                        // '다음' 버튼 활성화
                         nextStepBtn.disabled = false;
                     };
 
