@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (confirm('정말로 이 후기를 삭제하시겠습니까?')) {
                 try {
-                    const deleteResponse = await fetch(`${API_BE_URL}/api/reviews/${reviewId}`, {
+                    const deleteResponse = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password: password })
