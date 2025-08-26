@@ -12,11 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return alert('평점을 선택해주세요.');
         }
 
+        const passwordInput = document.getElementById('password');
+        if (!passwordInput.value) {
+            return alert('비밀번호를 입력해주세요.');
+        }
+
         const formData = new FormData();
         formData.append('title', document.getElementById('title').value);
         formData.append('author', document.getElementById('author').value);
         formData.append('rating', ratingInput.value);
         formData.append('content', document.getElementById('content').value);
+        formData.append('password', passwordInput.value);  // 비밀번호 포함
+
         for (const file of imageInput.files) {
             formData.append('images', file);
         }
