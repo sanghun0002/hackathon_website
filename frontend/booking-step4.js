@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "muhuel1-1", name: "평상 1", top: "45%", left: "30.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel1-2", name: "평상 2", top: "40%", left: "42%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel1-3", name: "평상 3", top: "38.5%", left: "55%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-4", name: "평상 4", top: "37.5%", left: "65%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-5", name: "평상 5", top: "37%", left: "78%", width: "7%", height: "6%", capacity: 8, isBooked: false }
+        { id: "muhuel1-4", name: "평상 4", top: "37.5%", left: "66.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel1-5", name: "평상 5", top: "37%", left: "78.5%", width: "7%", height: "6%", capacity: 8, isBooked: false }
       ]
     },
     "제2곡 봉비암": {
