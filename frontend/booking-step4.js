@@ -64,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
     "제1곡 봉비암": {
       image_url: "./images/muhuel/muhuel_1.png",
       decks: [
-        { id: "muhuel1-1", name: "평상 1", top: "30%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-2", name: "평상 2", top: "50%", left: "50%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-3", name: "평상 3", top: "30%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-4", name: "평상 4", top: "50%", left: "50%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel1-5", name: "평상 5", top: "70%", left: "70%", width: "6%", height: "6%", capacity: 8, isBooked: false }
+        { id: "muhuel1-1", name: "평상 1", top: "45%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel1-2", name: "평상 2", top: "40%", left: "38%", width: "6%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel1-3", name: "평상 3", top: "40%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel1-4", name: "평상 4", top: "35%", left: "80%", width: "6%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel1-5", name: "평상 5", top: "35%", left: "90%", width: "6%", height: "6%", capacity: 8, isBooked: false }
       ]
     },
     "제2곡 봉비암": {
