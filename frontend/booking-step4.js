@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     "삼계리 1구역": {
       image_url: "./images/samgyeri/samgyeri_part1.png",
       decks: [
-        { id: "1-1", name: "평상 1", top: "60%", left: "42%", width: "6%", height: "6%", capacity: 4, isBooked: false },
-        { id: "1-2", name: "평상 2", top: "65%", left: "55%", width: "6%", height: "6%", capacity: 4, isBooked: true },
-        { id: "1-3", name: "평상 3", top: "65%", left: "66%", width: "6%", height: "6%", capacity: 6, isBooked: false }
+        { id: "1-1", name: "평상 1", top: "60%", left: "43%", width: "6%", height: "6%", capacity: 4, isBooked: false },
+        { id: "1-2", name: "평상 2", top: "65%", left: "54%", width: "6%", height: "6%", capacity: 4, isBooked: true },
+        { id: "1-3", name: "평상 3", top: "64%", left: "66%", width: "6%", height: "6%", capacity: 6, isBooked: false }
       ]
     },
     "삼계리 2구역": {
