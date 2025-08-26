@@ -97,13 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
     "제4곡 임압": {
       image_url: "./images/muhuel/muhuel_4.png",
       decks: [
-        { id: "muhuel4-1", name: "평상 1", top: "49%", left: "20%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-2", name: "평상 2", top: "47%", left: "31%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-3", name: "평상 3", top: "47.5%", left: "43%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-4", name: "평상 4", top: "46.5%", left: "53%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-5", name: "평상 5", top: "47%", left: "64.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-6", name: "평상 6", top: "50%", left: "76%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel4-7", name: "평상 7", top: "52.5%", left: "87%", width: "7%", height: "6%", capacity: 8, isBooked: false }
+        { id: "muhuel4-1", name: "평상 1", top: "46%", left: "30%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel4-2", name: "평상 2", top: "47%", left: "40%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel4-3", name: "평상 3", top: "46%", left: "50%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel4-4", name: "평상 4", top: "44%", left: "50%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel4-5", name: "평상 5", top: "46%", left: "55%", width: "7%", height: "6%", capacity: 4, isBooked: false }
       ]
     }
   };
