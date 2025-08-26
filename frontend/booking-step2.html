@@ -51,168 +51,189 @@
     </div>
 
     <script>
-    // --- 수정된 부분: 경상북도 및 삼계리 계곡 추가 ---
-    const valleyData = {
-        "서울특별시": [
-            { name: "우이동 계곡", address: "서울 강북구 우이동", lat: 37.6631, lng: 127.0123 },
-            { name: "진관사 계곡", address: "서울 은평구 진관동", lat: 37.6369, lng: 126.9412 }
-        ],
-        "경기도": [
-            { name: "송추 계곡", address: "경기 양주시 장흥면", lat: 37.7311, lng: 127.0345 },
-            { name: "용추 계곡", address: "경기 가평군 가평읍", lat: 37.8683, lng: 127.5021 },
-            { name: "어비 계곡", address: "경기 가평군 설악면", lat: 37.7295, lng: 127.4987 }
-        ],
-        "강원도": [
-            { name: "무릉 계곡", address: "강원 동해시 삼화동", lat: 37.4583, lng: 129.0221 },
-            { name: "흥정 계곡", address: "강원 평창군 봉평면", lat: 37.6251, lng: 128.4012 }
-        ],
-        "경상북도": [
-            { name: "삼계리 계곡", address: "경북 포항시 북구 죽장면", lat: 36.1025, lng: 129.2236 },
-            { name: "무흘 계곡", address: "경북 김천시 남면", lat: 36.1447, lng: 128.0593 }
-        ]
-    };
-    // --- 여기까지 수정 ---
-    
-    const mapContainer = document.getElementById('map');
-    const selectedRegionNameSpan = document.getElementById('selected-region-name');
-    const valleyList = document.getElementById('valley-list');
-    let map;
-    let polygons = [];
-    let markers = [];
-    
-    kakao.maps.load(() => {
-        const mapOption = {
-            center: new kakao.maps.LatLng(36.5, 127.8),
-            level: 12
+        // --- 기존 데이터 유지 ---
+        const valleyData = {
+            "서울특별시": [
+                { name: "우이동 계곡", address: "서울 강북구 우이동", lat: 37.6631, lng: 127.0123 },
+                { name: "진관사 계곡", address: "서울 은평구 진관동", lat: 37.6369, lng: 126.9412 }
+            ],
+            "경기도": [
+                { name: "송추 계곡", address: "경기 양주시 장흥면", lat: 37.7311, lng: 127.0345 },
+                { name: "용추 계곡", address: "경기 가평군 가평읍", lat: 37.8683, lng: 127.5021 },
+                { name: "어비 계곡", address: "경기 가평군 설악면", lat: 37.7295, lng: 127.4987 }
+            ],
+            "강원도": [
+                { name: "무릉 계곡", address: "강원 동해시 삼화동", lat: 37.4583, lng: 129.0221 },
+                { name: "흥정 계곡", address: "강원 평창군 봉평면", lat: 37.6251, lng: 128.4012 }
+            ],
+            "경상북도": [
+                { name: "삼계리 계곡", address: "경북 포항시 북구 죽장면", lat: 36.1025, lng: 129.2236 },
+                { name: "무흘 계곡", address: "경북 김천시 남면", lat: 36.1447, lng: 128.0593 }
+            ]
         };
-        map = new kakao.maps.Map(mapContainer, mapOption);
-    
-        map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
-        map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
-    
-        fetch('./skorea-provinces.json')
-            .then(response => response.json())
-            .then(geojson => {
-                const areas = geojson.features.map(feature => {
-                    const coords = feature.geometry.coordinates;
-                    let paths = [];
-    
-                    if (feature.geometry.type === "Polygon") {
-                        paths = getPathFromCoords(coords);
-                    } else if (feature.geometry.type === "MultiPolygon") {
-                        coords.forEach(polygonCoords => {
-                            paths.push(...getPathFromCoords(polygonCoords));
-                        });
+        // --- 여기까지 기존 데이터 ---
+
+        const mapContainer = document.getElementById('map');
+        const selectedRegionNameSpan = document.getElementById('selected-region-name');
+        const valleyList = document.getElementById('valley-list');
+        const nextStepBtn = document.getElementById('next-step-btn'); // 다음 버튼
+
+        let map;
+        let polygons = [];
+        let markers = [];
+        let selectedValleyInfo = null; // 선택된 계곡 정보를 임시 저장할 변수
+
+        // '다음' 버튼 클릭 이벤트 리스너 추가
+        nextStepBtn.addEventListener('click', () => {
+            if (selectedValleyInfo) {
+                // 선택된 정보가 있으면 localStorage에 저장하고 페이지 이동
+                localStorage.setItem('selectedRegion', selectedValleyInfo.region);
+                localStorage.setItem('selectedValley', selectedValleyInfo.name);
+                window.location.href = 'booking-step3.html';
+            } else {
+                alert('계곡을 먼저 선택해주세요.');
+            }
+        });
+
+        kakao.maps.load(() => {
+            const mapOption = {
+                center: new kakao.maps.LatLng(36.5, 127.8),
+                level: 12
+            };
+            map = new kakao.maps.Map(mapContainer, mapOption);
+
+            map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
+            map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+
+            fetch('./skorea-provinces.json')
+                .then(response => response.json())
+                .then(geojson => {
+                    const areas = geojson.features.map(feature => {
+                        const coords = feature.geometry.coordinates;
+                        let paths = [];
+
+                        if (feature.geometry.type === "Polygon") {
+                            paths = getPathFromCoords(coords);
+                        } else if (feature.geometry.type === "MultiPolygon") {
+                            coords.forEach(polygonCoords => {
+                                paths.push(...getPathFromCoords(polygonCoords));
+                            });
+                        }
+                        return { name: feature.properties.name, path: paths };
+                    });
+                    displayArea(areas);
+                })
+                .catch(error => {
+                    console.error('행정구역 데이터를 불러오는 데 실패했습니다:', error);
+                    mapContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 font-bold">지도 데이터를 불러오는 데 실패했습니다.</div>';
+                });
+        });
+
+        function getPathFromCoords(coords) {
+            const paths = [];
+            coords.forEach(ring => {
+                const path = ring.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
+                paths.push(path);
+            });
+            return paths;
+        }
+
+        function displayArea(areaData) {
+            const colors = ['#F9E2AF', '#A8D8EA', '#F1A7A7', '#B5EAD7', '#C7CEEA',
+                            '#FFD1DC', '#E0BBE4', '#FFDAC1', '#D4F0F0'];
+            let colorIndex = 0;
+            let selectedPolygon = null;
+
+            areaData.forEach((area) => {
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+
+                const polygon = new kakao.maps.Polygon({
+                    map: map,
+                    path: area.path,
+                    strokeWeight: 2,
+                    strokeColor: '#004c80',
+                    strokeOpacity: 0.8,
+                    fillColor: color,
+                    fillOpacity: 0.7
+                });
+                polygons.push(polygon);
+
+                kakao.maps.event.addListener(polygon, 'mouseover', () => {
+                    if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 1 });
+                    map.setCursor('pointer');
+                });
+
+                kakao.maps.event.addListener(polygon, 'mouseout', () => {
+                    if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 0.7 });
+                    map.setCursor('');
+                });
+
+                kakao.maps.event.addListener(polygon, 'click', () => {
+                    if (selectedPolygon) {
+                        selectedPolygon.setOptions({ fillOpacity: 0.7, strokeColor: '#004c80' });
                     }
-                    return { name: feature.properties.name, path: paths };
+                    polygon.setOptions({ fillOpacity: 1, strokeColor: '#ff0000' });
+                    selectedPolygon = polygon;
+                    updateValleyList(area.name);
                 });
-                displayArea(areas);
-            })
-            .catch(error => {
-                console.error('행정구역 데이터를 불러오는 데 실패했습니다:', error);
-                mapContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 font-bold">지도 데이터를 불러오는 데 실패했습니다.</div>';
             });
-    });
-    
-    function getPathFromCoords(coords) {
-        const paths = [];
-        coords.forEach(ring => {
-            const path = ring.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
-            paths.push(path);
-        });
-        return paths;
-    }
-    
-    function displayArea(areaData) {
-        const colors = ['#F9E2AF', '#A8D8EA', '#F1A7A7', '#B5EAD7', '#C7CEEA',
-                      '#FFD1DC', '#E0BBE4', '#FFDAC1', '#D4F0F0'];
-        let colorIndex = 0;
-        let selectedPolygon = null;
-    
-        areaData.forEach((area) => {
-            const color = colors[colorIndex % colors.length];
-            colorIndex++;
-    
-            const polygon = new kakao.maps.Polygon({
-                map: map,
-                path: area.path,
-                strokeWeight: 2,
-                strokeColor: '#004c80',
-                strokeOpacity: 0.8,
-                fillColor: color,
-                fillOpacity: 0.7
-            });
-            polygons.push(polygon);
-    
-            kakao.maps.event.addListener(polygon, 'mouseover', () => {
-                if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 1 });
-                map.setCursor('pointer');
-            });
-    
-            kakao.maps.event.addListener(polygon, 'mouseout', () => {
-                if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 0.7 });
-                map.setCursor('');
-            });
-    
-            kakao.maps.event.addListener(polygon, 'click', () => {
-                if (selectedPolygon) {
-                    selectedPolygon.setOptions({ fillOpacity: 0.7, strokeColor: '#004c80' });
-                }
-                polygon.setOptions({ fillOpacity: 1, strokeColor: '#ff0000' });
-                selectedPolygon = polygon;
-                updateValleyList(area.name);
-            });
-        });
-    }
-    
-    function updateValleyList(regionName) {
-        selectedRegionNameSpan.textContent = regionName;
-        valleyList.innerHTML = '';
-        removeMarkers();
-    
-        const valleys = valleyData[regionName];
-        if (valleys && valleys.length > 0) {
-            const bounds = new kakao.maps.LatLngBounds();
-    
-            valleys.forEach(valley => {
-                const li = document.createElement('li');
-                li.className = 'p-2 rounded valley-list-item';
-                li.textContent = valley.name;
-    
-                const markerPosition = new kakao.maps.LatLng(valley.lat, valley.lng);
-                bounds.extend(markerPosition);
-    
-                li.onclick = () => {
-                    localStorage.setItem('selectedRegion', regionName);
-                    localStorage.setItem('selectedValley', valley.name);
-                    window.location.href = 'booking-step3.html';
-                };
-    
-                valleyList.appendChild(li);
-    
-                const marker = new kakao.maps.Marker({ position: markerPosition });
-                marker.setMap(map);
-                markers.push(marker);
-    
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: `<div style="padding:5px;font-size:12px;">${valley.name}</div>`
+        }
+
+        function updateValleyList(regionName) {
+            // 새로운 지역 선택 시 모든 마커 및 선택 정보 초기화
+            removeMarkers();
+            selectedValleyInfo = null;
+            nextStepBtn.disabled = true; // 다음 버튼 비활성화
+
+            selectedRegionNameSpan.textContent = regionName;
+            valleyList.innerHTML = '';
+
+            const valleys = valleyData[regionName];
+            if (valleys && valleys.length > 0) {
+                const bounds = new kakao.maps.LatLngBounds();
+                
+                valleys.forEach(valley => {
+                    const li = document.createElement('li');
+                    li.className = 'p-2 rounded valley-list-item';
+                    li.textContent = valley.name;
+
+                    const markerPosition = new kakao.maps.LatLng(valley.lat, valley.lng);
+                    bounds.extend(markerPosition);
+
+                    // 리스트 아이템 클릭 시
+                    li.onclick = () => {
+                        // 선택된 계곡 정보를 변수에 임시 저장
+                        selectedValleyInfo = { region: regionName, name: valley.name };
+                        // '다음' 버튼 활성화
+                        nextStepBtn.disabled = false;
+                    };
+
+                    valleyList.appendChild(li);
+
+                    const marker = new kakao.maps.Marker({ position: markerPosition });
+                    marker.setMap(map);
+                    markers.push(marker);
+
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:5px;font-size:12px;">${valley.name}</div>`
+                    });
+                    kakao.maps.event.addListener(marker, 'mouseover', () => infowindow.open(map, marker));
+                    kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
                 });
-                kakao.maps.event.addListener(marker, 'mouseover', () => infowindow.open(map, marker));
-                kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
-            });
-    
-            map.setBounds(bounds);
-        } else {
-            valleyList.innerHTML = '<li class="text-gray-500">등록된 계곡이 없습니다.</li>';
+
+                map.setBounds(bounds);
+            } else {
+                valleyList.innerHTML = '<li class="text-gray-500">등록된 계곡이 없습니다.</li>';
+            }
         }
-    }
-    
-    function removeMarkers() {
-        for (let i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
+
+        function removeMarkers() {
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+            markers = [];
         }
-        markers = [];
-    }
     </script>
 </body>
 </html>
