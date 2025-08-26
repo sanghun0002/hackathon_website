@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "muhuel2-2", name: "평상 2", top: "47%", left: "31%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel2-3", name: "평상 3", top: "47.5%", left: "43%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel2-4", name: "평상 4", top: "46.5%", left: "53%", width: "7%", height: "6%", capacity: 4, isBooked: false },
-        { id: "muhuel2-5", name: "평상 5", top: "48%", left: "65%", width: "7%", height: "6%", capacity: 4, isBooked: false },
+        { id: "muhuel2-5", name: "평상 5", top: "47.5%", left: "64.5%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel2-6", name: "평상 6", top: "50%", left: "76%", width: "7%", height: "6%", capacity: 4, isBooked: false },
         { id: "muhuel2-7", name: "평상 7", top: "52.5%", left: "87%", width: "7%", height: "6%", capacity: 8, isBooked: false }
       ]
