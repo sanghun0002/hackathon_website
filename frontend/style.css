@@ -394,9 +394,6 @@ body {
 /* booking-step3.css */
 #valley-map-image {
     width: 100%; height: auto; }
-#valley-map-image {
-    width: 100%; height: auto; }
-
 .section-clickable-area {
     background-color: transparent;
     cursor: pointer; transition: background-color 0.2s; }
