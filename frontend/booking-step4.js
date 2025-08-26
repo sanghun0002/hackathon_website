@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
     "삼계리 3구역": {
       image_url: "./images/samgyeri/samgyeri_part3.png",
       decks: [
-        { id: "3-1", name: "평상 1", top: "52%", left: "30%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-2", name: "평상 2", top: "52.5%", left: "33%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-3", name: "평상 3", top: "54%", left: "35%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-4", name: "평상 4", top: "55%", left: "37%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-5", name: "평상 5", top: "57%", left: "39%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-6", name: "평상 6", top: "59%", left: "41%", width: "6%", height: "6%", capacity: 6, isBooked: false },
-        { id: "3-7", name: "평상 7", top: "60%", left: "43%", width: "6%", height: "6%", capacity: 6, isBooked: false }
+        { id: "3-1", name: "평상 1", top: "50%", left: "29%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-2", name: "평상 2", top: "51%", left: "35%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-3", name: "평상 3", top: "54%", left: "40%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-4", name: "평상 4", top: "55%", left: "45%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-5", name: "평상 5", top: "57%", left: "50%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-6", name: "평상 6", top: "59%", left: "55%", width: "6%", height: "6%", capacity: 6, isBooked: false },
+        { id: "3-7", name: "평상 7", top: "60%", left: "60%", width: "6%", height: "6%", capacity: 6, isBooked: false }
       ]
     },
     "삼계리 4구역": {
@@ -143,6 +143,6 @@ sectionData.decks.forEach(deck => {
       alert('평상을 먼저 선택해주세요.');
       return;
     }
-    window.location.href = 'booking-check.html';
+    window.location.href = 'booking-payment.html';
   });
 });
