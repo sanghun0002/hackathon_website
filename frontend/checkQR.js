@@ -3,7 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const pyeongsangId = urlParams.get('id');
 
-    // HTML 요소 가져오기
+    // '선택 화면으로' 버튼의 링크를 동적으로 설정합니다.
+    const backBtn = document.getElementById('back-to-choice-btn');
+    if (pyeongsangId && backBtn) {
+        backBtn.href = `QR.html?id=${pyeongsangId}`;
+    }
+
+    // --- 이하 현장 인증 로직 ---
     const pyeongsangIdDisplay = document.getElementById('pyeongsang-id-display');
     const authForm = document.getElementById('auth-form');
     const nameInput = document.getElementById('name-input');
@@ -36,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // 백엔드로 평상 ID, 이름, 전화번호를 모두 보냅니다.
                 body: JSON.stringify({ pyeongsangId, name, phone }),
             });
 
@@ -45,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status === 'success') {
                 resultMessage.textContent = `✅ ${data.message}`;
                 resultMessage.style.color = 'green';
-                authForm.style.display = 'none'; // 성공 후 폼 숨기기
+                authForm.style.display = 'none';
             } else {
                 resultMessage.textContent = `❌ ${data.message}`;
                 resultMessage.style.color = 'red';
