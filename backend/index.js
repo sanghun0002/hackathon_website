@@ -4,7 +4,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 require('dotenv').config();
-
+/*데이터 초기화 용 수정 코드*/
 
 const app = express();
 const PORT = process.env.PORT || 3000;
