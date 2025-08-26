@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "muhuel1-5", name: "평상 5", top: "37%", left: "78.5%", width: "7%", height: "6%", capacity: 8, isBooked: false }
       ]
     },
-    "제2곡 봉비암": {
+    "제2곡 한강대": {
       image_url: "./images/muhuel/muhuel_2.png",
       decks: [
         { id: "muhuel2-1", name: "평상 1", top: "30%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "muhuel2-5", name: "평상 5", top: "70%", left: "70%", width: "6%", height: "6%", capacity: 8, isBooked: false }
       ]
     },
-    "제3곡 봉비암": {
+    "제3곡 무학정": {
       image_url: "./images/muhuel/muhuel_3.png",
       decks: [
         { id: "muhuel3-1", name: "평상 1", top: "30%", left: "30%", width: "6%", height: "6%", capacity: 4, isBooked: false },
