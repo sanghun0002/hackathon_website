@@ -393,9 +393,9 @@ body {
     font-weight: bold; }
 /* booking-step3.css */
 #valley-map-image {
-    width: 80%; height: auto; }
+    width: 100%; height: auto; }
 #valley-map-image {
-    width: 80%; height: auto; }
+    width: 100%; height: auto; }
 
 .section-clickable-area {
     background-color: transparent;
