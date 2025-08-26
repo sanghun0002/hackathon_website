@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
         date: null
     };
 
-    // 오늘 날짜로부터 14일 뒤의 날짜를 계산합니다.
     const today = new Date();
     const twoWeeksLater = new Date();
     twoWeeksLater.setDate(today.getDate() + 14);
@@ -15,9 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
         inline: true,
         dateFormat: "Y-m-d",
         minDate: "today",
-        maxDate: twoWeeksLater, // Date 객체를 사용하여 maxDate 설정
+        maxDate: twoWeeksLater,
         locale: 'ko',
-
         onReady: (selectedDates, dateStr, instance) => {
             nextBtn.disabled = true;
         },
@@ -36,7 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextBtn) {
         nextBtn.onclick = () => {
             if (bookingSelection.date) {
-                window.location.href = `booking-step2.html?date=${bookingSelection.date}`;
+                // 수정: localStorage에 날짜를 저장하고 페이지를 이동합니다.
+                localStorage.setItem('selectedDate', bookingSelection.date);
+                window.location.href = 'booking-step2.html'; // URL 파라미터 제거
             } else {
                 alert('날짜를 먼저 선택해주세요.');
             }
