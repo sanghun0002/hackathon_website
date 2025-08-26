@@ -405,6 +405,10 @@ body {
   border-color: rgba(37, 99, 235, 0.9); /* blue-600 */
   background: rgba(59, 130, 246, 0.25);
 }
+.section-clickable-area.selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+}
 /* ============================= */
 /*            공지사항            */
 /* ============================= */
