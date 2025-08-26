@@ -84,8 +84,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('통신 오류:', error);
-                resultDiv.textContent = '🔌 서버와 통신 중 오류가 발생했습니다. 서버가 켜져 있는지 확인해주세요.';
+                
+                // --- ▼▼ 여기가 수정된 부분입니다 ▼▼ ---
+
+                // 서버가 잠에서 깨어날 때 흔히 발생하는 네트워크 오류인지 확인
+                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    resultDiv.textContent = '⏳ 서버가 깨어나는 중입니다. 잠시 후 다시 시도해주세요.';
+                    resultDiv.style.color = 'orange';
+                } else {
+                    // 그 외 다른 오류일 경우
+                    resultDiv.textContent = '🔌 서버와 통신 중 오류가 발생했습니다.';
+                    resultDiv.style.color = 'red';
+                }
+                
+                // --- ▲▲ 여기가 수정된 부분입니다 ▲▲ ---
+
             } finally {
+                // 버튼을 다시 누를 수 있도록 활성화
                 uploadButton.disabled = false;
             }
         });
