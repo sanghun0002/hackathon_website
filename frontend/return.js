@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('사진을 먼저 촬영해주세요!');
                 return;
             }
-            resultDiv.textContent = '🤖 사진 크기 최적화 및 분석 중...';
+            resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
             try {
                 const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
