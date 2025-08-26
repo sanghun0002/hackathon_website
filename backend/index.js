@@ -9,6 +9,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 관리자 비밀번호 (하드코딩)
+const ADMIN_PASSWORD = '0000';
+
 app.use(cors());
 app.use(express.json());
 
@@ -53,7 +56,7 @@ let nextReviewId = 3;
 
 
 // ===============================================================
-// ===== 공지사항(Notice) API =====
+// ===== 공지사항(Notice) API (비밀번호 검증 추가) =====
 // ===============================================================
 
 app.get('/api/notices', (req, res) => {
@@ -84,8 +87,12 @@ app.get('/api/notices', (req, res) => {
     });
 });
 
+// [수정] POST: 새 공지 작성
 app.post('/api/notices', (req, res) => {
-    const { title, department, isSticky, content } = req.body;
+    const { title, department, isSticky, content, password } = req.body;
+    if (password !== ADMIN_PASSWORD) {
+        return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
+    }
     if (!title || !department || !content) {
         return res.status(400).json({ message: '제목, 작성부서, 내용은 필수입니다.' });
     }
@@ -111,10 +118,14 @@ app.get('/api/notices/:id', (req, res) => {
     }
 });
 
+// [수정] PUT: 공지 수정
 app.put('/api/notices/:id', (req, res) => {
     const noticeIndex = notices.findIndex(n => n.id === parseInt(req.params.id));
     if (noticeIndex !== -1) {
-        const { title, department, isSticky, content } = req.body;
+        const { title, department, isSticky, content, password } = req.body;
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
+        }
         notices[noticeIndex] = { ...notices[noticeIndex], title, department, isSticky, content };
         res.json(notices[noticeIndex]);
     } else {
@@ -122,7 +133,12 @@ app.put('/api/notices/:id', (req, res) => {
     }
 });
 
+// [수정] DELETE: 공지 삭제
 app.delete('/api/notices/:id', (req, res) => {
+    const { password } = req.body;
+    if (password !== ADMIN_PASSWORD) {
+        return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
+    }
     const noticeIndex = notices.findIndex(n => n.id === parseInt(req.params.id));
     if (noticeIndex !== -1) {
         notices.splice(noticeIndex, 1);
