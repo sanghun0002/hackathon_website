@@ -86,33 +86,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 평상 버튼 생성
   let selectedBtn = null;
-  sectionData.decks.forEach(deck => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = `absolute rounded-full border-2 
-      ${deck.isBooked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-400 hover:bg-green-500'}`;
-    btn.style.top = deck.top;
-    btn.style.left = deck.left;
-    btn.style.width = deck.width;
-    btn.style.height = deck.height;
-    btn.style.transform = 'translate(-50%, -50%)';
-    btn.title = `${deck.name} (${deck.capacity}인)`;
+sectionData.decks.forEach(deck => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'absolute deck-dot';
+  // 위치/크기(%)
+  btn.style.top = deck.top;
+  btn.style.left = deck.left;
+  btn.style.width = deck.width;
+  btn.style.height = deck.height;
+  btn.style.transform = 'translate(-50%, -50%)';
+  btn.title = `${deck.name} · 수용 ${deck.capacity}인`;
 
-    if (!deck.isBooked) {
-      btn.addEventListener('click', () => {
-        // 이전 선택 해제
-        if (selectedBtn) selectedBtn.classList.remove('ring-4', 'ring-blue-500');
-        // 현재 선택 강조
-        btn.classList.add('ring-4', 'ring-blue-500');
-        selectedBtn = btn;
+  if (deck.isBooked) {
+    // 예약 불가 스타일
+    btn.classList.add('unavailable', 'bg-gray-400'); // 비활성 + 회색
+    // 접근성 정보
+    btn.setAttribute('aria-disabled', 'true');
+  } else {
+    // 예약 가능 스타일
+    btn.classList.add('available', 'bg-emerald-400');
+    btn.addEventListener('mouseenter', () => { btn.classList.add('scale-105'); });
+    btn.addEventListener('mouseleave', () => { btn.classList.remove('scale-105'); });
 
-        localStorage.setItem('selectedDeck', JSON.stringify(deck));
-        payBtn.disabled = false;
-      });
-    }
+    // 클릭해서 선택
+    btn.addEventListener('click', () => {
+      if (selectedBtn) selectedBtn.classList.remove('selected');
+      btn.classList.add('selected');
 
-    hotspotContainer.appendChild(btn);
-  });
+      selectedBtn = btn;
+      localStorage.setItem('selectedDeck', JSON.stringify(deck));
+      document.getElementById('payment-btn').disabled = false;
+    });
+  }
+
+  hotspotContainer.appendChild(btn);
+});
 
   // 이미지 부모에 hotspot 붙이기
   deckSectionImage.parentElement.appendChild(hotspotContainer);
