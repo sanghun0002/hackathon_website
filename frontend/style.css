@@ -386,6 +386,16 @@ body {
 /* ------------------------------------------- */
 /* -             예약 시스템1-END              - */
 /* ------------------------------------------- */
+
+/* booking-step2.css*/
+.valley-list-item.selected {
+    background-color: #007bff; /* 파란색 배경 */
+    color: white; /* 흰색 글자 */
+    font-weight: bold; }
+.valley-list-item.selected:hover {
+    background-color: #0056b3; }
+.valley-list-item:hover {
+    background-color: #f0f0f0; }
 /* booking-step3.css */
 #valley-map-image {
     width: 100%; height: auto; }
