@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 실제 운영 서버 주소로 적용했습니다.
-    const API_BASE_URL = 'https://image-analyzer-wduj.onrender.com'/*'https://o70albxd7n.onrender.com'*/;
+    const API_BASE_URL = 'https://o70albxd7n.onrender.com';
 
     const boardBody = document.getElementById('review-board-body');
     
