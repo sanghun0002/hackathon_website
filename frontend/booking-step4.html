@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>평상 선택</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 p-8">
     <header class="main-header">
         <div class="logo">쉬어가~ 계곡</div>
     </header>
@@ -19,10 +20,18 @@
             <div class="step active"><span>평상 선택</span></div>
         </div>
 
-        <div class="calendar-card">
-            <h2>예약할 평상을 선택해주세요</h2>
-            <div id="spot-map" class="item-list">
-                <p>선택하신 계곡의 평상 정보를 불러오는 중입니다...</p>
+        <div class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-bold">평상 선택하기</h1>
+                <p class="text-gray-600">
+                    <span id="booking-info-display" class="font-bold text-blue-600"></span>
+                    에서 사용할 평상을 선택해주세요.
+                </p>
+            </div>
+            
+            <!-- 평상 목록이 동적으로 생성될 영역 -->
+            <div id="deck-list-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <p id="loading-message" class="text-center text-gray-500 col-span-full">평상 목록을 불러오는 중...</p>
             </div>
         </div>
     </main>
