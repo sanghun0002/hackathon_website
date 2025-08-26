@@ -2,34 +2,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Sample data for decks based on selected section ===
     // This is hardcoded data. In a real-world app, this would be fetched from a server.
     const deckData = {
-        "제1곡 봉비암": [
-            { id: "1-1", number: 1, capacity: 4, isBooked: false },
-            { id: "1-2", number: 2, capacity: 4, isBooked: true },
-            { id: "1-3", number: 3, capacity: 6, isBooked: false },
-            { id: "1-4", number: 4, capacity: 8, isBooked: false },
-            { id: "1-5", number: 5, capacity: 4, isBooked: true }
-        ],
-        "제2곡 한강대": [
-            { id: "2-1", number: 1, capacity: 6, isBooked: false },
-            { id: "2-2", number: 2, capacity: 4, isBooked: false }
-        ],
-        "제3곡 무학정": [
-            { id: "3-1", number: 1, capacity: 8, isBooked: true },
-            { id: "3-2", number: 2, capacity: 4, isBooked: false }
-        ],
-        "제4곡 임압": [
-            { id: "4-1", number: 1, capacity: 4, isBooked: false },
-            { id: "4-2", number: 2, capacity: 6, isBooked: false }
-        ],
-        "제5곡 사인암": [
-            { id: "5-1", number: 1, capacity: 6, isBooked: false }
-        ],
-        "제6곡 옥류동": [
-            { id: "6-1", number: 1, capacity: 4, isBooked: false },
-            { id: "6-2", number: 2, capacity: 4, isBooked: false },
-            { id: "6-3", number: 3, capacity: 8, isBooked: false }
-        ]
-        // Add data for other sections as needed.
+        "삼계리 1구역": {
+            image_url: "/images/samgyeri/samgyeri_part1.png",
+            decks: [
+                { id: "1-1", number: 1, capacity: 4, isBooked: false },
+                { id: "1-2", number: 2, capacity: 4, isBooked: true },
+                { id: "1-3", number: 3, capacity: 6, isBooked: false },
+                { id: "1-4", number: 4, capacity: 8, isBooked: false },
+                { id: "1-5", number: 5, capacity: 4, isBooked: true }
+            ]
+        },
+        "삼계리 2구역": {
+            image_url: "/images/samgyeri/samgyeri_part2.png",
+            decks: [
+                { id: "2-1", number: 1, capacity: 6, isBooked: false },
+                { id: "2-2", number: 2, capacity: 4, isBooked: false }
+            ]
+        },
+        "삼계리 3구역": {
+            image_url: "/images/samgyeri/samgyeri_part3.png",
+            decks: [
+                { id: "3-1", number: 1, capacity: 8, isBooked: true },
+                { id: "3-2", number: 2, capacity: 4, isBooked: false }
+            ]
+        },
+        "삼계리 4구역": {
+            image_url: "/images/samgyeri/samgyeri_part4.png",
+            decks: [
+                { id: "4-1", number: 1, capacity: 4, isBooked: false },
+                { id: "4-2", number: 2, capacity: 6, isBooked: false }
+            ]
+        },
+        "삼계리 5구역": {
+            image_url: "/images/samgyeri/samgyeri_part5.png",
+            decks: [
+                { id: "5-1", number: 1, capacity: 6, isBooked: false }
+            ]
+        },
+
+        
+        "제6곡 옥류동": {
+            image_url: "/images/okryudong.jpg", // 이미지 경로 추가
+            decks: [
+                { id: "6-1", number: 1, capacity: 4, isBooked: false },
+                { id: "6-2", number: 2, capacity: 4, isBooked: false },
+                { id: "6-3", number: 3, capacity: 8, isBooked: false }
+            ]
+        }
     };
 
     // --- Retrieve data from localStorage ---
@@ -43,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deckListContainer = document.getElementById('deck-list-container');
     const nextStepBtn = document.getElementById('next-step-btn');
     const loadingMessage = document.getElementById('loading-message');
+    const deckSectionImage = document.getElementById('deck-section-image');
 
     // --- State variables ---
     let selectedDeck = null; // Stores the currently selected deck
@@ -58,47 +78,58 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingInfoDisplay.textContent = `${selectedValley} > ${selectedSection}`;
 
     // --- Generate deck list dynamically ---
-    const decks = deckData[selectedSection];
+    const sectionData = deckData[selectedSection];
 
-    if (decks && decks.length > 0) {
-        // Remove loading message
-        if (loadingMessage) {
-            loadingMessage.remove();
-        }
+    if (sectionData) {
+        // Set the image source based on the selected section
+        deckSectionImage.src = sectionData.image_url;
 
-        decks.forEach(deck => {
-            const deckCard = document.createElement('div');
-            deckCard.className = `p-4 rounded-lg shadow-md flex flex-col items-center cursor-pointer transform transition-transform hover:scale-105 ${deck.isBooked ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-50 text-blue-900 deck-card'}`;
-            
-            deckCard.innerHTML = `
-                <div class="text-2xl font-bold mb-2">평상 ${deck.number}</div>
-                <div class="text-sm">수용인원: ${deck.capacity}인</div>
-                ${deck.isBooked ? '<div class="mt-2 text-sm font-bold text-red-600">예약 완료</div>' : '<div class="mt-2 text-sm font-bold text-green-600">예약 가능</div>'}
-            `;
+        const decks = sectionData.decks;
 
-            // Add click event listener for available decks
-            if (!deck.isBooked) {
-                deckCard.addEventListener('click', () => {
-                    // Deselect previous card
-                    if (selectedDeck) {
-                        selectedDeck.classList.remove('selected');
-                    }
-
-                    // Select current card
-                    deckCard.classList.add('selected');
-                    selectedDeck = deckCard;
-
-                    // Store selected deck info and enable next button
-                    localStorage.setItem('selectedDeck', JSON.stringify(deck));
-                    nextStepBtn.disabled = false;
-                });
+        if (decks && decks.length > 0) {
+            // Remove loading message
+            if (loadingMessage) {
+                loadingMessage.remove();
             }
 
-            deckListContainer.appendChild(deckCard);
-        });
+            decks.forEach(deck => {
+                const deckCard = document.createElement('div');
+                deckCard.className = `p-4 rounded-lg shadow-md flex flex-col items-center cursor-pointer transform transition-transform hover:scale-105 ${deck.isBooked ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-50 text-blue-900 deck-card'}`;
+                
+                deckCard.innerHTML = `
+                    <div class="text-2xl font-bold mb-2">평상 ${deck.number}</div>
+                    <div class="text-sm">수용인원: ${deck.capacity}인</div>
+                    ${deck.isBooked ? '<div class="mt-2 text-sm font-bold text-red-600">예약 완료</div>' : '<div class="mt-2 text-sm font-bold text-green-600">예약 가능</div>'}
+                `;
+
+                // Add click event listener for available decks
+                if (!deck.isBooked) {
+                    deckCard.addEventListener('click', () => {
+                        // Deselect previous card
+                        if (selectedDeck) {
+                            selectedDeck.classList.remove('selected');
+                        }
+
+                        // Select current card
+                        deckCard.classList.add('selected');
+                        selectedDeck = deckCard;
+
+                        // Store selected deck info and enable next button
+                        localStorage.setItem('selectedDeck', JSON.stringify(deck));
+                        nextStepBtn.disabled = false;
+                    });
+                }
+
+                deckListContainer.appendChild(deckCard);
+            });
+        } else {
+            if (loadingMessage) {
+                loadingMessage.textContent = '선택된 구역에 평상이 없습니다.';
+            }
+        }
     } else {
         if (loadingMessage) {
-            loadingMessage.textContent = '선택된 구역에 평상이 없습니다.';
+            loadingMessage.textContent = '선택된 구역의 정보를 찾을 수 없습니다.';
         }
     }
 

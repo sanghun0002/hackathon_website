@@ -409,6 +409,13 @@ body {
   border-color: #2563eb;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
 }
+/* booking-step4.css */
+.deck-card.selected {
+    border: 2px solid #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    background-color: #e6f0ff; }
+.deck-card:not(.selected):hover {
+    background-color: #d1e2ff; }
 /* ============================= */
 /*            공지사항            */
 /* ============================= */
