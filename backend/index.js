@@ -315,6 +315,23 @@ app.get('/api/bookings/status', (req, res) => {
 });
 // ===============================================================
 
+// GET: 특정 평상 ID로 단일 예약 조회
+app.get('/api/bookings/:pyeongsangId', (req, res) => {
+    const { pyeongsangId } = req.params;
+
+    const foundBooking = bookings.find(b => {
+        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`.replace(/\s/g, '');
+        return fullIdFromDB === pyeongsangId.replace(/\s/g, '');
+    });
+
+    if (foundBooking) {
+        res.json(foundBooking); // 찾은 예약 정보 응답
+    } else {
+        res.status(404).json({ message: '해당 ID의 예약 정보를 찾을 수 없습니다.' });
+    }
+});
+// -------------------------
+
 // POST: 현장 QR 인증 (날짜, 평상ID, 이름, 전화번호 확인)
 app.post('/api/bookings/verify-on-site', (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
