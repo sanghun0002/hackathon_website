@@ -82,6 +82,35 @@
         }
         .content-right {
             flex: 1;
+        /* Swiper 버튼 위치 조정 */
+        .review-swiper {
+            padding: 0 40px; /* 버튼이 들어갈 좌우 공간 확보 */
+        }
+        .review-swiper .swiper-button-next,
+        .review-swiper .swiper-button-prev {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .review-swiper .swiper-button-next::after,
+        .review-swiper .swiper-button-prev::after {
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .review-swiper .swiper-button-prev {
+            left: 0;
+        }
+        .review-swiper .swiper-button-next {
+            right: 0;
         }
     </style>
 </head>
