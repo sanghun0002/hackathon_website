@@ -315,6 +315,31 @@ app.get('/api/bookings/status', (req, res) => {
 });
 // ===============================================================
 
+// 기존 Node.js 서버 파일에 아래 API 엔드포인트를 추가하세요.
+
+// POST: 현장 QR 인증 (날짜, 평상ID, 이름, 전화번호 확인)
+app.post('/api/bookings/verify-on-site', (req, res) => {
+    const { pyeongsangId, name, phone } = req.body;
+
+    // 오늘 날짜를 'YYYY-MM-DD' 형식으로 구하기
+    const today = new Date().toISOString().split('T')[0];
+
+    // pyeongsangId, 이름, 전화번호, 오늘 날짜가 모두 일치하는 예약을 찾음
+    const foundBooking = bookings.find(b => 
+        b.deckName === pyeongsangId && // QR 코드의 ID는 deckName과 일치한다고 가정
+        b.name === name &&
+        b.phone === phone &&
+        b.bookingDate === today
+    );
+
+    if (foundBooking) {
+        // 모든 정보가 일치
+        res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
+    } else {
+        // 정보 불일치
+        res.status(404).json({ status: 'failure', message: '예약자 정보가 올바르지 않습니다. 다시 입력해주세요.' });
+    }
+});
 
 // ===============================================================
 // ===== 서버 실행 =====
