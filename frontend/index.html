@@ -236,18 +236,20 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- 1. 로그인/사용자 이름 표시 로직 (이전과 동일) ---
         const loginStatusLink = document.getElementById('login-status-link');
+        const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
 
+        // Firebase 로그인 상태가 확인되면, 그 결과에 따라 모든 것을 처리합니다.
         onAuthStateChanged(auth, async (user) => {
+            
+            // --- 1. 헤더의 로그인/사용자이름 버튼 처리 ---
             if (user) {
                 // 로그인 상태일 경우
                 try {
                     const userDocRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(userDocRef);
                     if (docSnap.exists() && docSnap.data().name) {
-                        const userName = docSnap.data().name;
-                        loginStatusLink.textContent = `${userName}님`;
+                        loginStatusLink.textContent = `${docSnap.data().name}님`;
                         loginStatusLink.href = 'login-status.html';
                     } else {
                         loginStatusLink.textContent = '내 정보';
@@ -263,27 +265,20 @@
                 loginStatusLink.textContent = '로그인';
                 loginStatusLink.href = 'login-status.html';
             }
-        });
 
-        // --- 2. [새로 추가] '예약하기' 버튼 로직 ---
-        
-        // 사이드바와 메인 섹션에 있는 '예약하기' 링크를 모두 찾습니다.
-        const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
-
-        bookingLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                // 현재 로그인 상태를 확인합니다.
-                const user = auth.currentUser;
-
-                if (!user) {
-                    // 로그아웃 상태이면, 기본 링크 이동을 막습니다.
-                    event.preventDefault(); 
-                    
-                    // 알림 메시지를 보여주고 로그인 페이지로 이동합니다.
-                    alert('로그인 후 이용하시기 바랍니다.');
-                    window.location.href = 'login-status.html';
-                }
-                // 로그인 상태이면, 아무것도 하지 않고 원래 링크(booking.html)로 이동하도록 둡니다.
+            // --- 2. '예약하기' 버튼 클릭 이벤트 처리 ---
+            // 로그인 상태가 명확해진 **지금 시점에** 클릭 이벤트를 설정합니다.
+            bookingLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!user) {
+                        // 로그아웃 상태임이 확실하므로, 링크 이동을 막습니다.
+                        event.preventDefault(); 
+                        
+                        alert('로그인 후 이용하시기 바랍니다.');
+                        window.location.href = 'login-status.html';
+                    }
+                    // 로그인 상태라면, 이 if 문은 무시되고 원래 링크로 정상 이동합니다.
+                });
             });
         });
     </script>
