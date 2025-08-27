@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Get DOM elements ---
     const filterDate = document.getElementById('filter-date');
-    const filterRegion = document.getElementById('filter-region');
     const filterValley = document.getElementById('filter-valley');
     const filterSection = document.getElementById('filter-section');
     const searchName = document.getElementById('search-name');
@@ -19,8 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     const itemsPerPage = 10;
     
-    // --- Mock Data (Replace this with real API call) ---
-    // This function simulates fetching data from a server.
+    // --- Fetch all booking data from the server ---
     const fetchAllBookings = async () => {
         try {
             const response = await fetch(`${serverUrl}/api/bookings`);
@@ -31,50 +29,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error('Error fetching booking data:', error);
             alert('예약 데이터를 불러오는 데 실패했습니다.');
-            return []; // 에러 발생 시 빈 배열 반환
+            return []; // Return an empty array on error
         }
     };
 
-    // --- Dynamic Filter Options (Simulated) ---
-    const getFilterOptions = (bookings) => {
-        const regions = [...new Set(bookings.map(b => b.region))].sort();
+    // --- Populate Filter Options ---
+    const populateValleyFilter = (bookings) => {
+        filterValley.innerHTML = '<option value="">전체</option>';
         const valleys = [...new Set(bookings.map(b => b.valley))].sort();
-        const sections = [...new Set(bookings.map(b => b.section))].sort();
-        return { regions, valleys, sections };
-    };
-
-    const populateFilterOptions = (options) => {
-        // Clear existing options
-        filterRegion.innerHTML = '<option value="">전체</option>';
-        options.regions.forEach(region => {
+        valleys.forEach(valley => {
             const opt = document.createElement('option');
-            opt.value = region;
-            opt.textContent = region;
-            filterRegion.appendChild(opt);
+            opt.value = valley;
+            opt.textContent = valley;
+            filterValley.appendChild(opt);
         });
-        
-        filterValley.innerHTML = '<option value="">전체</option>';
-        filterSection.innerHTML = '<option value="">전체</option>';
-        filterValley.disabled = true;
-        filterSection.disabled = true;
-    };
-
-    const populateValleyOptions = (region) => {
-        filterValley.innerHTML = '<option value="">전체</option>';
-        if (region) {
-            const valleysInRegion = [...new Set(allBookings.filter(b => b.region === region).map(b => b.valley))].sort();
-            valleysInRegion.forEach(valley => {
-                const opt = document.createElement('option');
-                opt.value = valley;
-                opt.textContent = valley;
-                filterValley.appendChild(opt);
-            });
-            filterValley.disabled = false;
-        } else {
-            filterValley.disabled = true;
-        }
-        filterSection.disabled = true;
-        filterSection.innerHTML = '<option value="">전체</option>';
     };
     
     const populateSectionOptions = (valley) => {
@@ -96,18 +64,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Filtering and Rendering Logic ---
     const applyFilters = () => {
         const date = filterDate.value;
-        const region = filterRegion.value;
         const valley = filterValley.value;
         const section = filterSection.value;
         const name = searchName.value.toLowerCase();
 
         filteredBookings = allBookings.filter(booking => {
             const matchesDate = !date || booking.bookingDate === date;
-            const matchesRegion = !region || booking.region === region;
             const matchesValley = !valley || booking.valley === valley;
             const matchesSection = !section || booking.section === section;
             const matchesName = !name || booking.name.toLowerCase().includes(name);
-            return matchesDate && matchesRegion && matchesValley && matchesSection && matchesName;
+            return matchesDate && matchesValley && matchesSection && matchesName;
         });
         
         totalBookingsSpan.textContent = filteredBookings.length;
@@ -123,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bookingsToRender = filteredBookings.slice(start, end);
 
         if (bookingsToRender.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">예약 내역이 없습니다.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 내역이 없습니다.</td></tr>`;
             return;
         }
 
@@ -131,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.region}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deckName}</td>
@@ -197,18 +162,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Initial setup ---
     const init = async () => {
         allBookings = await fetchAllBookings();
-        const filterOptions = getFilterOptions(allBookings);
-        populateFilterOptions(filterOptions);
+        populateValleyFilter(allBookings);
         applyFilters();
     };
 
     // --- Event Listeners ---
     filterDate.addEventListener('change', applyFilters);
-    filterRegion.addEventListener('change', () => {
-        const selectedRegion = filterRegion.value;
-        populateValleyOptions(selectedRegion);
-        applyFilters();
-    });
     filterValley.addEventListener('change', () => {
         const selectedValley = filterValley.value;
         populateSectionOptions(selectedValley);
