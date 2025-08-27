@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${booking.valley}</td>
                     <td>${booking.section}</td>
                     <td>${booking.deckName}</td>
-                    <td><span class="status-${booking.status === '예약 완료' ? 'completed' : 'pending'}">${booking.status}</span></td>
+                    <td><span class="status-${booking.status === '결제 대기 중' ? 'completed' : 'pending'}">${booking.status}</span></td>
                 </tr>
             `;
         });
