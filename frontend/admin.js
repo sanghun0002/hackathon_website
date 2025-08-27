@@ -84,10 +84,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 상태에 따라 CSS 클래스 이름을 반환하는 함수
     const getStatusClass = (status) => {
-        if (status === '예약완료') {
+        if (status === '예약 및 결제 완료') {
             return 'status-completed';
         }
-        if (status === '예약취소') {
+        if (status === '사용중') {
             return 'status-cancelled';
         }
         return 'status-pending'; // '대기' 또는 그 외의 경우
