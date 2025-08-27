@@ -2,90 +2,72 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>쉬어가~ 계곡</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100">
 
-  <!-- 상단 네비게이션 -->
-  <header class="flex justify-between items-center p-4 shadow bg-white">
-    <button id="admin-btn" class="px-4 py-2 rounded bg-gray-200">관리자</button>
+  <!-- 헤더 -->
+  <header class="flex justify-between items-center p-4 bg-white shadow">
+    <button id="adminBtn" class="px-4 py-2 rounded bg-gray-200">관리자</button>
     <h1 class="text-xl font-bold">쉬어가~ 계곡</h1>
-    <button id="login-btn" class="px-4 py-2 rounded bg-blue-500 text-white">로그인</button>
+    <button id="loginBtn" class="px-4 py-2 rounded bg-blue-500 text-white">로그인</button>
   </header>
 
-  <!-- 메인 컨텐츠 -->
-  <main class="p-4">
-    <!-- 배너 -->
-    <section class="mb-6">
-      <div class="relative w-full h-64 bg-gray-200 flex items-center justify-center">
-        <h2 class="text-3xl font-bold">전국 계곡 여행은 쉬어가~ 계곡!</h2>
+  <!-- 메인 -->
+  <main class="p-6">
+    <div class="relative w-full h-64 overflow-hidden rounded-xl shadow">
+      <img src="https://picsum.photos/id/1018/1200/400" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <h2 class="text-3xl text-white font-bold">전국 계곡 여행은 쉬어가~ 계곡!</h2>
       </div>
-      <p class="mt-2 text-center text-gray-600">
-        당일 치기, 1박 2일 계곡 방문을 편리하게 도와주는 특별한 공간으로 여러분을 초대합니다.
-      </p>
-    </section>
+    </div>
 
-    <!-- 메뉴 아이콘 -->
-    <section class="grid grid-cols-5 gap-4 text-center mb-6">
-      <div class="p-4 shadow rounded bg-white">공지사항</div>
-      <div class="p-4 shadow rounded bg-white">예약하기</div>
-      <div class="p-4 shadow rounded bg-white">편의사항</div>
-      <div class="p-4 shadow rounded bg-white">내 예약확인</div>
-      <div class="p-4 shadow rounded bg-white">사용후기</div>
-    </section>
-
-    <!-- 최신 이용후기 -->
-    <section class="mb-6">
-      <h3 class="text-lg font-semibold mb-2">최신 이용후기</h3>
-      <div class="grid grid-cols-3 gap-4">
-        <div class="p-4 shadow rounded bg-white">삼계리 계곡 ⭐⭐⭐⭐⭐</div>
-        <div class="p-4 shadow rounded bg-white">test ⭐⭐⭐⭐⭐</div>
-        <div class="p-4 shadow rounded bg-white">가족들과 좋은 시간 보냈습니다 ⭐⭐⭐⭐⭐</div>
-      </div>
-    </section>
-
-    <!-- 공지사항 -->
-    <section>
-      <h3 class="text-lg font-semibold mb-2">공지사항</h3>
-      <div class="p-4 shadow rounded bg-white">우천시 예약 취소 정책 (2025-08-03)</div>
-    </section>
+    <!-- 메뉴 -->
+    <div class="grid grid-cols-5 gap-4 mt-6">
+      <div class="bg-white shadow rounded-xl p-4 text-center">공지사항</div>
+      <div class="bg-white shadow rounded-xl p-4 text-center">예약하기</div>
+      <div class="bg-white shadow rounded-xl p-4 text-center">편의사항</div>
+      <div class="bg-white shadow rounded-xl p-4 text-center">내 예약확인</div>
+      <div class="bg-white shadow rounded-xl p-4 text-center">사용후기</div>
+    </div>
   </main>
 
   <!-- Firebase SDK -->
   <script type="module">
-    import { app, auth } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut } 
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { app, auth } from "./firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const loginBtn = document.querySelector('#login-btn');
-    const adminBtn = document.querySelector('#admin-btn');
+    const loginBtn = document.getElementById("loginBtn");
+    const adminBtn = document.getElementById("adminBtn");
 
-    // 로그인 상태 확인
+    // 로그인 상태 체크
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("현재 로그인된 사용자:", user.email);
-        if (loginBtn) {
-          loginBtn.textContent = "로그아웃";
-          loginBtn.onclick = async () => {
-            await signOut(auth);
-            window.location.reload();
-          };
-        }
-        if (adminBtn) {
-          adminBtn.textContent = user.email.includes("admin") ? "관리자" : "내 계정";
-          adminBtn.onclick = () => window.location.href = "admin.html"; 
+        // 로그인 상태
+        loginBtn.textContent = "로그아웃";
+        loginBtn.onclick = async () => {
+          await signOut(auth);
+          alert("로그아웃되었습니다.");
+          window.location.reload();
+        };
+
+        // 관리자 버튼
+        if (user.email.includes("admin")) {
+          adminBtn.textContent = "관리자";
+          adminBtn.onclick = () => window.location.href = "admin.html";
+        } else {
+          adminBtn.textContent = "내 예약확인";
+          adminBtn.onclick = () => window.location.href = "reservation.html";
         }
       } else {
-        if (loginBtn) {
-          loginBtn.textContent = "로그인";
-          loginBtn.onclick = () => window.location.href = "login.html";
-        }
-        if (adminBtn) {
-          adminBtn.textContent = "회원가입";
-          adminBtn.onclick = () => window.location.href = "signup.html";
-        }
+        // 로그아웃 상태
+        loginBtn.textContent = "로그인";
+        loginBtn.onclick = () => window.location.href = "login.html";
+
+        adminBtn.textContent = "관리자";
+        adminBtn.onclick = () => alert("로그인 후 이용할 수 있습니다.");
       }
     });
   </script>
