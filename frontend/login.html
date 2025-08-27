@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-12">
+    <div class="w-full max-w-md">
+        <form id="login-form" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-6 text-center">
+                <a href="index.html" class="text-3xl font-bold text-gray-800">쉬어가~ 계곡</a>
+                <h2 class="text-xl text-gray-600 mt-2">로그인</h2>
+            </div>
+            <div class="mb-4">
+                 <label class="block text-gray-700 text-sm font-bold mb-2" for="email">이메일</label>
+                <input id="email" type="email" placeholder="이메일" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">비밀번호</label>
+                <input id="password" type="password" placeholder="비밀번호" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold w-full py-2 rounded">로그인</button>
+            <p class="text-center mt-4 text-sm">
+                계정이 없으신가요? <a href="signup.html" class="text-blue-600 font-bold">회원가입</a>
+            </p>
+            <p id="error-message" class="text-red-500 text-xs italic mt-2 text-center"></p>
+        </form>
+    </div>
+
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        // 이미 로그인 상태라면 바로 메인 페이지로 보냅니다.
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                window.location.href = 'index.html'; 
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            errorMessage.textContent = '';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // 로그인이 성공하면 onAuthStateChanged가 감지하여 index.html로 보냅니다.
+            } catch(error) {
+                errorMessage.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
