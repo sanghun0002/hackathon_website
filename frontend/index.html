@@ -10,19 +10,79 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        .header-container { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 20px; box-sizing: border-box; }
-        .logo-box { flex-grow: 1; text-align: center; padding: 20px; background-color: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .header-button-box { width: 120px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; text-align: center; display: flex; justify-content: center; align-items: center; height: 40px; }
-        .header-button-box a { text-decoration: none; color: #333; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
-        .review-slider-card { width: 100%; height: 100%; background: white; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eee; }
+        /* 헤더 전체를 감싸는 컨테이너 */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 20px;
+            box-sizing: border-box;
+        }
+        
+        /* 로고를 감싸는 메인 박스 */
+        .logo-box {
+            flex-grow: 1;
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* 관리자/로그인 버튼을 감싸는 작은 박스 */
+        .header-button-box {
+            width: 120px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+        }
+        .header-button-box a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+        }
+
+        /* 후기 슬라이더 카드 스타일 */
+        .review-slider-card {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #eee;
+        }
         .review-slider-card .rating { font-size: 1.2rem; margin-bottom: 10px; }
         .review-slider-card .title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; color: #333; text-decoration: none; transition: color 0.2s; }
         .review-slider-card .title:hover { color: #007bff; }
         .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
         .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
-        .content-section { display: flex; gap: 20px; }
-        .content-left { flex: 2; min-width: 0; }
-        .content-right { flex: 1; }    
+        
+        /* 슬라이더 레이아웃 문제 해결 */
+        .content-section {
+            display: flex;
+            gap: 20px;
+        }
+        .content-left {
+            flex: 2;
+            min-width: 0;
+        }
+        .content-right {
+            flex: 1;
+        }
     </style>
 </head>
     
@@ -36,11 +96,12 @@
                 <li><a href="notice.html"><i class="fas fa-bullhorn"></i><span>공지사항</span></a></li>
                 <li><a href="booking.html"><i class="fas fa-calendar-alt"></i><span>예약하기</span></a></li>
                 <li><a href="local.html"><i class="fas fa-lightbulb"></i><span>편의사항</span></a></li>
-                <li><a href="bookingcheck.html"><i class="fas fa-check-circle"></i><span>내 예약확인</span></a></li>
+                <li><a href="booking-check.html"><i class="fas fa-check-circle"></i><span>내 예약확인</span></a></li>
                 <li><a href="review.html"><i class="fas fa-star"></i><span>사용후기</span></a></li>
             </ul>
         </nav>
     </aside>
+
     <div class="header-container">
         <div class="header-button-box">
             <a href="admin.html">관리자</a>
@@ -49,7 +110,7 @@
             <div class="logo">쉬어가~ 계곡</div>
         </header>
         <div class="header-button-box">
-            <a id="login-status-link" href="login-status.html">로그인</a>
+            <a href="login-status.html" id="login-status-link">로그인</a>
         </div>
     </div>
 
@@ -80,6 +141,7 @@
             <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
             <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
         </section>
+
         <section class="shortcuts">
             <a href="notice.html" class="shortcut-item">
                 <div class="icon">📢</div> <div>공지사항</div>
@@ -90,13 +152,14 @@
             <a href="local.html" class="shortcut-item">
                 <div class="icon">💡</div> <div>편의사항</div>
             </a>
-            <a href="bookingcheck.html" class="shortcut-item">
+            <a href="booking-check.html" class="shortcut-item">
                 <div class="icon">✅</div> <div>내 예약확인</div>
             </a>
             <a href="review.html" class="shortcut-item">
                 <div class="icon">⭐</div> <div>사용후기</div>
             </a>
         </section>
+        
         <section class="content-section">
             <div class="content-left">
                 <div class="swiper review-swiper">
@@ -113,6 +176,7 @@
                     <div class="swiper-button-prev"></div>
                 </div>
             </div>
+            
             <div class="content-right">
                 <div class="card notice-preview">
                     <div class="card-header">
@@ -132,138 +196,36 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <!-- --- 수정된 부분: app.js 내용을 포함하고 Firebase 로직 추가 --- -->
+    <script src="app.js"></script>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const API_BASE_URL = 'https://o70albxd7n.onrender.com';
-
-        // 로그인 상태 확인 및 버튼 텍스트 변경
         const loginStatusLink = document.getElementById('login-status-link');
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // 사용자가 로그인한 경우
+                const userDocRef = doc(db, "users", user.uid);
                 try {
-                    const userDocRef = doc(db, `/artifacts/${appId}/users`, user.uid);
                     const docSnap = await getDoc(userDocRef);
-                    if (docSnap.exists() && docSnap.data().name) {
-                        loginStatusLink.textContent = `${docSnap.data().name}님`;
+                    if (docSnap.exists()) {
+                        // Firestore에서 사용자 이름을 가져와 버튼에 표시
+                        const userName = docSnap.data().name;
+                        loginStatusLink.textContent = `${userName}님`;
                     } else {
-                        loginStatusLink.textContent = "내 정보";
+                        // Firestore에 이름 데이터가 없을 경우
+                        loginStatusLink.textContent = '내 정보';
                     }
-                } catch (e) {
-                    console.error("사용자 정보 로딩 실패:", e);
-                    loginStatusLink.textContent = "내 정보";
+                } catch (error) {
+                    console.error("사용자 정보 로딩 실패:", error);
+                    loginStatusLink.textContent = '내 정보'; // 에러 발생 시
                 }
-                loginStatusLink.href = 'login-status.html';
             } else {
+                // 사용자가 로그아웃한 경우
                 loginStatusLink.textContent = '로그인';
-                loginStatusLink.href = 'login.html';
-            }
-        });
-
-        // HTML 문서가 모두 로드되면 나머지 기능 실행
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 사이드바 토글
-            const sidebarToggle = document.querySelector('.sidebar-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            if(sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            }
-
-            // 히어로 섹션 슬라이더
-            const sliderWrapper = document.querySelector('.hero-section .slider-wrapper');
-            if (sliderWrapper) {
-                const slides = document.querySelectorAll('.slide');
-                const prevBtn = document.querySelector('.prev-btn');
-                const nextBtn = document.querySelector('.next-btn');
-                let currentIndex = 0;
-                const slideCount = slides.length;
-
-                function goToSlide(index) {
-                    if (index < 0) index = slideCount - 1;
-                    else if (index >= slideCount) index = 0;
-                    sliderWrapper.style.transform = `translateX(-${index * 100}%)`;
-                    currentIndex = index;
-                }
-                if(nextBtn && prevBtn){
-                    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
-                    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
-                }
-                setInterval(() => goToSlide(currentIndex + 1), 5000);
-            }
-
-            // 공지사항 위젯
-            const noticeListWidget = document.getElementById('notice-list-widget');
-            if (noticeListWidget) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/notices`);
-                    if (!response.ok) throw new Error('데이터 로딩 실패');
-                    const data = await response.json();
-                    const allNotices = [...data.stickyNotices, ...data.notices];
-                    const latestNotices = allNotices.slice(0, 5);
-                    noticeListWidget.innerHTML = '';
-                    if (latestNotices.length > 0) {
-                        latestNotices.forEach(notice => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `<a href="notice_detail.html?id=${notice.id}">${notice.title}</a><span class="date">${notice.date}</span>`;
-                            noticeListWidget.appendChild(li);
-                        });
-                    } else {
-                        noticeListWidget.innerHTML = '<li>등록된 공지사항이 없습니다.</li>';
-                    }
-                } catch (error) {
-                    console.error('공지사항 위젯 로딩 실패:', error);
-                    noticeListWidget.innerHTML = '<li>공지사항을 불러올 수 없습니다.</li>';
-                }
-            }
-
-            // 후기 슬라이더
-            const reviewSliderWrapper = document.getElementById('review-slider-wrapper');
-            if (reviewSliderWrapper) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/reviews`);
-                    if (!response.ok) throw new Error('후기 데이터 로딩 실패');
-                    const data = await response.json();
-                    const latestReviews = data.reviews.slice(0, 7);
-                    reviewSliderWrapper.innerHTML = '';
-                    if (latestReviews.length > 0) {
-                        latestReviews.forEach(review => {
-                            const slide = document.createElement('div');
-                            slide.className = 'swiper-slide';
-                            slide.innerHTML = `
-                                <div class="review-slider-card">
-                                    <div>
-                                        <div class="rating">${'⭐'.repeat(review.rating)}</div>
-                                        <a href="review_detail.html?id=${review.id}" class="title">${review.title}</a>
-                                        <p class="content">${review.content.substring(0, 80)}...</p>
-                                    </div>
-                                    <p class="author">- ${review.author}님</p>
-                                </div>`;
-                            reviewSliderWrapper.appendChild(slide);
-                        });
-                        new Swiper('.review-swiper', {
-                            slidesPerView: 1, spaceBetween: 20, loop: latestReviews.length > 2,
-                            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-                            breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
-                        });
-                    } else {
-                        reviewSliderWrapper.innerHTML = `<div class="swiper-slide"><div class="review-slider-card">등록된 후기가 없습니다.</div></div>`;
-                    }
-                } catch (error) {
-                    console.error('후기 슬라이더 로딩 실패:', error);
-                    reviewSliderWrapper.innerHTML = `<div class="swiper-slide"><div class="review-slider-card">후기를 불러올 수 없습니다.</div></div>`;
-                }
             }
         });
     </script>
