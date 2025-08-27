@@ -14,32 +14,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 버튼 비활성화 및 로딩 상태 표시
         submitButton.disabled = true;
         submitButton.textContent = '조회 중...';
-        resultContainer.style.display = 'none'; // 이전 결과 숨기기
+        resultContainer.style.display = 'none';
 
-        // 백엔드 API에 GET 요청 보내기
-        // 서버 주소는 실제 운영 환경에 맞게 변경해야 합니다.
-        fetch(`https://o70albxd7n.onrender.com=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`)
+        // ===============================================================
+        // ===== [수정된 부분] 잘못된 주소를 올바른 API 경로로 변경 =====
+        // ===============================================================
+        // 'https://o70albxd7n.onrender.com'는 실제 배포된 서버 주소입니다.
+        // 뒤에 '/api/bookings/check' 경로와 '?name=...' 파라미터를 정확히 붙여줍니다.
+        const serverUrl = 'https://o70albxd7n.onrender.com'; // 실제 서버 주소
+        const fetchUrl = `${serverUrl}/api/bookings/check?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+        // ===============================================================
+
+        fetch(fetchUrl)
             .then(response => {
                 if (response.status === 404) {
-                    // 404 Not Found는 예약이 없는 경우로 간주
-                    return []; // 빈 배열 반환
+                    return [];
                 }
                 if (!response.ok) {
-                    // 그 외 서버 에러
                     throw new Error('서버에서 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.');
                 }
                 return response.json();
             })
             .then(bookings => {
-                resultContainer.style.display = 'block'; // 결과 컨테이너 표시
+                resultContainer.style.display = 'block';
                 if (bookings.length > 0) {
-                    // 예약 정보가 있으면 표로 만들어 표시
                     displayBookingsAsTable(bookings);
                 } else {
-                    // 예약 정보가 없으면 메시지 표시
                     resultDiv.innerHTML = `<p class="text-center text-gray-500 py-8">일치하는 예약 내역이 없습니다.</p>`;
                 }
             })
@@ -49,12 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultDiv.innerHTML = `<p class="text-center text-red-500 py-8">오류가 발생했습니다: ${error.message}</p>`;
             })
             .finally(() => {
-                // 버튼 다시 활성화
                 submitButton.disabled = false;
                 submitButton.textContent = '조회하기';
             });
     });
 
+    // 이 함수는 가격을 표시하지 않으므로 수정할 필요 없습니다.
     function displayBookingsAsTable(bookings) {
         let tableHTML = `
             <table class="booking-table">
@@ -82,10 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        tableHTML += `
-                </tbody>
-            </table>
-        `;
+        tableHTML += `</tbody></table>`;
         resultDiv.innerHTML = tableHTML;
     }
 });
