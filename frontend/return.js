@@ -70,15 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
             resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
             try {
-                // 1. AI 서버로 청결도 분석 요청 (이전과 동일)
+                // --- [핵심 수정] ---
+                // 1. AI 서버로 청결도 분석 요청
                 const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
                 const formData = new FormData();
                 formData.append('file', resizedFile);
                 
-                const predictResponse = await fetch(backendUrl, { // backendUrl은 AI 서버 주소
+                const predictResponse = await fetch(aiServerUrl, {
                     method: 'POST',
                     body: formData,
                 });
+
                 if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
                 const predictData = await predictResponse.json();
 
@@ -86,27 +88,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (predictData.status === 'CLEAN') {
                     resultDiv.textContent = '✅ 청결 확인! 예약 내역을 삭제합니다...';
                     
-                    // 삭제에 필요한 사용자 정보와 평상 ID 가져오기
                     const userName = localStorage.getItem('userName');
                     const userPhone = localStorage.getItem('userPhone');
-                    const pyeongsangId = new URLSearchParams(window.location.search).get('id');
 
-                    if(!userName || !userPhone || !pyeongsangId) {
-                        throw new Error('예약 삭제에 필요한 사용자 또는 평상 정보가 없습니다.');
+                    if (!userName || !userPhone || !pyeongsangId) {
+                        throw new Error('예약 취소에 필요한 사용자 또는 평상 정보가 없습니다.');
                     }
 
-                    // 3. 예약 서버로 예약 삭제 요청
-                    const cancelUrl = `https://o70albxd7n.onrender.com/api/bookings/cancel/${pyeongsangId}`; // 예약 서버 주소
+                    // 3. Node.js 예약 서버로 예약 삭제 요청
+                    const cancelUrl = `${bookingServerUrl}/api/bookings/${pyeongsangId}`;
                     const cancelResponse = await fetch(cancelUrl, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: userName, phone: userPhone })
                     });
                     
-                    if(!cancelResponse.ok) throw new Error('예약 내역 삭제 중 서버 오류 발생');
+                    if (!cancelResponse.ok) {
+                        const errorData = await cancelResponse.json();
+                        throw new Error(`예약 내역 삭제에 실패했습니다: ${errorData.message}`);
+                    }
                     
-                    // 4. 최종 성공 메시지를 화면에 표시
-                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
+                    // 4. 최종 성공 메시지 표시
+                    resultDiv.textContent = '🎉 반납이 완료되었습니다.';
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
