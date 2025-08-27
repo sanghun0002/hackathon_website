@@ -58,7 +58,7 @@ let nextReviewId = 3;
 // ===============================================================
 // ===== 공지사항(Notice) API (비밀번호 검증 추가) =====
 // ===============================================================
-
+// (기존 공지사항 API 코드는 변경 없이 그대로 유지됩니다)
 app.get('/api/notices', (req, res) => {
     const page = parseInt(req.query.page || '1', 10);
     const noticesPerPage = 10;
@@ -86,8 +86,6 @@ app.get('/api/notices', (req, res) => {
         normalNoticesOnFirstPage: normalNoticesOnFirstPage
     });
 });
-
-// [수정] POST: 새 공지 작성
 app.post('/api/notices', (req, res) => {
     const { title, department, isSticky, content, password } = req.body;
     if (password !== ADMIN_PASSWORD) {
@@ -107,7 +105,6 @@ app.post('/api/notices', (req, res) => {
     notices.unshift(newNotice);
     res.status(201).json(newNotice);
 });
-
 app.get('/api/notices/:id', (req, res) => {
     const notice = notices.find(n => n.id === parseInt(req.params.id));
     if (notice) {
@@ -117,8 +114,6 @@ app.get('/api/notices/:id', (req, res) => {
         res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
     }
 });
-
-// [수정] PUT: 공지 수정
 app.put('/api/notices/:id', (req, res) => {
     const noticeIndex = notices.findIndex(n => n.id === parseInt(req.params.id));
     if (noticeIndex !== -1) {
@@ -132,8 +127,6 @@ app.put('/api/notices/:id', (req, res) => {
         res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
     }
 });
-
-// [수정] DELETE: 공지 삭제
 app.delete('/api/notices/:id', (req, res) => {
     const { password } = req.body;
     if (password !== ADMIN_PASSWORD) {
@@ -152,15 +145,12 @@ app.delete('/api/notices/:id', (req, res) => {
 // ===============================================================
 // ===== 후기(Review) API (비밀번호 기능 추가됨) =====
 // ===============================================================
-
-// GET: 모든 후기 목록 조회 (보안을 위해 password 필드 제외)
+// (기존 후기 API 코드는 변경 없이 그대로 유지됩니다)
 app.get('/api/reviews', (req, res) => {
     const sortedReviews = [...reviews].sort((a, b) => b.id - a.id);
     const safeReviews = sortedReviews.map(({ password, ...review }) => review);
     res.json({ reviews: safeReviews });
 });
-
-// POST: 새 후기 작성 (password 필드 추가)
 app.post('/api/reviews', upload.array('images', 5), (req, res) => {
     const { title, author, rating, content, password } = req.body;
     if (!password) {
@@ -172,7 +162,7 @@ app.post('/api/reviews', upload.array('images', 5), (req, res) => {
         id: nextReviewId++,
         title, author,
         rating: parseInt(rating, 10),
-        date: new Date().toISOString().split('T')[0],
+        date: new Date().toISOStr.ng().split('T')[0],
         views: 0,
         content,
         images,
@@ -181,8 +171,6 @@ app.post('/api/reviews', upload.array('images', 5), (req, res) => {
     reviews.unshift(newReview);
     res.status(201).json(newReview);
 });
-
-// GET: 특정 ID의 후기 상세 조회 (보안을 위해 password 필드 제외)
 app.get('/api/reviews/:id', (req, res) => {
     const review = reviews.find(r => r.id === parseInt(req.params.id));
     if (review) {
@@ -193,8 +181,6 @@ app.get('/api/reviews/:id', (req, res) => {
         res.status(404).json({ message: '후기를 찾을 수 없습니다.' });
     }
 });
-
-// PUT: 특정 ID의 후기 수정 (기존과 동일)
 app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
     const reviewIndex = reviews.findIndex(r => r.id === parseInt(req.params.id));
     if (reviewIndex === -1) {
@@ -225,8 +211,6 @@ app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
 
     res.json(reviews[reviewIndex]);
 });
-
-// DELETE: 특정 ID의 후기 삭제 (비밀번호 확인 로직 추가)
 app.delete('/api/reviews/:id', (req, res) => {
     const { password } = req.body;
     const reviewIndex = reviews.findIndex(r => r.id === parseInt(req.params.id));
@@ -241,8 +225,6 @@ app.delete('/api/reviews/:id', (req, res) => {
     reviews.splice(reviewIndex, 1);
     res.status(200).json({ message: '삭제 완료' });
 });
-
-// [신규] 수정 전 비밀번호 확인 API
 app.post('/api/reviews/:id/verify', (req, res) => {
     const { password } = req.body;
     const review = reviews.find(r => r.id === parseInt(req.params.id));
@@ -257,18 +239,17 @@ app.post('/api/reviews/:id/verify', (req, res) => {
 });
 
 // ===============================================================
-// ===== [추가된 코드] 예약(Booking) API 영역 =====
+// ===== 예약(Booking) API 영역 =====
 // ===============================================================
 
 // 예약 데이터를 저장할 배열 (실제 운영 시에는 DB 사용)
 let bookings = [];
 let nextBookingId = 1;
 
-// POST: 새 예약 생성
+// POST: 새 예약 생성 (가격 필드 없음)
 app.post('/api/bookings', (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity, status } = req.body;
 
-    // 필수 데이터 검증
     if (!name || !phone || !bookingDate || !valley || !section || !deckName) {
         return res.status(400).json({ message: '필수 예약 정보가 누락되었습니다.' });
     }
@@ -283,7 +264,7 @@ app.post('/api/bookings', (req, res) => {
         deckName,
         capacity,
         status,
-        createdAt: new Date().toISOString() // 예약 생성 시각 기록
+        createdAt: new Date().toISOString()
     };
 
     bookings.push(newBooking);
@@ -293,7 +274,6 @@ app.post('/api/bookings', (req, res) => {
 
 // GET: 모든 예약 목록 조회 (관리자용)
 app.get('/api/bookings', (req, res) => {
-    // 실제 운영 시에는 관리자 인증 로직 필요
     const sortedBookings = [...bookings].sort((a, b) => b.id - a.id);
     res.json(sortedBookings);
 });
@@ -314,6 +294,27 @@ app.get('/api/bookings/check', (req, res) => {
         res.status(404).json({ message: '일치하는 예약 정보를 찾을 수 없습니다.' });
     }
 });
+
+// ===============================================================
+// ===== [추가된 코드] 특정 날짜/구역의 예약 현황 조회 API =====
+// ===============================================================
+app.get('/api/bookings/status', (req, res) => {
+    const { date, section } = req.query;
+
+    if (!date || !section) {
+        return res.status(400).json({ message: '날짜와 구역 정보가 필요합니다.' });
+    }
+
+    // 전체 예약(bookings) 목록에서 해당 날짜와 구역이 일치하는 예약만 필터링
+    const bookedDecks = bookings
+        .filter(b => b.bookingDate === date && b.section === section)
+        .map(b => b.deckName); // 필터링된 결과에서 평상 이름(deckName)만 추출
+
+    // 추출된 평상 이름 배열을 응답으로 보냄 (예: ["평상 1", "평상 3"])
+    res.json(bookedDecks);
+});
+// ===============================================================
+
 
 // ===============================================================
 // ===== 서버 실행 =====
