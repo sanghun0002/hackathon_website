@@ -232,62 +232,64 @@
     <script src="app.js"></script>
 
 <script type="module">
-        import { auth, db } from './firebase-config.js';
+        import { auth, db, appId } from './firebase-config.js'; 
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- 1. 헤더의 로그인/사용자이름 버튼 처리 ---
         const loginStatusLink = document.getElementById('login-status-link');
-        
-        onAuthStateChanged(auth, async (user) => {
-            console.log('Firebase 로그인 상태 확인 완료. 사용자:', user ? user.email : '로그아웃 상태');
+        const adminLink = document.getElementById('admin-link'); // 관리자 링크 요소 가져오기
 
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // (로그인 시 사용자 이름 표시 로직 - 이전과 동일)
+                // --- 로그인 상태일 경우 ---
+                
+                // 1. 로그인 버튼을 사용자 이름으로 변경
                 try {
-                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
                     const docSnap = await getDoc(userDocRef);
+                    
                     if (docSnap.exists() && docSnap.data().name) {
-                        loginStatusLink.textContent = `${docSnap.data().name}님`;
-                        loginStatusLink.href = 'mypage.html';
+                        const userName = docSnap.data().name;
+                        loginStatusLink.textContent = `${userName}님`;
+                        loginStatusLink.href = 'login-status.html';
                     } else {
                         loginStatusLink.textContent = '내 정보';
-                        loginStatusLink.href = 'mypage.html';
+                        loginStatusLink.href = 'login-status.html';
                     }
                 } catch (error) {
+                    console.error("사용자 정보 로딩 실패:", error);
                     loginStatusLink.textContent = '내 정보';
-                    loginStatusLink.href = 'mypage.html';
+                    loginStatusLink.href = 'login-status.html';
                 }
+
+                // 2. 관리자 버튼 접근 권한 설정 🔑
+                if (user.email === 'admin@gmaill.com') {
+                    // 이메일이 관리자 계정이면
+                    adminLink.textContent = '관리자';
+                    adminLink.href = 'admin.html';
+                    adminLink.onclick = null; // 혹시 모를 클릭 이벤트 제거
+                } else {
+                    // 일반 사용자 계정이면
+                    adminLink.textContent = '내 예약확인';
+                    adminLink.href = 'booking-check.html';
+                    adminLink.onclick = null;
+                }
+
             } else {
-                // 로그아웃 상태
+                // --- 로그아웃 상태일 경우 ---
+
+                // 1. 로그인 버튼 설정
                 loginStatusLink.textContent = '로그인';
-                loginStatusLink.href = 'login-status.html';
+                loginStatusLink.href = 'login.html';
+
+                // 2. 관리자 버튼 비활성화
+                adminLink.textContent = '관리자';
+                adminLink.href = '#'; // 페이지 이동 방지
+                adminLink.onclick = (e) => {
+                    e.preventDefault(); // 기본 동작(링크 이동) 막기
+                    alert('관리자 기능은 로그인이 필요합니다.');
+                };
             }
-
-            // --- 2. '예약하기' 버튼 처리 ---
-            console.log('이제 "예약하기" 버튼의 동작을 설정합니다.');
-            const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
-            console.log(`'booking.html' 링크를 ${bookingLinks.length}개 찾았습니다.`);
-
-            bookingLinks.forEach((link, index) => {
-                // 다른 스크립트와의 충돌을 막기 위해 기존 이벤트 리스너를 제거하고 새로 추가합니다.
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', function(event) {
-                    console.log(`'예약하기' 링크 #${index + 1} 클릭됨.`);
-                    
-                    // 클릭 시점의 로그인 상태를 다시 한번 확인
-                    if (!auth.currentUser) {
-                        console.log('사용자가 로그아웃 상태이므로 링크 이동을 막습니다.');
-                        event.preventDefault(); 
-                        alert('로그인 후 이용하시기 바랍니다.');
-                        window.location.href = 'login-status.html';
-                    } else {
-                        console.log('사용자가 로그인 상태이므로 booking.html로 정상 이동합니다.');
-                    }
-                });
-            });
         });
     </script>
 </body>
