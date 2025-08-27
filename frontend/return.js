@@ -70,37 +70,54 @@ document.addEventListener('DOMContentLoaded', () => {
             resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
             try {
+                // 1. AI 서버로 청결도 분석 요청 (이전과 동일)
                 const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
                 const formData = new FormData();
                 formData.append('file', resizedFile);
-                const response = await fetch(backendUrl, { method: 'POST', body: formData });
-                if (!response.ok) { throw new Error(`서버 응답 오류: ${response.status}`); }
-                const data = await response.json();
-                switch (data.status) {
-                    case 'CLEAN': resultDiv.textContent = '✅ 반납 되었습니다. 이용해 주셔서 감사합니다.'; break;
-                    case 'DIRTY': resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.'; break;
-                    case 'NO_PYEONGSANG': resultDiv.textContent = '⚠️ 평상이 인식되지 않습니다. 평상이 보이도록 다시 촬영해주세요.'; break;
-                    default: resultDiv.textContent = '알 수 없는 오류가 발생했습니다.';
+                
+                const predictResponse = await fetch(backendUrl, { // backendUrl은 AI 서버 주소
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
+                const predictData = await predictResponse.json();
+
+                // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
+                if (predictData.status === 'CLEAN') {
+                    resultDiv.textContent = '✅ 청결 확인! 예약 내역을 삭제합니다...';
+                    
+                    // 삭제에 필요한 사용자 정보와 평상 ID 가져오기
+                    const userName = localStorage.getItem('userName');
+                    const userPhone = localStorage.getItem('userPhone');
+                    const pyeongsangId = new URLSearchParams(window.location.search).get('id');
+
+                    if(!userName || !userPhone || !pyeongsangId) {
+                        throw new Error('예약 삭제에 필요한 사용자 또는 평상 정보가 없습니다.');
+                    }
+
+                    // 3. 예약 서버로 예약 삭제 요청
+                    const cancelUrl = `https://o70albxd7n.onrender.com/api/bookings/cancel/${pyeongsangId}`; // 예약 서버 주소
+                    const cancelResponse = await fetch(cancelUrl, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: userName, phone: userPhone })
+                    });
+                    
+                    if(!cancelResponse.ok) throw new Error('예약 내역 삭제 중 서버 오류 발생');
+                    
+                    // 4. 최종 성공 메시지를 화면에 표시
+                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
+
+                } else if (predictData.status === 'DIRTY') {
+                    resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
+                } else if (predictData.status === 'NO_PYEONGSANG') {
+                    resultDiv.textContent = '⚠️ 평상이 인식되지 않습니다. 평상이 보이도록 다시 촬영해주세요.';
                 }
+
             } catch (error) {
-                console.error('통신 오류:', error);
-                
-                // --- ▼▼ 여기가 수정된 부분입니다 ▼▼ ---
-
-                // 서버가 잠에서 깨어날 때 흔히 발생하는 네트워크 오류인지 확인
-                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                    resultDiv.textContent = '⏳ 서버가 깨어나는 중입니다. 잠시 후 다시 시도해주세요.';
-                    resultDiv.style.color = 'orange';
-                } else {
-                    // 그 외 다른 오류일 경우
-                    resultDiv.textContent = '🔌 서버와 통신 중 오류가 발생했습니다.';
-                    resultDiv.style.color = 'red';
-                }
-                
-                // --- ▲▲ 여기가 수정된 부분입니다 ▲▲ ---
-
+                console.error('오류 발생:', error);
+                resultDiv.textContent = `🔌 오류가 발생했습니다: ${error.message}`;
             } finally {
-                // 버튼을 다시 누를 수 있도록 활성화
                 uploadButton.disabled = false;
             }
         });
