@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
 
     // --- 💻 서버 주소 설정 ---
-    const aiServerUrl = 'https://image-analyzer-wduj.onrender.com/predict'; // Python AI 서버
+    const aiServerUrl = 'https://65a8b868fc3c.ngrok-free.app/predict'; // Python AI 서버
     const bookingServerUrl = 'https://o70albxd7n.onrender.com'; // Node.js 예약 서버
 
     // 이미지 리사이징 함수
