@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return 'status-completed';
         }
         if (status === '사용 중') {
-            return 'status-cancelled';
+            return 'status-using';
         }
         return 'status-pending'; // '대기' 또는 그 외의 경우
     };
