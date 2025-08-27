@@ -199,7 +199,6 @@
     <script src="app.js"></script>
 
     <script type="module">
-        // 1. firebase-config.js에서 불필요한 appId import를 제거합니다.
         import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -210,23 +209,24 @@
             if (user) {
                 // 로그인 상태일 경우
                 try {
-                    // --- [핵심 수정] ---
-                    // Firestore 경로를 'users' 컬렉션의 사용자 uid로 단순화하여 일관성을 유지합니다.
+                    // Firestore 'users' 컬렉션에서 현재 사용자 uid에 해당하는 문서를 찾습니다.
                     const userDocRef = doc(db, 'users', user.uid);
                     const docSnap = await getDoc(userDocRef);
                     
+                    // 문서가 존재하고, 그 안에 'name' 필드가 있는지 확인합니다.
                     if (docSnap.exists() && docSnap.data().name) {
                         const userName = docSnap.data().name;
                         loginStatusLink.textContent = `${userName}님`;
-                        loginStatusLink.href = 'login-status.html'; // 또는 my-page.html 등
+                        loginStatusLink.href = 'login-status.html';
                     } else {
-                        console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다.");
-                        loginStatusLink.textContent = '내 정보1';
+                        // **이 부분은 새 계정으로 가입하면 실행되지 않아야 합니다.**
+                        console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다. (경로: users/" + user.uid + ")");
+                        loginStatusLink.textContent = '내 정보';
                         loginStatusLink.href = 'login-status.html';
                     }
                 } catch (error) {
                     console.error("사용자 정보 로딩 실패:", error);
-                    loginStatusLink.textContent = '내 정보2';
+                    loginStatusLink.textContent = '내 정보';
                     loginStatusLink.href = 'login-status.html';
                 }
             } else {
