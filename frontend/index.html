@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>쉬어가~ 계곡</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     
@@ -83,6 +83,39 @@
         .content-right {
             flex: 1;
         }
+
+        /* ----- 스와이퍼 화살표 스타일 추가 및 조정 ----- */
+        .review-swiper {
+            position: relative; /* 자식 요소인 화살표의 위치를 위해 필요 */
+            padding: 0 40px; /* 화살표 공간 확보 */
+        }
+        .review-swiper .swiper-button-next,
+        .review-swiper .swiper-button-prev {
+            color: #333; /* 화살표 색상 */
+            width: 30px; /* 화살표 버튼 너비 */
+            height: 30px; /* 화살표 버튼 높이 */
+            background: rgba(255, 255, 255, 0.8); /* 배경색 */
+            border-radius: 50%; /* 원형 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 */
+            transition: all 0.2s ease;
+        }
+        .review-swiper .swiper-button-next::after,
+        .review-swiper .swiper-button-prev::after {
+            font-size: 16px; /* 화살표 아이콘 크기 */
+            font-weight: bold;
+        }
+        .review-swiper .swiper-button-next:hover,
+        .review-swiper .swiper-button-prev:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #007bff; /* 호버 시 색상 변경 */
+        }
+        .review-swiper .swiper-button-prev {
+            left: 5px; /* 왼쪽에서 약간 떨어뜨리기 */
+        }
+        .review-swiper .swiper-button-next {
+            right: 5px; /* 오른쪽에서 약간 떨어뜨리기 */
+        }
+        /* ------------------------------------------- */
     </style>
 </head>
     
@@ -199,7 +232,7 @@
     <script src="app.js"></script>
 
     <script type="module">
-        import { auth, db } from './firebase-config.js';
+        import { auth, db, appId } from './firebase-config.js'; 
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -210,7 +243,7 @@
                 // 로그인 상태일 경우
                 try {
                     // Firestore 'users' 컬렉션에서 현재 사용자 uid에 해당하는 문서를 찾습니다.
-                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
                     const docSnap = await getDoc(userDocRef);
                     
                     // 문서가 존재하고, 그 안에 'name' 필드가 있는지 확인합니다.
@@ -220,7 +253,7 @@
                         loginStatusLink.href = 'login-status.html';
                     } else {
                         // **이 부분은 새 계정으로 가입하면 실행되지 않아야 합니다.**
-                        console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다. (경로: users/" + user.uid + ")");
+                        console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다. (경로: artifacts/" + appId + "/users/" + user.uid + ")");
                         loginStatusLink.textContent = '내 정보';
                         loginStatusLink.href = 'login-status.html';
                     }
