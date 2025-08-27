@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmForm = document.getElementById('confirm-form');
     const submitButton = confirmForm.querySelector('button[type="submit"]');
 
-    // --- 예약 정보 불러오기 ---
+    // --- 1. 예약 정보 불러오기 (가격 관련 코드 없음) ---
     const date = localStorage.getItem('selectedDate');
     const valley = localStorage.getItem('selectedValley');
     const section = localStorage.getItem('selectedSection');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const deck = JSON.parse(deckString);
 
-    // --- 예약 요약 화면 표시 ---
+    // --- 2. 화면에 요약 정보 표시 (가격 관련 코드 없음) ---
     summaryDiv.innerHTML = `
         <h2 class="text-xl font-semibold mb-4 border-b pb-2">예약하실 내역</h2>
         <div class="space-y-2">
@@ -25,76 +25,59 @@ document.addEventListener('DOMContentLoaded', () => {
             <p><strong>계곡:</strong> ${valley}</p>
             <p><strong>구역:</strong> ${section}</p>
             <p><strong>평상:</strong> ${deck.name} (수용인원: ${deck.capacity}인)</p>
-            <p class="font-bold text-lg mt-2 pt-2 border-t"><strong>결제 금액:</strong> ${deck.price.toLocaleString()}원</p>
         </div>
     `;
 
-    // --- 아임포트 초기화 ---
-    const IMP = window.IMP;
-    IMP.init('imp02243407'); // 테스트 가맹점 식별코드
-
-    // --- 결제 + 예약 저장 ---
+    // --- 3. 백엔드로 데이터 전송 (가격 관련 코드 없음) ---
     confirmForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = "예약 처리 중...";
 
         const userName = document.getElementById('user-name').value;
         const userPhone = document.getElementById('user-phone').value;
 
-        submitButton.disabled = true;
-        submitButton.textContent = "결제 처리 중...";
+        // a. 백엔드로 전송할 객체 (가격 속성 없음)
+        const newBooking = {
+            name: userName,
+            phone: userPhone,
+            bookingDate: date,
+            valley,
+            section,
+            deckName: deck.name,
+            capacity: deck.capacity,
+            status: "예약 완료"
+        };
 
-        IMP.request_pay({
-            pg: "kakaopay",
-            pay_method: "card",
-            merchant_uid: "order_" + new Date().getTime(),
-            name: `${valley} ${section} ${deck.name}`,
-            amount: deck.price,
-            buyer_name: userName,
-            buyer_tel: userPhone,
-        }, function(rsp) {
-            if (rsp.success) {
-                // 백엔드에서 요구하는 필드만 포함
-                const newBooking = {
-                    name: userName,
-                    phone: userPhone,
-                    bookingDate: date,
-                    valley,
-                    section,
-                    deckName: deck.name,
-                    capacity: deck.capacity,
-                    status: "예약 완료"
-                };
+        const serverUrl = 'https://o70albxd7n.onrender.com';
+        const fetchUrl = `${serverUrl}/api/bookings`;
 
-                fetch('https://o70albxd7n.onrender.com/api/bookings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newBooking),
-                })
-                .then(res => {
-                    if (!res.ok) return res.json().then(err => { throw new Error(err.message || '서버 저장 실패') });
-                    return res.json();
-                })
-                .then(data => {
-                    // localStorage 정리
-                    localStorage.removeItem('selectedDate');
-                    localStorage.removeItem('selectedValley');
-                    localStorage.removeItem('selectedSection');
-                    localStorage.removeItem('selectedDeck');
-
-                    confirmForm.classList.add('hidden');
-                    document.getElementById('success-message').classList.remove('hidden');
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert(`결제는 완료됐지만 예약 저장 중 오류 발생: ${err.message}`);
-                    submitButton.disabled = false;
-                    submitButton.textContent = "결제하기";
-                });
-            } else {
-                alert("결제 실패: " + rsp.error_msg);
-                submitButton.disabled = false;
-                submitButton.textContent = "결제하기";
+        fetch(fetchUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newBooking),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || '서버 응답 오류') });
             }
+            return response.json();
+        })
+        .then(data => {
+            // b. 임시 데이터 삭제 (가격 관련 코드 없음)
+            localStorage.removeItem('selectedDate');
+            localStorage.removeItem('selectedValley');
+            localStorage.removeItem('selectedSection');
+            localStorage.removeItem('selectedDeck');
+
+            alert('예약이 성공적으로 완료되었습니다.');
+            window.location.href = 'index.html';
+        })
+        .catch(error => {
+            console.error('예약 처리 중 오류 발생:', error);
+            alert(`예약에 실패했습니다: ${error.message}`);
+            submitButton.disabled = false;
+            submitButton.textContent = "예약 완료하기";
         });
     });
 });
