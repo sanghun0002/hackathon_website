@@ -266,7 +266,7 @@ let nextBookingId = 1;
 
 // POST: 새 예약 생성
 app.post('/api/bookings', (req, res) => {
-    const { name, phone, bookingDate, valley, section, deckName, capacity, price, status } = req.body;
+    const { name, phone, bookingDate, valley, section, deckName, capacity, status } = req.body;
 
     // 필수 데이터 검증
     if (!name || !phone || !bookingDate || !valley || !section || !deckName) {
@@ -282,7 +282,6 @@ app.post('/api/bookings', (req, res) => {
         section,
         deckName,
         capacity,
-        price,
         status,
         createdAt: new Date().toISOString() // 예약 생성 시각 기록
     };
