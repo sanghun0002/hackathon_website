@@ -1,25 +1,121 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 확인 사이트</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>예약 정보 확인 및 결제</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jQuery & 아임포트 SDK -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 </head>
-<body>
-    <div class="container admin-container">
-        <header>
-            <h1>관리자 확인 사이트</h1>
-            <p>입금 내역을 수동으로 확인하고 처리할 수 있습니다.</p>
-        </header>
-        <main>
-            <ul id="admin-reservation-list">
-                </ul>
-             <div class="nav-links">
-                <a href="payment-index.html">홈으로</a>
-            </div>
-        </main>
+<body class="bg-gray-100 p-8">
+  <header class="main-header"><div class="logo">쉬어가~ 계곡</div></header>
+
+  <main class="booking-container">
+    <h1 class="text-3xl font-bold text-center mb-6">최종 예약 정보 확인</h1>
+
+    <!-- 예약 요약 -->
+    <div id="final-booking-summary" class="bg-white p-6 rounded-lg shadow mb-6">
+      <p><strong>지역:</strong> <span id="summary-region"></span></p>
+      <p><strong>계곡:</strong> <span id="summary-valley"></span></p>
+      <p><strong>구역:</strong> <span id="summary-zone">A 구역</span></p>
+      <p><strong>평상:</strong> <span id="summary-table">3번 평상</span></p>
+      <p class="font-bold text-lg"><strong>결제 금액:</strong> <span id="summary-amount">50,000</span>원</p>
     </div>
-    <script src="script.js"></script>
+
+    <!-- 예약자 입력 -->
+    <form id="confirm-form" class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">예약자 정보를 입력해주세요.</h2>
+      <div class="mb-4">
+        <label for="user-name" class="block mb-2">이름</label>
+        <input type="text" id="user-name" class="w-full p-2 border rounded" required>
+      </div>
+      <div class="mb-4">
+        <label for="user-phone" class="block mb-2">전화번호</label>
+        <input type="tel" id="user-phone" class="w-full p-2 border rounded" placeholder="010-1234-5678" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+        결제하기
+      </button>
+    </form>
+
+    <!-- 결제 성공 메시지 -->
+    <div id="success-message" class="bg-white p-8 rounded-lg shadow-md text-center hidden mt-6">
+      <h2 class="text-2xl font-bold text-blue-600 mb-4">예약 및 결제가 완료되었습니다!</h2>
+      <p class="text-gray-600 mb-6">예약 조회 페이지에서 정보를 확인하실 수 있습니다.</p>
+      <div class="flex gap-4 justify-center">
+        <a href="bookingcheck.html" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition">예약 조회하기</a>
+        <a href="index.html" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition">홈으로</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- 예약 정보 표시 ---
+    const selectedRegion = localStorage.getItem('selectedRegion') || '정보 없음';
+    const selectedValley = localStorage.getItem('selectedValley') || '정보 없음';
+    document.getElementById('summary-region').textContent = selectedRegion;
+    document.getElementById('summary-valley').textContent = selectedValley;
+
+    // --- 아임포트 초기화 ---
+    const IMP = window.IMP;
+    IMP.init("imp02243407"); // 가맹점 식별코드 (테스트용)
+
+    const form = document.getElementById("confirm-form");
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("user-name").value;
+      const phone = document.getElementById("user-phone").value;
+      const amountText = document.getElementById("summary-amount").textContent;
+      const amount = parseInt(amountText.replace(/,/g, ''), 10);
+
+      // --- 결제창 호출 ---
+      IMP.request_pay({
+        pg: "kakaopay.TC0ONETIME",   // 테스트용 PG
+        pay_method: "card",
+        merchant_uid: "order_" + new Date().getTime(),
+        name: `${selectedValley} A 구역 3번 평상`,
+        amount: amount,
+        buyer_name: name,
+        buyer_tel: phone,
+      }, function (rsp) {
+        if (rsp.success) {
+          // --- 결제 성공 → 서버에 예약 저장 ---
+          const newReservation = {
+            name: name,
+            phone: phone,
+            bookingDate: new Date().toISOString().split('T')[0],
+            region: selectedRegion,
+            valley: selectedValley,
+            zone: "A 구역",
+            table: "3번 평상"
+          };
+
+          fetch("/api/bookings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newReservation)
+          })
+          .then(res => {
+            if (!res.ok) throw new Error("서버 저장 실패");
+            return res.json();
+          })
+          .then(data => {
+            console.log("예약 저장 성공:", data);
+            document.getElementById("confirm-form").classList.add("hidden");
+            document.getElementById("success-message").classList.remove("hidden");
+          })
+          .catch(err => {
+            alert("예약 저장 중 오류 발생: " + err.message);
+          });
+
+        } else {
+          alert("결제 실패: " + rsp.error_msg);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
