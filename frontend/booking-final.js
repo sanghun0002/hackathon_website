@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('selectedDeck');
 
             alert('예약이 성공적으로 완료되었습니다.');
-            window.location.href = 'booking-complete.html';
+            window.location.href = 'index.html';
         })
         .catch(error => {
             console.error('예약 처리 중 오류 발생:', error);
