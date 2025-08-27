@@ -321,14 +321,15 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
     const foundBooking = bookings.find(b => {
-        // --- [핵심 수정] ---
-        // DB에 저장된 valley, section, deckName을 조합하여
-        // QR에서 읽어온 pyeongsangId와 일치하는지 확인합니다.
-        const fullId = `${b.valley}-${b.section}-${b.deckName}`;
+        // DB에 저장된 valley, section, deckName을 조합
+        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
         
-        return fullId === pyeongsangId &&
-               b.name === name &&
-               b.phone === phone &&
+        // --- [핵심 수정] ---
+        // 비교하기 전에 모든 공백(띄어쓰기)을 제거합니다.
+        // .replace(/\s/g, '')는 문자열의 모든 공백을 찾아 제거하는 코드입니다.
+        return fullIdFromDB.replace(/\s/g, '') === pyeongsangId.replace(/\s/g, '') &&
+               b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
+               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
                b.bookingDate === today;
     });
 
