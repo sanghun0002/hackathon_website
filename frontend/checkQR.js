@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultMessage = document.getElementById('result-message');
     
     // --- 💻 백엔드 서버 주소를 여기에 설정 ---
-    const backendUrl = 'https://image-analyzer-wduj.onrender.com/verify-booking';
+    const backendUrl = 'https://65a8b868fc3c.ngrok-free.app/verify-booking';
 
     // 화면에 평상 ID 표시
     if (pyeongsangId) {
