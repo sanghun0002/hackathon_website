@@ -162,7 +162,7 @@ app.post('/api/reviews', upload.array('images', 5), (req, res) => {
         id: nextReviewId++,
         title, author,
         rating: parseInt(rating, 10),
-        date: new Date().toISOStr.ng().split('T')[0],
+        date: new Date().toISOString().split('T')[0],
         views: 0,
         content,
         images,
