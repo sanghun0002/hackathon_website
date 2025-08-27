@@ -361,35 +361,34 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     }
 });
 
-// DELETE: 예약 내역 삭제 (환불 메시지 안내용)
-app.delete('/api/bookings/cancel/:pyeongsangId', (req, res) => {
-    // URL에서 pyeongsangId를 받음
+// DELETE: 특정 예약 취소 (평상 ID로 찾고, 이름/전화번호로 본인 확인)
+app.delete('/api/bookings/:pyeongsangId', (req, res) => {
+    // URL에서 취소할 예약의 평상 ID를 가져옴
     const { pyeongsangId } = req.params;
-    // 본인 확인을 위해 이름과 전화번호도 함께 받음
+    // 본인 확인을 위해 요청 본문(body)에서 이름과 전화번호를 가져옴
     const { name, phone } = req.body;
 
-    console.log('예약 삭제 요청 받음:', { pyeongsangId, name, phone });
+    if (!name || !phone) {
+        return res.status(400).json({ message: '본인 확인을 위해 이름과 전화번호가 필요합니다.' });
+    }
 
-    // pyeongsangId, 이름, 전화번호가 모두 일치하는 예약 건의 인덱스를 찾음
+    // bookings 배열에서 해당 평상 ID, 이름, 전화번호가 모두 일치하는 예약 건의 인덱스를 찾음
     const bookingIndex = bookings.findIndex(b => {
-        // DB에 저장된 valley, section, deckName을 조합하여 ID 생성 후 비교
-        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
-
-        return fullIdFromDB.replace(/\s/g, '') === pyeongsangId.replace(/\s/g, '') &&
+        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`.replace(/\s/g, '');
+        return fullIdFromDB === pyeongsangId.replace(/\s/g, '') &&
                b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
                b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '');
     });
 
     if (bookingIndex === -1) {
-        return res.status(404).json({ message: '삭제할 예약 정보를 찾을 수 없습니다.' });
+        return res.status(404).json({ message: '취소할 예약을 찾을 수 없습니다.' });
     }
 
-    // 데이터베이스(배열)에서 해당 예약 내역 삭제
-    const deletedBooking = bookings.splice(bookingIndex, 1);
-    console.log('예약 내역 삭제 완료:', deletedBooking);
+    // 모든 확인이 끝나면, 배열에서 해당 예약 정보를 삭제
+    bookings.splice(bookingIndex, 1);
 
-    // 프론트엔드에 성공 메시지 전송
-    res.json({ message: '예약 내역이 성공적으로 삭제되었습니다.' });
+    console.log(`예약 ${pyeongsangId}가 삭제되었습니다.`);
+    res.status(200).json({ message: '예약이 성공적으로 취소되었습니다.' });
 });
 
 // ===============================================================
