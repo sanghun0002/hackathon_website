@@ -315,31 +315,26 @@ app.get('/api/bookings/status', (req, res) => {
 });
 // ===============================================================
 
-// --- 현장 QR 인증 API ---
+// POST: 현장 QR 인증 (날짜, 평상ID, 이름, 전화번호 확인)
 app.post('/api/bookings/verify-on-site', (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
-
-    // --- 진단용 로그 추가 ---
-    console.log('--- 현장 인증 요청 받음 ---');
-    console.log('프론트엔드에서 받은 데이터:', { pyeongsangId, name, phone });
-    
     const today = new Date().toISOString().split('T')[0];
-    console.log('서버가 인식한 오늘 날짜:', today);
-    console.log('현재 서버에 저장된 예약 전체 목록:', bookings);
-    // -----------------------
 
-    const foundBooking = bookings.find(b => 
-        b.deckName === pyeongsangId &&
-        b.name === name &&
-        b.phone === phone &&
-        b.bookingDate === today
-    );
+    const foundBooking = bookings.find(b => {
+        // --- [핵심 수정] ---
+        // DB에 저장된 valley, section, deckName을 조합하여
+        // QR에서 읽어온 pyeongsangId와 일치하는지 확인합니다.
+        const fullId = `${b.valley}-${b.section}-${b.deckName}`;
+        
+        return fullId === pyeongsangId &&
+               b.name === name &&
+               b.phone === phone &&
+               b.bookingDate === today;
+    });
 
     if (foundBooking) {
-        console.log('일치하는 예약을 찾았습니다:', foundBooking);
         res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
     } else {
-        console.log('일치하는 예약을 찾지 못했습니다.');
         res.status(404).json({ status: 'failure', message: '예약자 정보가 올바르지 않습니다. 다시 입력해주세요.' });
     }
 });
