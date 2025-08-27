@@ -22,29 +22,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Mock Data (Replace this with real API call) ---
     // This function simulates fetching data from a server.
     const fetchAllBookings = async () => {
-        // In a real application, you would make a fetch call here:
-        // const response = await fetch('/api/admin/bookings');
-        // const data = await response.json();
-        // return data;
-
-        // Mock data for demonstration
-        return [
-            { bookingDate: "2025-08-27", region: "경상북도", valley: "무흘 계곡", section: "제1곡 봉비암", deckName: "평상 1", name: "홍길동", phone: "010-1234-5678", status: "사용중" },
-            { bookingDate: "2025-08-28", region: "경상북도", valley: "무흘 계곡", section: "제1곡 봉비암", deckName: "평상 2", name: "김철수", phone: "010-9876-5432", status: "대기" },
-            { bookingDate: "2025-08-27", region: "경상북도", valley: "무흘 계곡", section: "제2곡 한강대", deckName: "평상 1", name: "이영희", phone: "010-1111-2222", status: "사용중" },
-            { bookingDate: "2025-08-29", region: "경상북도", valley: "삼계리 계곡", section: "삼계리 1구역", deckName: "평상 3", name: "박민준", phone: "010-3333-4444", status: "대기" },
-            { bookingDate: "2025-08-27", region: "경기도", valley: "송추 계곡", section: "1구역", deckName: "평상 2", name: "최은지", phone: "010-5555-6666", status: "대기" },
-            { bookingDate: "2025-08-28", region: "경기도", valley: "송추 계곡", section: "1구역", deckName: "평상 1", name: "강현우", phone: "010-7777-8888", status: "사용중" },
-            { bookingDate: "2025-08-29", region: "경기도", valley: "용추 계곡", section: "A구역", deckName: "평상 1", name: "서지민", phone: "010-9999-0000", status: "대기" },
-            // Add more mock data for pagination testing
-            { bookingDate: "2025-08-27", region: "경상북도", valley: "무흘 계곡", section: "제1곡 봉비암", deckName: "평상 3", name: "장민지", phone: "010-1234-1234", status: "대기" },
-            { bookingDate: "2025-08-28", region: "경상북도", valley: "무흘 계곡", section: "제2곡 한강대", deckName: "평상 2", name: "오동민", phone: "010-5678-5678", status: "대기" },
-            { bookingDate: "2025-08-29", region: "경상북도", valley: "삼계리 계곡", section: "삼계리 1구역", deckName: "평상 1", name: "김동건", phone: "010-1122-3344", status: "사용중" },
-            { bookingDate: "2025-08-29", region: "경기도", valley: "어비 계곡", section: "B구역", deckName: "평상 1", name: "유재석", phone: "010-4455-6677", status: "대기" },
-            { bookingDate: "2025-08-29", region: "경기도", valley: "어비 계곡", section: "B구역", deckName: "평상 2", name: "노홍철", phone: "010-8899-0011", status: "대기" },
-            { bookingDate: "2025-08-29", region: "강원도", valley: "무릉 계곡", section: "1구역", deckName: "평상 4", name: "박명수", phone: "010-2233-4455", status: "대기" },
-            { bookingDate: "2025-08-29", region: "강원도", valley: "흥정 계곡", section: "A구역", deckName: "평상 1", name: "정준하", phone: "010-6677-8899", status: "대기" }
-        ];
+        try {
+            const response = await fetch(`${serverUrl}/api/bookings`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch booking data');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching booking data:', error);
+            alert('예약 데이터를 불러오는 데 실패했습니다.');
+            return []; // 에러 발생 시 빈 배열 반환
+        }
     };
 
     // --- Dynamic Filter Options (Simulated) ---
