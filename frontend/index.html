@@ -231,29 +231,25 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
 
-    <script type="module">
-        import { auth, db, appId } from './firebase-config.js'; 
+<script type="module">
+        import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- 1. 로그인/사용자 이름 표시 로직 (이전과 동일) ---
         const loginStatusLink = document.getElementById('login-status-link');
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // 로그인 상태일 경우
                 try {
-                    // Firestore 'users' 컬렉션에서 현재 사용자 uid에 해당하는 문서를 찾습니다.
-                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
+                    const userDocRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(userDocRef);
-                    
-                    // 문서가 존재하고, 그 안에 'name' 필드가 있는지 확인합니다.
                     if (docSnap.exists() && docSnap.data().name) {
                         const userName = docSnap.data().name;
                         loginStatusLink.textContent = `${userName}님`;
                         loginStatusLink.href = 'login-status.html';
                     } else {
-                        // **이 부분은 새 계정으로 가입하면 실행되지 않아야 합니다.**
-                        console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다. (경로: artifacts/" + appId + "/users/" + user.uid + ")");
                         loginStatusLink.textContent = '내 정보';
                         loginStatusLink.href = 'login-status.html';
                     }
@@ -265,10 +261,31 @@
             } else {
                 // 로그아웃 상태일 경우
                 loginStatusLink.textContent = '로그인';
-                loginStatusLink.href = 'login.html';
+                loginStatusLink.href = 'login-status.html';
             }
         });
 
+        // --- 2. [새로 추가] '예약하기' 버튼 로직 ---
+        
+        // 사이드바와 메인 섹션에 있는 '예약하기' 링크를 모두 찾습니다.
+        const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
+
+        bookingLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // 현재 로그인 상태를 확인합니다.
+                const user = auth.currentUser;
+
+                if (!user) {
+                    // 로그아웃 상태이면, 기본 링크 이동을 막습니다.
+                    event.preventDefault(); 
+                    
+                    // 알림 메시지를 보여주고 로그인 페이지로 이동합니다.
+                    alert('로그인 후 이용하시기 바랍니다.');
+                    window.location.href = 'login-status.html';
+                }
+                // 로그인 상태이면, 아무것도 하지 않고 원래 링크(booking.html)로 이동하도록 둡니다.
+            });
+        });
     </script>
 </body>
 </html>
