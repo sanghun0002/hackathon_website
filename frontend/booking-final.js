@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmForm = document.getElementById('confirm-form');
     const submitButton = confirmForm.querySelector('button[type="submit"]');
 
-    // 1. 예약 정보 불러오기
+    // --- 1. 예약 정보 불러오기 ---
     const date = localStorage.getItem('selectedDate');
     const valley = localStorage.getItem('selectedValley');
     const section = localStorage.getItem('selectedSection');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const deck = JSON.parse(deckString);
 
-    // 2. 화면에 요약 정보 표시
+    // --- 2. 화면에 요약 정보 표시 ---
     summaryDiv.innerHTML = `
         <h2 class="text-xl font-semibold mb-4 border-b pb-2">예약하실 내역</h2>
         <div class="space-y-2">
@@ -29,32 +29,33 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // 3. 포트원 초기화
+    // --- 3. 아임포트 초기화 ---
     const IMP = window.IMP;
-    IMP.init('imp02243407'); // 본인의 가맹점 식별코드로 교체
+    IMP.init('imp02243407'); // 가맹점 식별코드
 
-    // 4. '결제 하기' 버튼 클릭 시 이벤트 처리
+    // --- 4. 결제 및 예약 저장 ---
     confirmForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         const userName = document.getElementById('user-name').value;
         const userPhone = document.getElementById('user-phone').value;
+        const amount = deck.price;
 
-        // 포트원 결제 요청
+        submitButton.disabled = true;
+        submitButton.textContent = "결제 처리 중...";
+
+        // 아임포트 결제 호출
         IMP.request_pay({
             pg: "kakaopay",
             pay_method: "card",
             merchant_uid: "order_" + new Date().getTime(),
             name: `${valley} ${section} ${deck.name}`,
-            amount: deck.price,
+            amount: amount,
             buyer_name: userName,
             buyer_tel: userPhone,
         }, function (rsp) {
             if (rsp.success) {
-                // 결제 성공 시, 백엔드 서버로 데이터 전송
-                submitButton.disabled = true;
-                submitButton.textContent = "예약 처리 중...";
-
+                // --- 결제 성공 시 서버에 예약 저장 ---
                 const newBooking = {
                     name: userName,
                     phone: userPhone,
@@ -64,23 +65,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     deckName: deck.name,
                     capacity: deck.capacity,
                     price: deck.price,
-                    paymentId: rsp.imp_uid, // 결제 고유번호 추가
+                    paymentId: rsp.imp_uid,
                     status: "예약 완료"
                 };
 
                 const serverUrl = 'https://o70albxd7n.onrender.com';
-                const fetchUrl = `${serverUrl}/api/bookings`;
-
-                fetch(fetchUrl, {
+                fetch(`${serverUrl}/api/bookings`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newBooking),
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || '서버 응답 오류') });
-                    }
-                    return response.json();
+                .then(res => {
+                    if (!res.ok) return res.json().then(err => { throw new Error(err.message || '서버 저장 실패') });
+                    return res.json();
                 })
                 .then(data => {
                     localStorage.removeItem('selectedDate');
@@ -88,17 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.removeItem('selectedSection');
                     localStorage.removeItem('selectedDeck');
 
-                    alert('예약이 성공적으로 완료되었습니다.');
-                    window.location.href = 'index.html';
+                    confirmForm.classList.add('hidden');
+                    document.getElementById('success-message').classList.remove('hidden');
                 })
-                .catch(error => {
-                    console.error('예약 처리 중 오류 발생:', error);
-                    alert(`결제는 성공했으나 예약 저장에 실패했습니다: ${error.message}`);
+                .catch(err => {
+                    console.error(err);
+                    alert(`결제는 완료됐지만 예약 저장 중 오류 발생: ${err.message}`);
                     submitButton.disabled = false;
-                    submitButton.textContent = "결제 하기";
+                    submitButton.textContent = "결제하기";
                 });
             } else {
-                alert("결제에 실패했습니다. 에러: " + rsp.error_msg);
+                alert("결제 실패: " + rsp.error_msg);
+                submitButton.disabled = false;
+                submitButton.textContent = "결제하기";
             }
         });
     });
