@@ -940,3 +940,49 @@ body {
 .image-preview-wrapper:hover .delete-overlay label {
     display: block;
 }
+
+/* admin.css */
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: var(--background-light, #f9f9f9);
+    color: var(--text-dark, #333);
+}
+
+.container {
+    padding: 24px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.filters {
+    background-color: var(--background-light, #f9f9f9);
+    border: 1px solid #e2e8f0;
+}
+
+.min-w-full thead th {
+    background-color: #f9fafb;
+    border-bottom-width: 1px;
+    border-color: #e5e7eb;
+}
+
+.min-w-full tbody td {
+    border-bottom-width: 1px;
+    border-color: #e5e7eb;
+}
+
+.min-w-full tbody tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
+#pagination-controls button {
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#pagination-controls button:hover:not(:disabled) {
+    background-color: #e2e8f0;
+}
+
+/* admin.css end */
