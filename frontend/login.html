@@ -28,34 +28,51 @@
         </form>
     </div>
 
-    <script type="module">
-        import { auth } from './firebase-config.js';
-        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+   <script type="module">
+      // 1. firebase-config.js에서 appId를 추가로 import 합니다.
+      import { auth, db, appId } from './firebase-config.js';
+      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const loginForm = document.getElementById('login-form');
-        const errorMessage = document.getElementById('error-message');
+      const loggedInView = document.getElementById('logged-in-view');
+      const loggedOutView = document.getElementById('logged-out-view');
+      const userNameSpan = document.getElementById('user-name');
+      const logoutBtn = document.getElementById('logout-btn');
 
-        // 이미 로그인 상태라면 바로 메인 페이지로 보냅니다.
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                window.location.href = 'index.html'; 
-            }
-        });
+      onAuthStateChanged(auth, async (user) => {
+          if (user) {
+              try {
+                  // 2. 데이터를 읽어올 경로를 index.html과 동일하게 수정합니다.
+                  const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
+                  const docSnap = await getDoc(userDocRef);
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            errorMessage.textContent = '';
+                  if (docSnap.exists()) {
+                      userNameSpan.textContent = docSnap.data().name;
+                  } else {
+                      userNameSpan.textContent = user.email;
+                  }
+              } catch (error) {
+                  console.error("사용자 정보 가져오기 실패:", error);
+                  userNameSpan.textContent = user.email;
+              }
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // 로그인이 성공하면 onAuthStateChanged가 감지하여 index.html로 보냅니다.
-            } catch(error) {
-                errorMessage.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
-                console.error(error);
-            }
-        });
-    </script>
+              loggedInView.classList.remove('hidden');
+              loggedOutView.classList.add('hidden');
+
+          } else {
+              loggedOutView.classList.remove('hidden');
+              loggedInView.classList.add('hidden');
+          }
+      });
+
+      logoutBtn.addEventListener('click', () => {
+          signOut(auth)
+              .then(() => console.log('로그아웃 성공'))
+              .catch(error => {
+                  console.error('로그아웃 실패:', error);
+                  alert('로그아웃에 실패했습니다.');
+              });
+      });
+  </script>
 </body>
 </html>
