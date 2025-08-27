@@ -344,6 +344,37 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     }
 });
 
+// DELETE: 예약 내역 삭제 (환불 메시지 안내용)
+app.delete('/api/bookings/cancel/:pyeongsangId', (req, res) => {
+    // URL에서 pyeongsangId를 받음
+    const { pyeongsangId } = req.params;
+    // 본인 확인을 위해 이름과 전화번호도 함께 받음
+    const { name, phone } = req.body;
+
+    console.log('예약 삭제 요청 받음:', { pyeongsangId, name, phone });
+
+    // pyeongsangId, 이름, 전화번호가 모두 일치하는 예약 건의 인덱스를 찾음
+    const bookingIndex = bookings.findIndex(b => {
+        // DB에 저장된 valley, section, deckName을 조합하여 ID 생성 후 비교
+        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
+
+        return fullIdFromDB.replace(/\s/g, '') === pyeongsangId.replace(/\s/g, '') &&
+               b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
+               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '');
+    });
+
+    if (bookingIndex === -1) {
+        return res.status(404).json({ message: '삭제할 예약 정보를 찾을 수 없습니다.' });
+    }
+
+    // 데이터베이스(배열)에서 해당 예약 내역 삭제
+    const deletedBooking = bookings.splice(bookingIndex, 1);
+    console.log('예약 내역 삭제 완료:', deletedBooking);
+
+    // 프론트엔드에 성공 메시지 전송
+    res.json({ message: '예약 내역이 성공적으로 삭제되었습니다.' });
+});
+
 // ===============================================================
 // ===== 서버 실행 =====
 // ===============================================================
