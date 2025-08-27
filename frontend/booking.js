@@ -1,87 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const summaryDiv = document.getElementById('final-booking-summary');
-    const confirmForm = document.getElementById('confirm-form');
-    const submitButton = confirmForm.querySelector('button[type="submit"]');
+    const nextBtn = document.getElementById('next-step-btn');
+    const hiddenDateInput = document.getElementById('date-input');
 
-    const date = localStorage.getItem('selectedDate');
-    const valley = localStorage.getItem('selectedValley');
-    const section = localStorage.getItem('selectedSection');
-    const deckString = localStorage.getItem('selectedDeck');
+    let bookingSelection = {
+        date: null
+    };
 
-    if (!date || !valley || !section || !deckString) {
-        alert('예약 정보가 올바르지 않습니다. 처음부터 다시 시도해주세요.');
-        window.location.href = 'booking.html';
-        return;
-    }
+    const today = new Date();
+    const twoWeeksLater = new Date();
+    twoWeeksLater.setDate(today.getDate() + 14);
 
-    const deck = JSON.parse(deckString);
-
-    // 가격 표시 부분 제거
-    summaryDiv.innerHTML = `
-        <h2 class="text-xl font-semibold mb-4 border-b pb-2">예약하실 내역</h2>
-        <div class="space-y-2">
-            <p><strong>날짜:</strong> ${date}</p>
-            <p><strong>계곡:</strong> ${valley}</p>
-            <p><strong>구역:</strong> ${section}</p>
-            <p><strong>평상:</strong> ${deck.name} (수용인원: ${deck.capacity}인)</p>
-        </div>
-    `;
-
-    confirmForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        submitButton.disabled = true;
-        submitButton.textContent = "예약 처리 중...";
-
-        const userName = document.getElementById('user-name').value;
-        const userPhone = document.getElementById('user-phone').value;
-
-        // 백엔드로 전송할 객체 (가격 정보 없음)
-        const newBooking = {
-            name: userName,
-            phone: userPhone,
-            bookingDate: date,
-            valley,
-            section,
-            deckName: deck.name,
-            capacity: deck.capacity,
-            status: "예약 완료"
-        };
-
-        // ===============================================================
-        // ===== [수정된 부분] 서버 주소를 정확하게 명시 =====
-        // ===============================================================
-        const serverUrl = 'https://o70albxd7n.onrender.com'; // 실제 서버 주소
-        const fetchUrl = `${serverUrl}/api/bookings`;
-        // ===============================================================
-
-        fetch(fetchUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newBooking),
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || '서버 응답에 문제가 발생했습니다.') });
+    flatpickr("#calendar-area", {
+        inline: true,
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        maxDate: twoWeeksLater,
+        locale: 'ko',
+        onReady: (selectedDates, dateStr, instance) => {
+            nextBtn.disabled = true;
+        },
+        onChange: (selectedDates, dateStr, instance) => {
+            if (dateStr) {
+                hiddenDateInput.value = dateStr;
+                bookingSelection.date = dateStr;
+                nextBtn.disabled = false;
+            } else {
+                bookingSelection.date = null;
+                nextBtn.disabled = true;
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('서버로부터 받은 응답:', data);
-            
-            localStorage.removeItem('selectedDate');
-            localStorage.removeItem('selectedValley');
-            localStorage.removeItem('selectedSection');
-            localStorage.removeItem('selectedDeck');
-            localStorage.removeItem('selectedPrice'); // 혹시 남아있을 수 있으니 제거
-
-            alert('예약이 성공적으로 완료되었습니다.');
-            window.location.href = 'booking-complete.html';
-        })
-        .catch(error => {
-            console.error('예약 처리 중 오류 발생:', error);
-            alert(`예약에 실패했습니다: ${error.message}`);
-            submitButton.disabled = false;
-            submitButton.textContent = "예약 완료하기";
-        });
+        }
     });
+
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            if (bookingSelection.date) {
+                // 수정: localStorage에 날짜를 저장하고 페이지를 이동합니다.
+                localStorage.setItem('selectedDate', bookingSelection.date);
+                window.location.href = 'booking-step2.html'; // URL 파라미터 제거
+            } else {
+                alert('날짜를 먼저 선택해주세요.');
+            }
+        };
+    }
 });
