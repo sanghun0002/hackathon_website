@@ -113,6 +113,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // (기존 사이드 메뉴, 히어로 슬라이더 기능은 변경 없이 그대로 유지됩니다)
-    // ...
+    // ===================================
+    // ===== 사이드 메뉴 기능 =====
+    // ===================================
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (sidebar) {
+        const toggleIcon = sidebar.querySelector('.sidebar-toggle i');
+    
+        sidebar.addEventListener('mouseenter', () => {
+            toggleIcon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+        });
+    
+        sidebar.addEventListener('mouseleave', () => {
+            toggleIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+        });
+    }
+
+    // ===================================
+    // ===== 히어로 섹션 슬라이더 기능 =====
+    // ===================================
+    const sliderWrapper = document.querySelector('.slider-wrapper');
+
+    if (sliderWrapper) {
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        let currentIndex = 0;
+        const slideCount = slides.length;
+
+        function goToSlide(index) {
+            if (index < 0) index = slideCount - 1;
+            else if (index >= slideCount) index = 0;
+            sliderWrapper.style.transform = `translateX(-${index * 100}%)`;
+            currentIndex = index;
+        }
+
+        nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+        prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+
+        setInterval(() => {
+            goToSlide(currentIndex + 1);
+        }, 5000);
+    }
 });
