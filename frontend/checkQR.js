@@ -3,21 +3,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const pyeongsangId = urlParams.get('id');
 
-    // '선택 화면으로' 버튼의 링크를 동적으로 설정합니다.
+    // '이전' 버튼 링크 설정
     const backBtn = document.getElementById('back-to-choice-btn');
     if (pyeongsangId && backBtn) {
         backBtn.href = `QR.html?id=${pyeongsangId}`;
     }
 
-    // --- 이하 현장 인증 로직 ---
+    // HTML 요소 가져오기
     const pyeongsangIdDisplay = document.getElementById('pyeongsang-id-display');
     const authForm = document.getElementById('auth-form');
     const nameInput = document.getElementById('name-input');
     const phoneInput = document.getElementById('phone-input');
     const resultMessage = document.getElementById('result-message');
-
+    
     // --- 💻 백엔드 서버 주소를 여기에 설정 ---
-    const backendUrl = 'https://a8b87664edd2.ngrok-free.app/verify-booking';
+    const backendUrl = 'https://image-analyzer-wduj.onrender.com/verify-booking';
 
     // 화면에 평상 ID 표시
     if (pyeongsangId) {
@@ -47,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
 
+            // [수정된 부분] 서버가 보내주는 메시지를 그대로 출력
             if (data.status === 'success') {
                 resultMessage.textContent = `✅ ${data.message}`;
                 resultMessage.style.color = 'green';
-                authForm.style.display = 'none';
+                authForm.style.display = 'none'; // 성공 후 폼 숨기기
             } else {
                 resultMessage.textContent = `❌ ${data.message}`;
                 resultMessage.style.color = 'red';
