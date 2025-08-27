@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('페이지 로딩 완료, 반납 스크립트 실행 시작.');
+
     // URL에서 평상 ID 값을 읽어옵니다.
     const urlParams = new URLSearchParams(window.location.search);
     const pyeongsangId = urlParams.get('id');
@@ -9,15 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
         backBtn.href = `QR.html?id=${pyeongsangId}`;
     }
 
-    // --- 이하 반납 인증 로직 ---
+    // HTML 요소들을 미리 찾아 변수에 저장합니다.
     const imageInput = document.getElementById('imageInput');
     const preview = document.getElementById('preview');
     const uploadButton = document.getElementById('uploadButton');
     const resultDiv = document.getElementById('result');
 
-    // --- 💻 백엔드 서버 주소를 여기에 설정 ---
-    const backendUrl = 'https://65a8b868fc3c.ngrok-free.app/predict';
+    // --- 💻 서버 주소 설정 ---
+    const aiServerUrl = 'https://image-analyzer-wduj.onrender.com/predict'; // Python AI 서버
+    const bookingServerUrl = 'https://o70albxd7n.onrender.com'; // Node.js 예약 서버
 
+    // 이미지 리사이징 함수
     function resizeImage(file, maxWidth, maxHeight, quality) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -29,17 +33,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
+
                     if (width > height) {
-                        if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
                     } else {
-                        if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
                     }
+
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
+
                     canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                        resolve(new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now(),
+                        }));
                     }, 'image/jpeg', quality);
                 };
                 img.onerror = reject;
@@ -48,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 사진 선택(촬영) 시 미리보기 기능
     if (imageInput) {
         imageInput.addEventListener('change', (event) => {
             const file = event.target.files?.[0];
@@ -59,18 +76,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // '인증하기' 버튼 클릭 이벤트 처리
     if (uploadButton) {
-        uploadButton.disabled = true;
+        uploadButton.disabled = true; // 페이지 로드 시에는 버튼 비활성화
+
         uploadButton.addEventListener('click', async () => {
             const originalFile = imageInput.files?.[0];
             if (!originalFile) {
                 alert('사진을 먼저 촬영해주세요!');
                 return;
             }
+
             resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
+
             try {
-                // --- [핵심 수정] ---
                 // 1. AI 서버로 청결도 분석 요청
                 const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
                 const formData = new FormData();
@@ -86,14 +106,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
                 if (predictData.status === 'CLEAN') {
-                    resultDiv.textContent = '✅ 청결 확인! 예약 내역을 삭제합니다...';
+                    resultDiv.textContent = '✅ 청결 확인! 본인 확인을 위해 정보를 입력해주세요.';
                     
-                    const userName = localStorage.getItem('userName');
-                    const userPhone = localStorage.getItem('userPhone');
+                    const userName = prompt("예약자 성함을 입력하세요:");
+                    if (userName === null || userName.trim() === '') return; // 사용자가 취소하거나 아무것도 입력하지 않으면 중단
 
-                    if (!userName || !userPhone || !pyeongsangId) {
-                        throw new Error('예약 취소에 필요한 사용자 또는 평상 정보가 없습니다.');
-                    }
+                    const userPhone = prompt("예약 시 사용한 전화번호를 입력하세요:");
+                    if (userPhone === null || userPhone.trim() === '') return; // 사용자가 취소하거나 아무것도 입력하지 않으면 중단
+
+                    resultDiv.textContent = '예약 내역을 삭제 중입니다...';
 
                     // 3. Node.js 예약 서버로 예약 삭제 요청
                     const cancelUrl = `${bookingServerUrl}/api/bookings/${pyeongsangId}`;
