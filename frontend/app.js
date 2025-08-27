@@ -37,8 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // =======================================================
-    // ===== [신규] 후기 슬라이더 기능 (Swiper.js 연동) =====
+    // ===== 후기 슬라이더 기능 (Swiper.js 연동) =====
     // =======================================================
+    // [수정] reviewSliderWrapper 변수는 이 블록 안에서만 사용하도록 수정
     const reviewSliderWrapper = document.getElementById('review-slider-wrapper');
 
     if (reviewSliderWrapper) {
@@ -67,8 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="review-slider-card">
                             <div>
                                 <div class="rating">${renderStars(review.rating)}</div>
-                                <h4 class="title">${review.title}</h4>
-                                <p class="content">${review.content.substring(0, 100)}...</p>
+                                <a href="review_detail.html?id=${review.id}" class="title">${review.title}</a>
+                                <p class="content">${review.content.substring(0, 80)}...</p>
                             </div>
                             <p class="author">- ${review.author}님</p>
                         </div>
@@ -78,26 +79,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // 모든 슬라이드가 추가된 후 Swiper 초기화
                 const swiper = new Swiper('.review-swiper', {
-                    // 옵션
-                    slidesPerView: 1, // 한 번에 1개의 슬라이드 보이기
-                    spaceBetween: 30, // 슬라이드 사이 여백
-                    loop: true, // 무한 루프
-                    
-                    // 화면 크기에 따른 반응형 설정
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    loop: latestReviews.length > 2,
                     breakpoints: {
-                        // 768px 이상일 때
-                        768: {
-                          slidesPerView: 2,
-                          spaceBetween: 20
-                        },
-                        // 1024px 이상일 때
-                        1024: {
-                          slidesPerView: 3,
-                          spaceBetween: 30
-                        }
+                        768: { slidesPerView: 2, spaceBetween: 20 },
+                        1024: { slidesPerView: 3, spaceBetween: 30 }
                     },
-                    
-                    // 네비게이션 버튼
                     navigation: {
                         nextEl: '.swiper-button-next',
                         prevEl: '.swiper-button-prev',
