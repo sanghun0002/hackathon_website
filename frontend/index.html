@@ -12,79 +12,59 @@
     
     <!-- 헤더 및 슬라이더 스타일 -->
     <style>
-        /* 헤더 전체를 감싸는 컨테이너 */
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 10px 20px;
-            box-sizing: border-box;
-        }
-        
-        /* 로고를 감싸는 메인 박스 */
-        .logo-box {
-            flex-grow: 1;
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+        /* (기존 헤더 스타일은 변경 없이 그대로 유지됩니다) */
+        .header-container { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 20px; box-sizing: border-box; }
+        .logo-box { flex-grow: 1; text-align: center; padding: 20px; background-color: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .header-button-box { width: 120px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; text-align: center; display: flex; justify-content: center; align-items: center; height: 40px; }
+        .header-button-box a { text-decoration: none; color: #333; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
 
-        /* 관리자/로그인 버튼을 감싸는 작은 박스 */
-        .header-button-box {
-            width: 120px;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 40px;
-        }
-        .header-button-box a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 14px;
-        }
-
-        /* 후기 슬라이더 카드 스타일 */
-        .review-slider-card {
-            width: 100%;
-            height: 100%;
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid #eee;
-        }
+        /* (기존 후기 슬라이더 카드 스타일은 변경 없이 그대로 유지됩니다) */
+        .review-slider-card { width: 100%; height: 100%; background: white; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eee; }
         .review-slider-card .rating { font-size: 1.2rem; margin-bottom: 10px; }
         .review-slider-card .title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; color: #333; text-decoration: none; transition: color 0.2s; }
         .review-slider-card .title:hover { color: #007bff; }
         .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
         .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
         
-        /* 슬라이더 레이아웃 문제 해결 */
-        .content-section {
+        /* (기존 슬라이더 레이아웃 스타일은 변경 없이 그대로 유지됩니다) */
+        .content-section { display: flex; gap: 20px; }
+        .content-left { flex: 2; min-width: 0; }
+        .content-right { flex: 1; }
+
+        /* ======================================================= */
+        /* ===== [추가/수정된 코드] Swiper 버튼 위치 조정 ===== */
+        /* ======================================================= */
+        .review-swiper {
+            position: relative; /* 버튼의 absolute 위치 기준점 */
+            padding: 0 40px; /* 버튼이 들어갈 좌우 공간 확보 */
+        }
+        .review-swiper .swiper-button-next,
+        .review-swiper .swiper-button-prev {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px; /* 버튼 크기 고정 */
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
             display: flex;
-            gap: 20px;
+            align-items: center;
+            justify-content: center;
         }
-        .content-left {
-            flex: 2;
-            min-width: 0;
+        .review-swiper .swiper-button-next::after,
+        .review-swiper .swiper-button-prev::after {
+            font-size: 16px; /* 화살표 아이콘 크기 조절 */
+            font-weight: bold;
+            color: #007bff;
         }
-        .content-right {
-            flex: 1;
+        .review-swiper .swiper-button-prev {
+            left: 0; /* 왼쪽 끝에 배치 */
         }
+        .review-swiper .swiper-button-next {
+            right: 0; /* 오른쪽 끝에 배치 */
+        }
+        /* ======================================================= */
     </style>
 </head>
     
@@ -112,7 +92,7 @@
             <div class="logo">쉬어가~ 계곡</div>
         </header>
         <div class="header-button-box">
-            <a href="login-status.html">로그인</a>
+            <a href="login.html">로그인</a>
         </div>
     </div>
 
@@ -165,18 +145,21 @@
         <section class="content-section">
             <!-- 왼쪽: 후기 슬라이더 -->
             <div class="content-left">
-                <div class="swiper review-swiper">
-                    <div class="card-header" style="padding: 0 10px 10px 10px;">
-                        <h3>최신 이용후기</h3>
-                        <a href="review.html" class="more-link">더보기 +</a>
-                    </div>
-                    <div class="swiper-wrapper" id="review-slider-wrapper">
-                        <!-- 후기 슬라이드가 여기에 동적으로 추가됩니다. -->
-                        <div class="swiper-slide">
-                            <div class="review-slider-card">후기를 불러오는 중...</div>
+                <!-- [수정] Swiper 컨테이너를 한 번 더 감싸서 버튼 위치 기준 잡기 -->
+                <div style="position: relative;">
+                    <div class="swiper review-swiper">
+                        <div class="card-header" style="padding: 0 10px 10px 10px;">
+                            <h3>최신 이용후기</h3>
+                            <a href="review.html" class="more-link">더보기 +</a>
+                        </div>
+                        <div class="swiper-wrapper" id="review-slider-wrapper">
+                            <!-- 후기 슬라이드가 여기에 동적으로 추가됩니다. -->
+                            <div class="swiper-slide">
+                                <div class="review-slider-card">후기를 불러오는 중...</div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Swiper 네비게이션 버튼 -->
+                    <!-- Swiper 네비게이션 버튼 (컨테이너 안으로 이동) -->
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>
                 </div>
