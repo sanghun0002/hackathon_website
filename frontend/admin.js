@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (status === '예약 및 결제 완료') {
             return 'status-completed';
         }
-        if (status === '사용중') {
+        if (status === '사용 중') {
             return 'status-cancelled';
         }
         return 'status-pending'; // '대기' 또는 그 외의 경우
