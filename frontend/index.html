@@ -6,6 +6,38 @@
     <title>쉬어가~ 계곡</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- [추가] 헤더 버튼 스타일 -->
+    <style>
+        .main-header {
+            display: flex;
+            justify-content: center; /* 로고를 중앙에 두기 위한 기본 정렬 */
+            align-items: center;
+            position: relative; /* 자식 요소의 absolute 위치 기준 */
+            width: 100%;
+        }
+        .header-btn {
+            position: absolute; /* 헤더를 기준으로 절대 위치 */
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .header-btn:hover {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+        .header-btn.left-btn {
+            left: 20px; /* 왼쪽 여백 */
+        }
+        .header-btn.right-btn {
+            right: 20px; /* 오른쪽 여백 */
+        }
+    </style>
 </head>
     
 <body>
@@ -24,8 +56,16 @@
             </ul>
         </nav>
     </aside>
+
+    <!-- [수정된 헤더] -->
     <header class="main-header">
+        <!-- 왼쪽 관리자 버튼 -->
+        <a href="admin.html" class="header-btn left-btn">관리자</a>
+        
         <div class="logo">쉬어가~ 계곡</div>
+
+        <!-- 오른쪽 로그인 버튼 -->
+        <a href="login.html" class="header-btn right-btn">로그인</a>
     </header>
 
    <main>
