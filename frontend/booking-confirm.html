@@ -2,24 +2,17 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>예약 정보 확인 및 결제</title>
+    <title>예약 정보 확인 및 입력</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 </head>
 <body class="bg-gray-100 p-8">
     <header class="main-header"><div class="logo">쉬어가~ 계곡</div></header>
-
     <main class="booking-container">
         <h1 class="text-3xl font-bold text-center mb-6">최종 예약 정보 확인</h1>
-
-        <!-- 예약 요약 -->
         <div id="final-booking-summary" class="bg-white p-6 rounded-lg shadow mb-6">
             <p class="text-center text-gray-500">예약 정보를 불러오는 중...</p>
         </div>
-
-        <!-- 예약자 입력 -->
         <form id="confirm-form" class="bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-semibold mb-4">예약자 정보를 입력해주세요.</h2>
             <div class="mb-4">
@@ -30,22 +23,9 @@
                 <label for="user-phone" class="block mb-2">전화번호</label>
                 <input type="tel" id="user-phone" class="w-full p-2 border rounded" placeholder="010-1234-5678" required>
             </div>
-            <button type="submit" class="btn btn-primary w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                결제하기
-            </button>
+            <button type="submit" class="btn btn-primary w-full">결제 하기</button>
         </form>
-
-        <!-- 결제 성공 메시지 -->
-        <div id="success-message" class="bg-white p-8 rounded-lg shadow-md text-center hidden mt-6">
-            <h2 class="text-2xl font-bold text-blue-600 mb-4">예약 및 결제가 완료되었습니다!</h2>
-            <p class="text-gray-600 mb-6">예약 조회 페이지에서 정보를 확인하실 수 있습니다.</p>
-            <div class="flex gap-4 justify-center">
-                <a href="bookingcheck.html" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition">예약 조회하기</a>
-                <a href="index.html" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition">홈으로</a>
-            </div>
-        </div>
     </main>
-
     <script src="booking-final.js"></script>
 </body>
 </html>
