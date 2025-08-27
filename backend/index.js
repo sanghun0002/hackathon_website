@@ -256,6 +256,65 @@ app.post('/api/reviews/:id/verify', (req, res) => {
     }
 });
 
+// ===============================================================
+// ===== [추가된 코드] 예약(Booking) API 영역 =====
+// ===============================================================
+
+// 예약 데이터를 저장할 배열 (실제 운영 시에는 DB 사용)
+let bookings = [];
+let nextBookingId = 1;
+
+// POST: 새 예약 생성
+app.post('/api/bookings', (req, res) => {
+    const { name, phone, bookingDate, valley, section, deckName, capacity, price, status } = req.body;
+
+    // 필수 데이터 검증
+    if (!name || !phone || !bookingDate || !valley || !section || !deckName) {
+        return res.status(400).json({ message: '필수 예약 정보가 누락되었습니다.' });
+    }
+
+    const newBooking = {
+        id: nextBookingId++,
+        name,
+        phone,
+        bookingDate,
+        valley,
+        section,
+        deckName,
+        capacity,
+        price,
+        status,
+        createdAt: new Date().toISOString() // 예약 생성 시각 기록
+    };
+
+    bookings.push(newBooking);
+    console.log('새로운 예약이 추가되었습니다:', newBooking);
+    res.status(201).json({ message: '예약이 성공적으로 완료되었습니다.', booking: newBooking });
+});
+
+// GET: 모든 예약 목록 조회 (관리자용)
+app.get('/api/bookings', (req, res) => {
+    // 실제 운영 시에는 관리자 인증 로직 필요
+    const sortedBookings = [...bookings].sort((a, b) => b.id - a.id);
+    res.json(sortedBookings);
+});
+
+// GET: 특정 사용자의 예약 조회 (이름과 전화번호로)
+app.get('/api/bookings/check', (req, res) => {
+    const { name, phone } = req.query;
+
+    if (!name || !phone) {
+        return res.status(400).json({ message: '조회를 위해 이름과 전화번호를 모두 입력해주세요.' });
+    }
+
+    const foundBookings = bookings.filter(b => b.name === name && b.phone === phone);
+
+    if (foundBookings.length > 0) {
+        res.json(foundBookings);
+    } else {
+        res.status(404).json({ message: '일치하는 예약 정보를 찾을 수 없습니다.' });
+    }
+});
 
 // ===============================================================
 // ===== 서버 실행 =====
