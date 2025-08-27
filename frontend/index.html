@@ -35,6 +35,17 @@
         .review-slider-card .title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; color: #333; }
         .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
         .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
+        .content-section {
+            display: flex; /* 자식 요소들을 가로로 배치 */
+            gap: 20px;     /* 좌우 섹션 사이의 간격 */
+        }
+        .content-left {
+            flex: 2; /* 오른쪽 섹션보다 2배의 너비를 차지 */
+            min-width: 0; /* flex 아이템이 부모를 넘어가지 않도록 하는 중요한 속성 */
+        }
+        .content-right {
+            flex: 1; /* 왼쪽 섹션의 절반 너비를 차지 */
+        }    
     </style>
 </head>
     
