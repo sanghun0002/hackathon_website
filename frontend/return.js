@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
 
     // --- 💻 백엔드 서버 주소를 여기에 설정 ---
-    const backendUrl = ' https://a8b87664edd2.ngrok-free.app/predict';
+    const backendUrl = 'https://65a8b868fc3c.ngrok-free.app/predict';
 
     function resizeImage(file, maxWidth, maxHeight, quality) {
         return new Promise((resolve, reject) => {
