@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 백엔드 API에 GET 요청 보내기
         // 서버 주소는 실제 운영 환경에 맞게 변경해야 합니다.
-        fetch(`http://localhost:3000/api/bookings/check?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`)
+        fetch(`https://o70albxd7n.onrender.com=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`)
             .then(response => {
                 if (response.status === 404) {
                     // 404 Not Found는 예약이 없는 경우로 간주
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <th>계곡</th>
                         <th>구역</th>
                         <th>평상</th>
-                        <th>가격</th>
                         <th>예약 상태</th>
                     </tr>
                 </thead>
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${booking.valley}</td>
                     <td>${booking.section}</td>
                     <td>${booking.deckName}</td>
-                    <td>${booking.price ? Number(booking.price).toLocaleString() + '원' : '-'}</td>
                     <td><span class="status-${booking.status === '예약 완료' ? 'completed' : 'pending'}">${booking.status}</span></td>
                 </tr>
             `;
