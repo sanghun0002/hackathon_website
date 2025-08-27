@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     // 4. 최종 성공 메시지 표시
-                    resultDiv.textContent = '🎉 반납이 완료되었습니다.';
+                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 영업일 기준 최대 7일이 소요될 수 있습니다.';
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
