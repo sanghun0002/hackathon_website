@@ -198,8 +198,9 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
 
-    <script type="module">
-        import { auth, db, appId } from './firebase-config.js'; 
+<script type="module">
+        // firebase-config.js에서 appId도 함께 가져옵니다.
+        import { auth, db, appId } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -207,25 +208,33 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // 사용자가 로그인한 경우
-                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
-                
+                // --- 1. 로그인 상태일 경우 ---
                 try {
+                    // --- [핵심 수정] ---
+                    // 회원가입 시 사용했던 것과 동일한, 올바른 Firestore 경로로 수정합니다.
+                    const userDocRef = doc(db, `/artifacts/${appId}/users`, user.uid);
                     const docSnap = await getDoc(userDocRef);
-                    if (docSnap.exists()) {
+                    
+                    // Firestore에 문서가 있고, 그 안에 'name' 필드가 있는지 확인합니다.
+                    if (docSnap.exists() && docSnap.data().name) {
                         const userName = docSnap.data().name;
-                        loginStatusLink.textContent = `${name}님`;
+                        loginStatusLink.textContent = `${userName}님`;
+                        loginStatusLink.href = 'login-status.html'; // 로그인 시 마이페이지로 연결
                     } else {
-                        console.error("문서를 찾을 수 없습니다. 경로를 다시 확인해주세요.");
+                        // 이름 정보가 없을 경우, '내 정보'로 표시합니다.
+                        console.log("Firestore에 사용자 이름 정보가 없습니다.");
                         loginStatusLink.textContent = '내 정보';
+                        loginStatusLink.href = 'login-status.html';
                     }
                 } catch (error) {
                     console.error("사용자 정보 로딩 실패:", error);
                     loginStatusLink.textContent = '내 정보';
+                    loginStatusLink.href = 'login-status.html';
                 }
             } else {
-                // 사용자가 로그아웃한 경우
+                // --- 2. 로그아웃 상태일 경우 ---
                 loginStatusLink.textContent = '로그인';
+                loginStatusLink.href = 'login-status.html';
             }
         });
     </script>
