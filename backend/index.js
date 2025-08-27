@@ -321,12 +321,7 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
     const foundBooking = bookings.find(b => {
-        // DB에 저장된 valley, section, deckName을 조합
         const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
-        
-        // --- [핵심 수정] ---
-        // 비교하기 전에 모든 공백(띄어쓰기)을 제거합니다.
-        // .replace(/\s/g, '')는 문자열의 모든 공백을 찾아 제거하는 코드입니다.
         return fullIdFromDB.replace(/\s/g, '') === pyeongsangId.replace(/\s/g, '') &&
                b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
                b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
@@ -334,8 +329,17 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     });
 
     if (foundBooking) {
+        // --- [핵심 수정] ---
+        // 찾은 예약 데이터의 상태(status)를 '사용 중'으로 변경합니다.
+        foundBooking.status = '사용 중';
+        
+        console.log('예약 상태 변경 완료:', foundBooking); // 상태 변경 확인용 로그
+        // -----------------------
+
+        // 모든 정보가 일치
         res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
     } else {
+        // 정보 불일치
         res.status(404).json({ status: 'failure', message: '예약자 정보가 올바르지 않습니다. 다시 입력해주세요.' });
     }
 });
