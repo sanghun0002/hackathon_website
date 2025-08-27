@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const valley = localStorage.getItem('selectedValley');
     const section = localStorage.getItem('selectedSection');
     const deckString = localStorage.getItem('selectedDeck');
-    // 가격 정보도 가져오도록 booking-step4.js가 수정되었다고 가정합니다.
-    const price = localStorage.getItem('selectedPrice') || '가격 정보 없음'; 
 
     // 필수 정보가 하나라도 없으면 오류 처리 후 첫 페이지로 이동
     if (!date || !valley || !section || !deckString) {
@@ -79,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('selectedValley');
             localStorage.removeItem('selectedSection');
             localStorage.removeItem('selectedDeck');
-            localStorage.removeItem('selectedPrice');
 
             // e. 모든 과정이 끝났으므로 예약 완료 페이지로 이동합니다.
             alert('예약이 성공적으로 완료되었습니다.');
