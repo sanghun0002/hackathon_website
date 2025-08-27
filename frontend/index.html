@@ -1,222 +1,341 @@
 <!DOCTYPE html>
+
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쉬어가~ 계곡</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="style.css">
-    
-    <style>
-        .header-container { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 20px; box-sizing: border-box; }
-        .logo-box { flex-grow: 1; text-align: center; padding: 20px; background-color: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .header-button-box { width: 120px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; text-align: center; display: flex; justify-content: center; align-items: center; height: 40px; }
-        .header-button-box a { text-decoration: none; color: #333; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
-        .review-slider-card { width: 100%; height: 100%; background: white; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eee; }
-        .review-slider-card .rating { font-size: 1.2rem; margin-bottom: 10px; }
-        .review-slider-card .title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; color: #333; }
-        .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
-        .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
-        .content-section { display: flex; gap: 20px; }
-        .content-left { flex: 2; min-width: 0; }
-        .content-right { flex: 1; }    
-    </style>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>쉬어가~ 계곡</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- [추가] Swiper.js CSS -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="style.css">
+
+    
+
+    <!-- 헤더 스타일 -->
+
+    <style>
+
+        /* (기존 헤더 스타일은 변경 없이 그대로 유지됩니다) */
+
+        .header-container { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 20px; box-sizing: border-box; }
+
+        .logo-box { flex-grow: 1; text-align: center; padding: 20px; background-color: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .header-button-box { width: 120px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; text-align: center; display: flex; justify-content: center; align-items: center; height: 40px; }
+
+        .header-button-box a { text-decoration: none; color: #333; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; }
+
+
+
+        /* [추가] 후기 슬라이더 카드 스타일 */
+
+        .review-slider-card {
+
+            width: 100%;
+
+            height: 100%;
+
+            background: white;
+
+            border-radius: 8px;
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: space-between;
+
+            border: 1px solid #eee;
+
+        }
+
+        .review-slider-card .rating { font-size: 1.2rem; margin-bottom: 10px; }
+
+        .review-slider-card .title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; color: #333; }
+
+        .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
+
+        .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
+
+        .content-section {
+
+            display: flex; /* 자식 요소들을 가로로 배치 */
+
+            gap: 20px;     /* 좌우 섹션 사이의 간격 */
+
+        }
+
+        .content-left {
+
+            flex: 2; /* 오른쪽 섹션보다 2배의 너비를 차지 */
+
+            min-width: 0; /* flex 아이템이 부모를 넘어가지 않도록 하는 중요한 속성 */
+
+        }
+
+        .content-right {
+
+            flex: 1; /* 왼쪽 섹션의 절반 너비를 차지 */
+
+        }    
+
+    </style>
+
 </head>
-    
+
+    
+
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-toggle">
-            <i class="fas fa-chevron-right"></i>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="notice.html"><i class="fas fa-bullhorn"></i><span>공지사항</span></a></li>
-                <li><a href="booking.html"><i class="fas fa-calendar-alt"></i><span>예약하기</span></a></li>
-                <li><a href="local.html"><i class="fas fa-lightbulb"></i><span>편의사항</span></a></li>
-                <li><a href="bookingcheck.html"><i class="fas fa-check-circle"></i><span>내 예약확인</span></a></li>
-                <li><a href="review.html"><i class="fas fa-star"></i><span>사용후기</span></a></li>
-            </ul>
-        </nav>
-    </aside>
-    <div class="header-container">
-        <div class="header-button-box">
-            <a href="admin.html">관리자</a>
-        </div>
-        <header class="logo-box">
-            <div class="logo">쉬어가~ 계곡</div>
-        </header>
-        <div class="header-button-box">
-            <a id="login-status-link" href="login-status.html">로그인</a>
-        </div>
-    </div>
 
-   <main>
-        <!-- (기존 main 태그 내용은 변경 없이 그대로 유지됩니다) -->
-        <section class="hero-section">
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <div class="slide" style="background-image: url('images/background1.jpg');">
-                        <div class="hero-content">
-                            <h1>전국 계곡 여행은 쉬어가~ 계곡!</h1>
-                            <p>당일 치기, 1박 2일 계곡 방문을 편한하게 도와주는 특별한 공간으로 여러분을 초대합니다.</p>
-                        </div>
-                    </div>
-                    <div class="slide" style="background-image: url('images/background2.jpg');">
-                        <div class="hero-content">
-                            <h1>시원한 여름, 자연 속으로</h1>
-                            <p>가족, 친구들과 함께 잊지 못할 추억을 만들어보세요.</p>
-                        </div>
-                    </div>
-                    <div class="slide" style="background-image: url('images/background3.jpg');">
-                        <div class="hero-content">
-                            <h1>최고의 휴식처, 바로 여기</h1>
-                            <p>지금 바로 예약하고 특별한 혜택을 누리세요.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
-            <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
-        </section>
-        <section class="shortcuts">
-            <a href="notice.html" class="shortcut-item">
-                <div class="icon">📢</div> <div>공지사항</div>
-            </a>
-            <a href="booking.html" class="shortcut-item">
-                <div class="icon">📅</div> <div>예약하기</div>
-            </a>
-            <a href="local.html" class="shortcut-item">
-                <div class="icon">💡</div> <div>편의사항</div>
-            </a>
-            <a href="bookingcheck.html" class="shortcut-item">
-                <div class="icon">✅</div> <div>내 예약확인</div>
-            </a>
-            <a href="review.html" class="shortcut-item">
-                <div class="icon">⭐</div> <div>사용후기</div>
-            </a>
-        </section>
-        <section class="content-section">
-            <div class="content-left">
-                <div class="swiper review-swiper">
-                    <div class="card-header" style="padding: 0 10px 10px 10px;">
-                        <h3>최신 이용후기</h3>
-                        <a href="review.html" class="more-link">더보기 +</a>
-                    </div>
-                    <div class="swiper-wrapper" id="review-slider-wrapper">
-                        <div class="swiper-slide">
-                            <div class="review-slider-card">후기를 불러오는 중...</div>
-                        </div>
-                    </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                </div>
-            </div>
-            <div class="content-right">
-                <div class="card notice-preview">
-                    <div class="card-header">
-                        <h3>공지사항</h3>
-                        <a href="notice.html" class="more-link">더보기 +</a>
-                    </div>
-                    <ul id="notice-list-widget">
-                        <li>공지사항을 불러오는 중...</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <footer class="main-footer">
-        <p>&copy; 2025 쉬어가~ 계곡. All Rights Reserved.</p>
-    </footer>
+    <!-- (기존 aside, header-container 코드는 변경 없이 그대로 유지됩니다) -->
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <!-- --- 수정된 부분: app.js를 지우고 모든 스크립트를 여기에 통합 --- -->
-    <script type="module">
-        // Firebase 모듈 import
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <aside class="sidebar">
 
-        // Firebase 설정
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        <div class="sidebar-toggle">
 
-        // DOMContentLoaded: HTML 문서가 모두 로드되면 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- 로그인 상태 확인 로직 ---
-            const loginStatusLink = document.getElementById('login-status-link');
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // 로그인된 경우
-                    try {
-                        const userDocRef = doc(db, `/artifacts/${appId}/users`, user.uid);
-                        const docSnap = await getDoc(userDocRef);
-                        if (docSnap.exists() && docSnap.data().name) {
-                            loginStatusLink.textContent = `${docSnap.data().name}님`;
-                        } else {
-                            loginStatusLink.textContent = "내 정보";
-                        }
-                    } catch (e) {
-                        console.error("사용자 정보 로딩 실패:", e);
-                        loginStatusLink.textContent = "내 정보";
-                    }
-                    loginStatusLink.href = 'login-status.html';
-                } else {
-                    // 로그아웃된 경우
-                    loginStatusLink.textContent = '로그인';
-                    loginStatusLink.href = 'login.html';
-                }
-            });
+            <i class="fas fa-chevron-right"></i>
 
-            // --- 기존 app.js에 있었을 것으로 추정되는 기능들 ---
+        </div>
 
-            // 1. 사이드바 토글 기능
-            const sidebarToggle = document.querySelector('.sidebar-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            if(sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            }
+        <nav class="sidebar-nav">
 
-            // 2. 메인 슬라이더 기능
-            const heroSlider = new Swiper('.hero-section .slider-container', {
-                loop: true,
-                autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false,
-                },
-                navigation: {
-                    nextEl: '.hero-section .next-btn',
-                    prevEl: '.hero-section .prev-btn',
-                },
-            });
+            <ul>
 
-            // 3. 후기 슬라이더 기능
-            const reviewSwiper = new Swiper('.review-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                breakpoints: {
-                    768: {
-                        slidesPerView: 2,
-                        spaceBetween: 20,
-                    },
-                }
-            });
-            
-            // (이 아래에 공지사항, 후기 목록을 서버에서 불러오는 fetch 코드가 들어갈 수 있습니다)
-        });
-    </script>
+                <li><a href="notice.html"><i class="fas fa-bullhorn"></i><span>공지사항</span></a></li>
+
+                <li><a href="booking.html"><i class="fas fa-calendar-alt"></i><span>예약하기</span></a></li>
+
+                <li><a href="local.html"><i class="fas fa-lightbulb"></i><span>편의사항</span></a></li>
+
+                <li><a href="booking-check.html"><i class="fas fa-check-circle"></i><span>내 예약확인</span></a></li>
+
+                <li><a href="review.html"><i class="fas fa-star"></i><span>사용후기</span></a></li>
+
+            </ul>
+
+        </nav>
+
+    </aside>
+
+    <div class="header-container">
+
+        <div class="header-button-box">
+
+            <a href="admin.html">관리자</a>
+
+        </div>
+
+        <header class="logo-box">
+
+            <div class="logo">쉬어가~ 계곡</div>
+
+        </header>
+
+        <div class="header-button-box">
+
+            <a href="login-status.html">로그인</a>
+
+        </div>
+
+    </div>
+
+
+
+   <main>
+
+        <section class="hero-section">
+
+            <div class="slider-container">
+
+                <div class="slider-wrapper">
+
+                    <div class="slide" style="background-image: url('images/background1.jpg');">
+
+                        <div class="hero-content">
+
+                            <h1>전국 계곡 여행은 쉬어가~ 계곡!</h1>
+
+                            <p>당일 치기, 1박 2일 계곡 방문을 편한하게 도와주는 특별한 공간으로 여러분을 초대합니다.</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="slide" style="background-image: url('images/background2.jpg');">
+
+                        <div class="hero-content">
+
+                            <h1>시원한 여름, 자연 속으로</h1>
+
+                            <p>가족, 친구들과 함께 잊지 못할 추억을 만들어보세요.</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="slide" style="background-image: url('images/background3.jpg');">
+
+                        <div class="hero-content">
+
+                            <h1>최고의 휴식처, 바로 여기</h1>
+
+                            <p>지금 바로 예약하고 특별한 혜택을 누리세요.</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+
+            <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+
+        </section>
+
+
+
+        <section class="shortcuts">
+
+            <a href="notice.html" class="shortcut-item">
+
+                <div class="icon">📢</div> <div>공지사항</div>
+
+            </a>
+
+            <a href="booking.html" class="shortcut-item">
+
+                <div class="icon">📅</div> <div>예약하기</div>
+
+            </a>
+
+            <a href="local.html" class="shortcut-item">
+
+                <div class="icon">💡</div> <div>편의사항</div>
+
+            </a>
+
+            <a href="booking-check.html" class="shortcut-item">
+
+                <div class="icon">✅</div> <div>내 예약확인</div>
+
+            </a>
+
+            <a href="review.html" class="shortcut-item">
+
+                <div class="icon">⭐</div> <div>사용후기</div>
+
+            </a>
+
+        </section>
+
+        
+
+        <!-- [수정된 content-section] -->
+
+        <section class="content-section">
+
+            <!-- 왼쪽 content-left를 후기 슬라이더로 변경 -->
+
+            <div class="content-left">
+
+                <!-- Swiper.js를 위한 기본 구조 -->
+
+                <div class="swiper review-swiper">
+
+                    <div class="card-header" style="padding: 0 10px 10px 10px;">
+
+                        <h3>최신 이용후기</h3>
+
+                        <a href="review.html" class="more-link">더보기 +</a>
+
+                    </div>
+
+                    <div class="swiper-wrapper" id="review-slider-wrapper">
+
+                        <!-- 후기 슬라이드가 여기에 동적으로 추가됩니다. -->
+
+                        <div class="swiper-slide">
+
+                            <div class="review-slider-card">후기를 불러오는 중...</div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Swiper 네비게이션 버튼 -->
+
+                    <div class="swiper-button-next"></div>
+
+                    <div class="swiper-button-prev"></div>
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- 오른쪽 content-right는 공지사항만 남김 -->
+
+            <div class="content-right">
+
+                <div class="card notice-preview">
+
+                    <div class="card-header">
+
+                        <h3>공지사항</h3>
+
+                        <a href="notice.html" class="more-link">더보기 +</a>
+
+                    </div>
+
+                    <ul id="notice-list-widget">
+
+                        <li>공지사항을 불러오는 중...</li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    
+
+    <footer class="main-footer">
+
+        <p>&copy; 2025 쉬어가~ 계곡. All Rights Reserved.</p>
+
+    </footer>
+
+
+
+    <!-- [추가] Swiper.js 스크립트 -->
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script src="app.js"></script>
+
 </body>
+
 </html>
