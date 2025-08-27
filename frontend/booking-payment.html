@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>아임포트 카카오페이 결제 테스트</title>
+    <link rel="stylesheet" href="style.css"> <!-- 기존 스타일시트를 재사용할 수 있습니다. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery와 아임포트 SDK를 반드시 먼저 불러옵니다. -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <main class="max-w-lg mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-6">카카오페이 결제 테스트</h1>
+
+        <!-- 결제 정보 (실제로는 이전 페이지에서 받아옵니다) -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">주문 정보</h2>
+            <p><strong>상품명:</strong> <span id="product-name">계곡 평상 A-3</span></p>
+            <p class="font-bold text-lg"><strong>결제 금액:</strong> <span id="payment-amount">100</span>원</p>
+            <p class="text-sm text-gray-500 mt-2">※ 테스트를 위해 결제 금액이 100원으로 설정되었습니다.</p>
+        </div>
+
+        <!-- 결제자 정보 입력 폼 -->
+        <form id="payment-form" class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">주문자 정보를 입력해주세요.</h2>
+            <div class="mb-4">
+                <label for="user-name" class="block mb-2">이름</label>
+                <input type="text" id="user-name" class="w-full p-2 border rounded" value="홍길동" required>
+            </div>
+            <div class="mb-4">
+                <label for="user-phone" class="block mb-2">전화번호</label>
+                <input type="tel" id="user-phone" class="w-full p-2 border rounded" value="010-1234-5678" required>
+            </div>
+            <button type="submit" class="w-full bg-yellow-400 text-black font-bold py-3 rounded-lg hover:bg-yellow-500 transition">
+                카카오페이로 결제하기
+            </button>
+        </form>
+
+        <!-- 결과 메시지 표시 영역 -->
+        <div id="result-message" class="bg-white p-8 rounded-lg shadow-md text-center hidden mt-6"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. 아임포트 가맹점 식별코드 초기화
+            const IMP = window.IMP;
+            IMP.init("imp02243407"); // 발급받은 테스트용 가맹점 식별코드를 입력합니다.
+
+            const form = document.getElementById("payment-form");
+            const resultDiv = document.getElementById("result-message");
+
+            form.addEventListener("submit", function(e) {
+                e.preventDefault(); // 폼 기본 제출 방지
+
+                // 2. 결제에 필요한 정보 수집
+                const productName = document.getElementById("product-name").textContent;
+                const amount = parseInt(document.getElementById("payment-amount").textContent, 10);
+                const buyerName = document.getElementById("user-name").value;
+                const buyerTel = document.getElementById("user-phone").value;
+                
+                // 고유한 주문번호 생성 (실제로는 서버에서 생성하는 것을 권장)
+                const merchantUid = "order_" + new Date().getTime();
+
+                // 3. IMP.request_pay() 함수를 호출하여 결제창 열기
+                IMP.request_pay({
+                    pg: "kakaopay.TC0ONETIME", // 카카오페이 테스트용 PG사
+                    pay_method: "card",        // 결제 수단
+                    merchant_uid: merchantUid, // 고유한 주문번호
+                    name: productName,         // 주문명 (결제창에 표시됨)
+                    amount: amount,            // 결제 금액
+                    buyer_name: buyerName,     // 구매자 이름
+                    buyer_tel: buyerTel,       // 구매자 전화번호
+                    // buyer_email: "test@example.com", // 필요 시 구매자 이메일 추가
+                    // m_redirect_url: "{모바일에서 결제 완료 후 돌아올 주소}" // 모바일 환경 리디렉션
+                }, function (rsp) {
+                    // 4. 결제 후 콜백 함수 처리
+                    if (rsp.success) {
+                        // --- 결제 성공 시 로직 ---
+                        console.log("결제 성공 응답:", rsp);
+
+                        // TODO: 실제 서비스에서는 여기서 서버에 결제 검증 및 예약 정보 저장을 요청해야 합니다.
+                        // 예: fetch('/api/bookings', { ... })
+
+                        resultDiv.innerHTML = `
+                            <h2 class="text-2xl font-bold text-blue-600 mb-4">결제에 성공했습니다!</h2>
+                            <p><strong>주문번호:</strong> ${rsp.merchant_uid}</p>
+                            <p><strong>결제금액:</strong> ${rsp.paid_amount.toLocaleString()}원</p>
+                        `;
+                        resultDiv.classList.remove('hidden');
+                        form.classList.add('hidden');
+
+                    } else {
+                        // --- 결제 실패 시 로직 ---
+                        console.log("결제 실패 응답:", rsp);
+                        
+                        resultDiv.innerHTML = `
+                            <h2 class="text-2xl font-bold text-red-600 mb-4">결제에 실패했습니다.</h2>
+                            <p><strong>오류 메시지:</strong> ${rsp.error_msg}</p>
+                        `;
+                        resultDiv.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
