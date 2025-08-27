@@ -221,12 +221,12 @@
                         loginStatusLink.href = 'login-status.html'; // 또는 my-page.html 등
                     } else {
                         console.log("Firestore에서 사용자 이름 정보를 찾을 수 없습니다.");
-                        loginStatusLink.textContent = '내 정보';
+                        loginStatusLink.textContent = '내 정보1';
                         loginStatusLink.href = 'login-status.html';
                     }
                 } catch (error) {
                     console.error("사용자 정보 로딩 실패:", error);
-                    loginStatusLink.textContent = '내 정보';
+                    loginStatusLink.textContent = '내 정보2';
                     loginStatusLink.href = 'login-status.html';
                 }
             } else {
