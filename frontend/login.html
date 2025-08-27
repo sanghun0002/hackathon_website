@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="w-full max-w-md text-center">
+        <header class="mb-8">
+            <a href="index.html" class="text-3xl font-bold text-gray-800">쉬어가~ 계곡</a>
+        </header>
+
+        <!-- 로그인 안 된 사용자에게 보여줄 화면 -->
+        <div id="logged-out-view" class="bg-white shadow-md rounded px-8 pt-10 pb-10 mb-4 hidden">
+            <h2 class="text-2xl font-bold mb-6">로그인이 필요합니다</h2>
+            <p class="text-gray-600 mb-8">회원이 아니신가요? 간단한 가입으로<br>더 많은 서비스를 이용해보세요.</p>
+            <div class="space-y-4">
+                <a href="login.html" class="block w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                    로그인
+                </a>
+                <a href="signup.html" class="block w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                    회원가입
+                </a>
+            </div>
+        </div>
+
+        <!-- 로그인 된 사용자에게 보여줄 화면 -->
+        <div id="logged-in-view" class="bg-white shadow-md rounded px-8 pt-10 pb-10 mb-4 hidden">
+            <h2 class="text-2xl font-bold mb-6"><span id="user-name" class="text-blue-600"></span>님, 환영합니다!</h2>
+            <p class="text-gray-600 mb-8">무엇을 도와드릴까요?</p>
+            <div class="space-y-4">
+                 <a href="booking.html" class="block w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                    예약하기
+                </a>
+                <button id="logout-btn" class="block w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, appId } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const loggedInView = document.getElementById('logged-in-view');
+        const loggedOutView = document.getElementById('logged-out-view');
+        const userNameSpan = document.getElementById('user-name');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // 로그인 상태를 실시간으로 감지
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // 사용자가 로그인한 경우
+                try {
+                    // Firestore에서 사용자 이름 가져오기
+                    const userDocRef = doc(db, `/artifacts/${appId}/users`, user.uid);
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        userNameSpan.textContent = docSnap.data().name;
+                    } else {
+                        userNameSpan.textContent = user.email; // Firestore에 정보가 없으면 이메일 표시
+                    }
+                } catch (error) {
+                    console.error("사용자 정보 가져오기 실패:", error);
+                    userNameSpan.textContent = user.email;
+                }
+                
+                loggedInView.classList.remove('hidden');
+                loggedOutView.classList.add('hidden');
+
+            } else {
+                // 사용자가 로그아웃한 경우
+                loggedOutView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+            }
+        });
+
+        // 로그아웃 버튼 클릭 이벤트
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                // 로그아웃 성공
+                alert('로그아웃되었습니다.');
+                loggedOutView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+            }).catch((error) => {
+                console.error('로그아웃 실패:', error);
+                alert('로그아웃에 실패했습니다.');
+            });
+        });
+    </script>
+</body>
+</html>
