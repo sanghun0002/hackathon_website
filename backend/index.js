@@ -141,7 +141,6 @@ app.delete('/api/notices/:id', (req, res) => {
     }
 });
 
-
 // ===============================================================
 // ===== 후기(Review) API (비밀번호 기능 추가됨) =====
 // ===============================================================
@@ -186,7 +185,6 @@ app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
     if (reviewIndex === -1) {
         return res.status(404).json({ message: '수정할 후기를 찾을 수 없습니다.' });
     }
-
     const { title, author, rating, content, imagesToDelete } = req.body;
     
     let currentImages = reviews[reviewIndex].images;
@@ -199,7 +197,6 @@ app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
         const newImageUrls = req.files.map(file => file.path);
         currentImages = [...currentImages, ...newImageUrls];
     }
-
     reviews[reviewIndex] = {
         ...reviews[reviewIndex],
         title,
@@ -208,7 +205,6 @@ app.put('/api/reviews/:id', upload.array('newImages', 5), (req, res) => {
         content,
         images: currentImages
     };
-
     res.json(reviews[reviewIndex]);
 });
 app.delete('/api/reviews/:id', (req, res) => {
@@ -220,8 +216,7 @@ app.delete('/api/reviews/:id', (req, res) => {
     }
     if (reviews[reviewIndex].password !== password) {
         return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
-    }
-    
+    } 
     reviews.splice(reviewIndex, 1);
     res.status(200).json({ message: '삭제 완료' });
 });
@@ -237,15 +232,12 @@ app.post('/api/reviews/:id/verify', (req, res) => {
         res.status(403).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
     }
 });
-
 // ===============================================================
 // ===== 예약(Booking) API 영역 =====
 // ===============================================================
-
 // 예약 데이터를 저장할 배열 (실제 운영 시에는 DB 사용)
 let bookings = [];
 let nextBookingId = 1;
-
 // POST: 새 예약 생성 (가격 필드 없음)
 app.post('/api/bookings', (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity, status } = req.body;
@@ -271,13 +263,11 @@ app.post('/api/bookings', (req, res) => {
     console.log('새로운 예약이 추가되었습니다:', newBooking);
     res.status(201).json({ message: '예약이 성공적으로 완료되었습니다.', booking: newBooking });
 });
-
 // GET: 모든 예약 목록 조회 (관리자용)
 app.get('/api/bookings', (req, res) => {
     const sortedBookings = [...bookings].sort((a, b) => b.id - a.id);
     res.json(sortedBookings);
 });
-
 // GET: 특정 사용자의 예약 조회 (이름과 전화번호로)
 app.get('/api/bookings/check', (req, res) => {
     const { name, phone } = req.query;
@@ -294,7 +284,6 @@ app.get('/api/bookings/check', (req, res) => {
         res.status(404).json({ message: '일치하는 예약 정보를 찾을 수 없습니다.' });
     }
 });
-
 // ===============================================================
 // ===== [추가된 코드] 특정 날짜/구역의 예약 현황 조회 API =====
 // ===============================================================
@@ -314,7 +303,6 @@ app.get('/api/bookings/status', (req, res) => {
     res.json(bookedDecks);
 });
 // ===============================================================
-
 // GET: 특정 평상 ID로 단일 예약 조회
 app.get('/api/bookings/:pyeongsangId', (req, res) => {
     const { pyeongsangId } = req.params;
@@ -331,7 +319,6 @@ app.get('/api/bookings/:pyeongsangId', (req, res) => {
     }
 });
 // -------------------------
-
 // POST: 현장 QR 인증 (날짜, 평상ID, 이름, 전화번호 확인)
 app.post('/api/bookings/verify-on-site', (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
