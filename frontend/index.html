@@ -5,37 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>쉬어가~ 계곡</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- [추가] 헤더 버튼 스타일 -->
+    
+    <!-- [수정] 헤더 버튼 및 박스 스타일 -->
     <style>
         .main-header {
             display: flex;
-            justify-content: center; /* 로고를 중앙에 두기 위한 기본 정렬 */
+            justify-content: space-between; /* 요소들을 양쪽 끝으로 정렬 */
             align-items: center;
-            position: relative; /* 자식 요소의 absolute 위치 기준 */
             width: 100%;
+            padding: 0 20px; /* 헤더 좌우 여백 */
+            box-sizing: border-box;
         }
-        .header-btn {
-            position: absolute; /* 헤더를 기준으로 절대 위치 */
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
+        .logo {
+            /* 로고는 중앙에 위치하도록 유지 */
+            text-align: center;
+        }
+        /* [추가] 버튼을 감싸는 새로운 박스 스타일 */
+        .header-box {
+            padding: 8px 18px; /* 박스 내부 여백 (버튼보다 약간 더 큼) */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            transition: background-color 0.2s;
+        }
+        .header-box:hover {
+            background-color: #f0f0f0;
+        }
+        /* 박스 안의 링크(버튼) 스타일 */
+        .header-box a {
             text-decoration: none;
             color: #333;
             font-weight: 500;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .header-btn:hover {
-            background-color: #f0f0f0;
-            color: #000;
-        }
-        .header-btn.left-btn {
-            left: 20px; /* 왼쪽 여백 */
-        }
-        .header-btn.right-btn {
-            right: 20px; /* 오른쪽 여백 */
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -57,15 +61,19 @@
         </nav>
     </aside>
 
-    <!-- [수정된 헤더] -->
+    <!-- [수정된 헤더 구조] -->
     <header class="main-header">
-        <!-- 왼쪽 관리자 버튼 -->
-        <a href="admin.html" class="header-btn left-btn">관리자</a>
+        <!-- 왼쪽 관리자 박스 -->
+        <div class="header-box">
+            <a href="admin.html">관리자</a>
+        </div>
         
         <div class="logo">쉬어가~ 계곡</div>
 
-        <!-- 오른쪽 로그인 버튼 -->
-        <a href="login.html" class="header-btn right-btn">로그인</a>
+        <!-- 오른쪽 로그인 박스 -->
+        <div class="header-box">
+            <a href="login.html">로그인</a>
+        </div>
     </header>
 
    <main>
