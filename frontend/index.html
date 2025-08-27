@@ -236,48 +236,56 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- 1. 헤더의 로그인/사용자이름 버튼 처리 ---
         const loginStatusLink = document.getElementById('login-status-link');
-        const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
-
-        // Firebase 로그인 상태가 확인되면, 그 결과에 따라 모든 것을 처리합니다.
+        
         onAuthStateChanged(auth, async (user) => {
-            
-            // --- 1. 헤더의 로그인/사용자이름 버튼 처리 ---
+            console.log('Firebase 로그인 상태 확인 완료. 사용자:', user ? user.email : '로그아웃 상태');
+
             if (user) {
-                // 로그인 상태일 경우
+                // (로그인 시 사용자 이름 표시 로직 - 이전과 동일)
                 try {
                     const userDocRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(userDocRef);
                     if (docSnap.exists() && docSnap.data().name) {
                         loginStatusLink.textContent = `${docSnap.data().name}님`;
-                        loginStatusLink.href = 'login-status.html';
+                        loginStatusLink.href = 'mypage.html';
                     } else {
                         loginStatusLink.textContent = '내 정보';
-                        loginStatusLink.href = 'login-status.html';
+                        loginStatusLink.href = 'mypage.html';
                     }
                 } catch (error) {
-                    console.error("사용자 정보 로딩 실패:", error);
                     loginStatusLink.textContent = '내 정보';
-                    loginStatusLink.href = 'login-status.html';
+                    loginStatusLink.href = 'mypage.html';
                 }
             } else {
-                // 로그아웃 상태일 경우
+                // 로그아웃 상태
                 loginStatusLink.textContent = '로그인';
                 loginStatusLink.href = 'login-status.html';
             }
 
-            // --- 2. '예약하기' 버튼 클릭 이벤트 처리 ---
-            // 로그인 상태가 명확해진 **지금 시점에** 클릭 이벤트를 설정합니다.
-            bookingLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    if (!user) {
-                        // 로그아웃 상태임이 확실하므로, 링크 이동을 막습니다.
+            // --- 2. '예약하기' 버튼 처리 ---
+            console.log('이제 "예약하기" 버튼의 동작을 설정합니다.');
+            const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
+            console.log(`'booking.html' 링크를 ${bookingLinks.length}개 찾았습니다.`);
+
+            bookingLinks.forEach((link, index) => {
+                // 다른 스크립트와의 충돌을 막기 위해 기존 이벤트 리스너를 제거하고 새로 추가합니다.
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+
+                newLink.addEventListener('click', function(event) {
+                    console.log(`'예약하기' 링크 #${index + 1} 클릭됨.`);
+                    
+                    // 클릭 시점의 로그인 상태를 다시 한번 확인
+                    if (!auth.currentUser) {
+                        console.log('사용자가 로그아웃 상태이므로 링크 이동을 막습니다.');
                         event.preventDefault(); 
-                        
                         alert('로그인 후 이용하시기 바랍니다.');
                         window.location.href = 'login-status.html';
+                    } else {
+                        console.log('사용자가 로그인 상태이므로 booking.html로 정상 이동합니다.');
                     }
-                    // 로그인 상태라면, 이 if 문은 무시되고 원래 링크로 정상 이동합니다.
                 });
             });
         });
