@@ -21,6 +21,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiServerUrl = 'https://65a8b868fc3c.ngrok-free.app/predict'; // Python AI 서버
     const bookingServerUrl = 'https://o70albxd7n.onrender.com'; // Node.js 예약 서버
 
+    // --- [핵심 추가] 페이지 로드 시 예약 상태를 확인하는 함수 ---
+    async function checkBookingStatus() {
+        if (!pyeongsangId) {
+            resultDiv.textContent = '⚠️ 유효하지 않은 평상 ID입니다.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${bookingServerUrl}/api/bookings/${pyeongsangId}`);
+            
+            if (!response.ok) {
+                // 예약 정보가 없는 경우 (404 Not Found)
+                if (response.status === 404) {
+                    throw new Error('해당 평상에 대한 유효한 예약이 없습니다.');
+                }
+                throw new Error('예약 정보를 불러오는 데 실패했습니다.');
+            }
+
+            const booking = await response.json();
+            
+            // 예약 상태 확인
+            if (booking.status === '사용 중') {
+                // 상태가 '사용 중'이면 촬영 버튼 활성화
+                imageInputLabel.style.backgroundColor = '#28a745'; // 원래 색으로
+                imageInputLabel.style.cursor = 'pointer';
+                imageInput.disabled = false;
+                resultDiv.textContent = '반납을 위해 사진을 촬영해주세요.';
+            } else {
+                // '사용 중'이 아니면 비활성화
+                throw new Error(`이 평상은 현재 '사용 중' 상태가 아닙니다. (현재 상태: ${booking.status})`);
+            }
+
+        } catch (error) {
+            console.error('상태 확인 오류:', error);
+            resultDiv.textContent = `❌ ${error.message}`;
+            resultDiv.style.color = 'red';
+            // 촬영 및 인증 버튼 모두 비활성화
+            imageInputLabel.style.backgroundColor = '#cccccc';
+            imageInputLabel.style.cursor = 'not-allowed';
+            imageInput.disabled = true;
+            uploadButton.disabled = true;
+        }
+    }
+
+    // 페이지가 열리면 제일 먼저 예약 상태 확인 함수를 실행
+    checkBookingStatus();
+    
     // 이미지 리사이징 함수
     function resizeImage(file, maxWidth, maxHeight, quality) {
         return new Promise((resolve, reject) => {
