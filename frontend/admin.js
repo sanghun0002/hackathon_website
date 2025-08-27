@@ -1,6 +1,6 @@
-// This script handles all the administrative functions for the booking management page.
+// 이 스크립트는 예약 관리 페이지의 모든 관리 기능을 처리합니다.
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- Get DOM elements ---
+    // --- DOM 요소 가져오기 ---
     const filterDate = document.getElementById('filter-date');
     const filterValley = document.getElementById('filter-valley');
     const filterSection = document.getElementById('filter-section');
@@ -10,30 +10,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
 
-    // Server URL
+    // 서버 URL
     const serverUrl = 'https://o70albxd7n.onrender.com';
 
-    let allBookings = []; // All booking data from the server
-    let filteredBookings = []; // Filtered data for display
+    let allBookings = []; // 서버에서 가져온 모든 예약 데이터
+    let filteredBookings = []; // 필터링된 후 화면에 표시될 데이터
     let currentPage = 1;
     const itemsPerPage = 10;
     
-    // --- Fetch all booking data from the server ---
+    // --- 서버에서 모든 예약 데이터 가져오기 ---
     const fetchAllBookings = async () => {
         try {
             const response = await fetch(`${serverUrl}/api/bookings`);
             if (!response.ok) {
-                throw new Error('Failed to fetch booking data');
+                throw new Error('예약 데이터를 가져오는 데 실패했습니다.');
             }
             return await response.json();
         } catch (error) {
-            console.error('Error fetching booking data:', error);
+            console.error('예약 데이터 가져오기 오류:', error);
             alert('예약 데이터를 불러오는 데 실패했습니다.');
-            return []; // Return an empty array on error
+            return []; // 오류 발생 시 빈 배열 반환
         }
     };
 
-    // --- Populate Filter Options ---
+    // --- 필터 옵션 채우기 ---
     const populateValleyFilter = (bookings) => {
         filterValley.innerHTML = '<option value="">전체</option>';
         const valleys = [...new Set(bookings.map(b => b.valley))].sort();
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- Filtering and Rendering Logic ---
+    // --- 필터링 및 렌더링 로직 ---
     const applyFilters = () => {
         const date = filterDate.value;
         const valley = filterValley.value;
@@ -77,13 +77,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         totalBookingsSpan.textContent = filteredBookings.length;
-        currentPage = 1; // Reset to first page on filter change
+        currentPage = 1; // 필터 변경 시 첫 페이지로 리셋
         renderTable();
         renderPagination();
     };
 
+    // 상태에 따라 CSS 클래스 이름을 반환하는 함수
+    const getStatusClass = (status) => {
+        if (status === '예약완료') {
+            return 'status-completed';
+        }
+        if (status === '예약취소') {
+            return 'status-cancelled';
+        }
+        return 'status-pending'; // '대기' 또는 그 외의 경우
+    };
+
     const renderTable = () => {
-        tableBody.innerHTML = ''; // Clear table
+        tableBody.innerHTML = ''; // 테이블 비우기
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const bookingsToRender = filteredBookings.slice(start, end);
@@ -95,6 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         bookingsToRender.forEach(booking => {
             const row = document.createElement('tr');
+            const status = booking.status || '대기';
+            const statusClass = getStatusClass(status);
+
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
@@ -102,8 +116,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deckName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span class="status-badge status-${booking.status ? booking.status.replace(/\s/g, '').toLowerCase() : 'pending'}">${booking.status || '대기'}</span>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="${statusClass}">${status}</span>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -115,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
         if (totalPages <= 1) return;
 
-        // Previous button
+        // 이전 버튼
         const prevBtn = document.createElement('button');
         prevBtn.textContent = '← 이전';
         prevBtn.disabled = currentPage === 1;
@@ -127,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         paginationControls.appendChild(prevBtn);
 
-        // Page number buttons
+        // 페이지 번호 버튼
         const pageNumbers = Math.min(totalPages, 5);
         let startPage = Math.max(1, currentPage - Math.floor(pageNumbers / 2));
         let endPage = Math.min(totalPages, startPage + pageNumbers - 1);
@@ -146,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             paginationControls.appendChild(pageBtn);
         }
 
-        // Next button
+        // 다음 버튼
         const nextBtn = document.createElement('button');
         nextBtn.textContent = '다음 →';
         nextBtn.disabled = currentPage === totalPages;
@@ -159,14 +173,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginationControls.appendChild(nextBtn);
     };
 
-    // --- Initial setup ---
+    // --- 초기 설정 ---
     const init = async () => {
         allBookings = await fetchAllBookings();
         populateValleyFilter(allBookings);
         applyFilters();
     };
 
-    // --- Event Listeners ---
+    // --- 이벤트 리스너 ---
     filterDate.addEventListener('change', applyFilters);
     filterValley.addEventListener('change', () => {
         const selectedValley = filterValley.value;
