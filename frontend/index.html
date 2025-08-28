@@ -89,7 +89,9 @@
             position: relative; /* 자식 요소인 화살표의 위치를 위해 필요 */
             padding: 0 40px; /* 화살표 공간 확보 */
         }
-        .review-swiper .swiper-button-next,
+        .review-swiper .swiper-button-next {
+            right: 5px; /* 오른쪽에서 약간 떨어뜨리기 */
+        }
         .review-swiper .swiper-button-prev {
             color: #333; /* 화살표 색상 */
             width: 30px; /* 화살표 버튼 너비 */
@@ -116,6 +118,23 @@
             right: 5px; /* 오른쪽에서 약간 떨어뜨리기 */
         }
         /* ------------------------------------------- */
+         /* --- [문제 해결] 아래 CSS 코드를 추가해 주세요 --- */
+        #notice-list-widget li {
+            display: flex; /* 내부 요소를 가로로 정렬 */
+            justify-content: space-between; /* 양쪽 끝으로 밀착 */
+            align-items: center; /* 세로 중앙 정렬 */
+            gap: 15px; /* 제목과 날짜 사이의 최소 간격 */
+        }
+
+        #notice-list-widget li a {
+            white-space: nowrap; /* 제목이 길어도 줄바꿈 방지 */
+            overflow: hidden; /* 제목이 영역을 벗어나면 숨김 */
+            text-overflow: ellipsis; /* 숨겨진 텍스트는 ...으로 표시 */
+        }
+
+        #notice-list-widget li .date {
+            flex-shrink: 0; /* 날짜가 공간이 부족해도 줄어들지 않음 */
+        }
     </style>
 </head>
     
