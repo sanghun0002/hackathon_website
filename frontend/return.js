@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('사진을 먼저 촬영해주세요!');
                 return;
             }
-            resultDiv.textContent = '🤖 AI가 사진을 분석 중입니다...';
+            resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
 
             try {
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
                 if (predictData.status === 'CLEAN') {
-                    resultDiv.textContent = '✅ 청결 확인! 예약 내역을 자동으로 정리합니다...';
+                    resultDiv.textContent = '✅ 청결 확인!';
                     
                     const user = auth.currentUser;
                     if (!user) throw new Error('로그인 정보가 없습니다. 다시 로그인해주세요.');
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         throw new Error(`예약 삭제 실패: ${errorData.message}`);
                     }
                     
-                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
+                    resultDiv.textContent = '반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
