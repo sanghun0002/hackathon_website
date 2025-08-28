@@ -109,9 +109,6 @@ app.get('/api/notices', async (req, res) => {
     try {
         const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY id DESC');
         const normalResult = await pool.query('SELECT * FROM notices WHERE is_sticky = false ORDER BY id DESC');
-        
-        // 페이지네이션 로직은 프론트엔드에서 처리하거나, 여기서 SQL LIMIT, OFFSET으로 구현할 수 있습니다.
-        // 여기서는 단순화하여 전체 목록을 보냅니다.
         res.json({
             notices: normalResult.rows,
             stickyNotices: stickyResult.rows,
@@ -265,7 +262,6 @@ app.post('/api/bookings', async (req, res) => {
 // GET: 모든 '활성' 예약 목록 조회 (관리자용)
 app.get('/api/bookings', async (req, res) => {
     try {
-        // [DB 변경] '반납 완료'가 아닌 예약만 조회
         const result = await pool.query("SELECT * FROM bookings WHERE status != '반납 완료' ORDER BY id DESC");
         res.json(result.rows);
     } catch (err) {
@@ -277,9 +273,8 @@ app.get('/api/bookings', async (req, res) => {
 // GET: 모든 '완료된' 예약 목록 조회
 app.get('/api/bookings/completed', async (req, res) => {
     try {
-         //[DB 변경] '반납 완료' 상태인 예약만 조회
         const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
-      res.json(result.rows);
+        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
@@ -291,7 +286,6 @@ app.get('/api/bookings/completed', async (req, res) => {
 app.delete('/api/bookings/cancel/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        // [DB 변경] 삭제 전 '사용 중' 상태가 아닌지 확인
         const bookingCheck = await pool.query("SELECT status FROM bookings WHERE id = $1", [id]);
         if(bookingCheck.rows.length === 0) {
             return res.status(404).json({ message: '취소할 예약 정보를 찾을 수 없습니다.' });
@@ -307,13 +301,35 @@ app.delete('/api/bookings/cancel/:id', async (req, res) => {
     }
 });
 
-// [DB 변경] DELETE: 예약 반납 처리 -> UPDATE로 로직 변경
+// [신규 추가] PUT: 예약 반납 처리 (상태 변경)
+app.put('/api/bookings/return/:id', async (req, res) => {
+    const { id } = req.params; // URL 경로에서 예약 ID를 가져옵니다.
+
+    try {
+        // ID를 사용하여 해당 예약의 status를 '반납 완료'로, completed_at을 현재 시간으로 업데이트합니다.
+        const result = await pool.query(
+            "UPDATE bookings SET status = '반납 완료', completed_at = NOW() WHERE id = $1 RETURNING *",
+            [id]
+        );
+
+        // 업데이트된 행이 없으면(ID가 잘못된 경우) 404 에러를 보냅니다.
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: '반납할 예약 정보를 찾을 수 없습니다.' });
+        }
+
+        // 성공적으로 처리되면 메시지와 함께 업데이트된 예약 정보를 응답합니다.
+        res.status(200).json({ message: '반납 처리가 완료되었습니다.', booking: result.rows[0] });
+    } catch (err) {
+        console.error('반납 처리 중 오류 발생:', err);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
+});
+
+
+// [주석 처리] 기존의 혼란을 유발하던 반납 로직은 주석 처리하거나 삭제합니다.
+/*
 app.delete('/api/bookings/:pyeongsangId', async (req, res) => {
-    // 이 로직은 이제 QR 인증 후 '반납'을 처리하는 로직으로 변경됩니다.
-    // 기존 pyeongsangId 식별 방식 대신, 실제 예약 ID를 사용하는 것이 더 안정적입니다.
-    // 프론트엔드에서 예약 ID를 넘겨주는 방식으로 수정이 필요할 수 있습니다.
-    // 여기서는 기존 로직을 최대한 유지하여 ID로 반납 처리합니다.
-    const { id } = req.body; // body에서 예약 id를 받는다고 가정
+    const { id } = req.body; 
 
     try {
         const result = await pool.query(
@@ -330,24 +346,8 @@ app.delete('/api/bookings/:pyeongsangId', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
+*/
 
-// [수정] 반납 완료된 예약 목록을 실제 DB에서 조회하는 API
-app.get('/api/bookings/completed', async (req, res) => {
-    try {
-        // bookings 테이블에서 status가 '반납 완료'인 모든 데이터를 조회합니다.
-        // completed_at 컬럼을 기준으로 최신순으로 정렬합니다.
-        const result = await pool.query(
-            "SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC"
-        );
-        
-        // 조회된 데이터를 JSON 형태로 응답합니다.
-        res.json(result.rows);
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
-    }
-});
 
 // ===============================================================
 // ===== 서버 실행 =====
