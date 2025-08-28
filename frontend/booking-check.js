@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultContainer = document.getElementById('check-result-container');
     const resultDiv = document.getElementById('check-result');
     const submitButton = checkForm.querySelector('button[type="submit"]');
-    const serverUrl = 'https://o70albxd7n.onrender.com'; // 실제 서버 주소
+    const serverUrl = 'https://o70albxd7n.onrender.com';
 
     checkForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -23,12 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch(fetchUrl)
             .then(response => {
-                if (response.status === 404) {
-                    return [];
-                }
-                if (!response.ok) {
-                    throw new Error('서버에서 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.');
-                }
+                if (response.status === 404) return [];
+                if (!response.ok) throw new Error('서버 응답에 문제가 발생했습니다.');
                 return response.json();
             })
             .then(bookings => {
@@ -49,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitButton.textContent = '조회하기';
             });
     });
-    
+
     function displayBookingsAsTable(bookings) {
         let tableHTML = `
             <table class="booking-table w-full text-sm text-left text-gray-500">
@@ -70,14 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
         bookings.forEach(booking => {
             const bookingId = booking._id || booking.id;
 
+            // [수정] '예약 완료' 상태일 때만 활성화된 '취소' 버튼이 나오도록 로직 변경
             let cancelButtonHTML = '';
-            if (booking.status === '사용 중') {
-                cancelButtonHTML = `
-                    <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
-                        취소 불가
-                    </button>
-                `;
-            } else {
+            if (booking.status === '예약 완료') {
+                // 상태가 '예약 완료'이면: 활성화된 '취소' 버튼을 만듭니다.
                 cancelButtonHTML = `
                     <button 
                         class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
@@ -85,14 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         취소
                     </button>
                 `;
+            } else {
+                // 그 외 상태('사용 중', '예약 취소' 등)이면: 비활성화된 버튼을 만듭니다.
+                const buttonText = booking.status === '예약 취소' ? '취소 완료' : '취소 불가';
+                cancelButtonHTML = `
+                    <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
+                        ${buttonText}
+                    </button>
+                `;
             }
             
-            // [수정] 날짜 형식을 'YYYY-MM-DD'로 깔끔하게 변경
             const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
             
+            // [수정] 문자열 안의 불필요한 주석 제거
             tableHTML += `
                 <tr class="bg-white border-b">
-                    // [수정] booking.bookingDate -> booking.booking_date, booking.deckName -> booking.deck_name
                     <td class="px-6 py-4">${displayDate}</td>
                     <td class="px-6 py-4">${booking.valley}</td>
                     <td class="px-6 py-4">${booking.section}</td>
@@ -156,4 +155,4 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`오류가 발생했습니다: ${error.message}`);
         }
     }
-});
+});ㄴ
