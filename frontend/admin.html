@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>예약 관리</title>
+
+    <!-- =============================================================== -->
+    <!-- ===== [추가된 부분] 관리자 접근을 제어하는 '문지기' 스크립트 ===== -->
+    <!-- =============================================================== -->
+    <script type="module" src="admin-guard.js"></script>
+    <!-- =============================================================== -->
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +32,7 @@
 </head>
 <body class="bg-gray-100 p-8">
     <header class="main-header">
-        <div class="logo">쉬어가~ 계곡</div>
+        <div class="logo">쉬어가~ 계곡 (관리자)</div>
     </header>
 
     <main class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
@@ -90,8 +97,10 @@
             <!-- 페이지네이션 버튼은 JS에서 동적으로 생성됩니다 -->
         </div>
     </main>
-
+    <div class="buttons">
+         <a href="index.html" class="btn btn-secondary">← 홈으로</a>
+    </div>
     <footer class="main-footer"></footer>
-    <script src="admin.js"></script>
+    <script type="module" src="admin.js"></script>
 </body>
 </html>
