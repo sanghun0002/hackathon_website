@@ -95,13 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         tableHTML += `</tbody></table>`;
-        tableHTML += `
-        <div class="flex justify-center mt-6">
-            <a href="loadsearch.html" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg">
-                길찾기
-            </a>
-        </div>
-    `;
 
         resultDiv.innerHTML = tableHTML;
 
