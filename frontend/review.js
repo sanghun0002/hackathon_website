@@ -24,7 +24,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function renderStars(rating) { return '⭐'.repeat(rating); }
+    function renderStars(rating) {
+    let stars = '';
+    for (let i = 5; i >= 1; i--) {
+        stars += `
+            <input type="radio" name="rating-${Math.random()}" id="rate${i}-${Math.random()}" value="${i}" ${i === rating ? 'checked' : ''} disabled class="hidden">
+            <label for="rate${i}" class="text-yellow-500 text-lg">★</label>
+        `;
+    }
+    return `<div class="flex gap-1">${stars}</div>`;
+}
+
 
     function createRow(review, number) {
         const tr = document.createElement('tr');
