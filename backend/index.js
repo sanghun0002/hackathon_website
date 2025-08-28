@@ -275,16 +275,16 @@ app.get('/api/bookings', async (req, res) => {
 });
 
 // GET: 모든 '완료된' 예약 목록 조회
-app.get('/api/bookings/completed', async (req, res) => {
-    try {
+//app.get('/api/bookings/completed', async (req, res) => {
+  //  try {
         // [DB 변경] '반납 완료' 상태인 예약만 조회
-        const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
-    }
-});
+    //    const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
+      //  res.json(result.rows);
+   // } catch (err) {
+     //   console.error(err);
+       // res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  //  }
+//});
 
 
 // DELETE: 예약 취소 (ID로)
