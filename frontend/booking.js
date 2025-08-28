@@ -34,9 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextBtn) {
         nextBtn.onclick = () => {
             if (bookingSelection.date) {
-                // 수정: localStorage에 날짜를 저장하고 페이지를 이동합니다.
-                localStorage.setItem('selectedDate', bookingSelection.date);
-                window.location.href = 'booking-step2.html'; // URL 파라미터 제거
+                // [수정] URL 쿼리 파라미터에 날짜를 담아 다음 페이지로 이동
+                window.location.href = `booking-step2.html?date=${bookingSelection.date}`;
             } else {
                 alert('날짜를 먼저 선택해주세요.');
             }
