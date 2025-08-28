@@ -9,12 +9,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (noticeListWidget) {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/notices`);
+            // 1페이지 데이터만 가져오면 최신 10개(고정 포함)를 얻을 수 있습니다.
+            const response = await fetch(`${API_BASE_URL}/api/notices?page=1`);
             if (!response.ok) throw new Error('데이터 로딩 실패');
             
             const data = await response.json();
-            const allNotices = [...data.stickyNotices, ...data.notices];
-            const latestNotices = allNotices.slice(0, 5);
+            
+            // [문제 해결] 이제 서버는 'notices' 배열 하나만 보냅니다.
+            // 이 배열에 고정 공지가 이미 포함되어 있으므로 바로 사용합니다.
+            const latestNotices = data.notices.slice(0, 5); // 5개만 잘라서 표시
             
             noticeListWidget.innerHTML = '';
             
@@ -23,9 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 latestNotices.forEach(notice => {
                     const listItem = document.createElement('li');
+                    
+                    // [문제 해결] 날짜 필드명을 'date'에서 'created_at'으로 수정
+                    const formattedDate = new Date(notice.created_at).toLocaleDateString();
+
                     listItem.innerHTML = `
                         <a href="notice_detail.html?id=${notice.id}">${notice.title}</a>
-                        <span class="date">${notice.date}</span>
+                        <span class="date">${formattedDate}</span>
                     `;
                     noticeListWidget.appendChild(listItem);
                 });
@@ -39,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // =======================================================
     // ===== 후기 슬라이더 기능 (Swiper.js 연동) =====
     // =======================================================
-    // [수정] reviewSliderWrapper 변수는 이 블록 안에서만 사용하도록 수정
     const reviewSliderWrapper = document.getElementById('review-slider-wrapper');
 
     if (reviewSliderWrapper) {
@@ -48,9 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) throw new Error('후기 데이터 로딩 실패');
             
             const data = await response.json();
-            const latestReviews = data.reviews.slice(0, 7); // 슬라이더용으로 7개 정도 가져오기
+            const latestReviews = data.reviews.slice(0, 7);
             
-            reviewSliderWrapper.innerHTML = ''; // 로딩 메시지 비우기
+            reviewSliderWrapper.innerHTML = ''; 
             
             if (latestReviews.length === 0) {
                 reviewSliderWrapper.innerHTML = `
@@ -63,7 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const slide = document.createElement('div');
                     slide.className = 'swiper-slide';
                     
-                    // 카드 내용 생성
                     slide.innerHTML = `
                         <div class="review-slider-card">
                             <div>
