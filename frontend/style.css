@@ -677,15 +677,15 @@ body {
 /*                                */
 /* 후기 수정 페이지의 기존 이미지 표시 영역 스타일 */
 .form-group-static {
-    display: flex;
-    align-items: flex-start;
+      display: grid;                  /* ⭐ Flexbox 대신 Grid를 사용합니다. */
+    grid-template-columns: 160px 1fr; /* ⭐ 왼쪽 열(라벨)은 160px, 오른쪽 열(입력창)은 나머지 전체 */
+    align-items: center;            /* 세로 중앙 정렬 */
+    gap: 0 20px;                    /* 열 사이의 간격을 20px로 설정 */
     margin-bottom: 20px;
 }
 .form-group-static label {
-       width: 160px; 
-    flex-shrink: 0;
-    font-weight: 500;
-    padding-top: 8px;
+     font-weight: 500;
+    padding: 0;
 }
 
 .existing-images {
