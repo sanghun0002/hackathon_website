@@ -1,7 +1,7 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Authentication Check ---
-    const ADMIN_PASSWORD = '123456';
+    const ADMIN_PASSWORD = '123456'; 
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
     if (password !== ADMIN_PASSWORD) {
@@ -137,6 +137,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const init = async () => {
         tableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
         allBookings = await fetchAllBookings();
+        // [변경] init 함수에서 필터 옵션을 채운 후, applyFilters()를 호출하면
+        // 필터 값이 비어있으므로 모든 예약 목록이 표시됩니다.
         populateValleyFilter(allBookings);
         applyFilters();
     };
