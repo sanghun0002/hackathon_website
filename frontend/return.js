@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalFile = imageInput.files?.[0];
             if (!originalFile) { /* ... */ }
 
-            resultDiv.textContent = '🤖 AI가 사진을 분석 중입니다...';
+            resultDiv.textContent = 'AI 분석 중...';
             uploadButton.disabled = true;
 
             try {
