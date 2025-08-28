@@ -238,6 +238,9 @@ app.post('/api/reviews/:id/verify', (req, res) => {
 // 예약 데이터를 저장할 배열 (실제 운영 시에는 DB 사용)
 let bookings = [];
 let nextBookingId = 1;
+
+let completedBookings = []; 
+
 // POST: 새 예약 생성 (가격 필드 없음)
 app.post('/api/bookings', (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity, status } = req.body;
@@ -348,40 +351,38 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     }
 });
 
-// DELETE: 특정 예약 취소 (본인 확인 + 날짜 확인)
+// [수정] 예약 '삭제'가 아닌 '반납 처리' API로 변경
 app.delete('/api/bookings/:pyeongsangId', (req, res) => {
-    // URL에서 취소할 예약의 평상 ID를 가져옴
     const { pyeongsangId } = req.params;
-    // 본인 확인을 위해 요청 본문(body)에서 이름과 전화번호를 가져옴
     const { name, phone } = req.body;
-    // --- 오늘 날짜 확인 ---
-    const today = new Date().toISOString().split('T')[0];    
+    const today = new Date().toISOString().split('T')[0];
 
-    if (!name || !phone) {
-        return res.status(400).json({ message: '본인 확인을 위해 이름과 전화번호가 필요합니다.' });
-    }
-
-    // bookings 배열에서 해당 평상 ID, 이름, 전화번호, 그리고 '오늘 날짜'까지 모두 일치하는 예약 건의 인덱스를 찾음
     const bookingIndex = bookings.findIndex(b => {
         const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`.replace(/\s/g, '');
-        
-        // --- [핵심 수정] 예약 날짜(b.bookingDate)가 오늘(today)과 일치하는지 확인 ---
         return fullIdFromDB === pyeongsangId.replace(/\s/g, '') &&
                b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
                b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
-               b.bookingDate === today; // <-- 날짜 비교 조건 추가!
+               b.bookingDate === today;
     });
 
     if (bookingIndex === -1) {
-        // 조건에 맞는 예약을 찾지 못한 경우 (ID, 이름, 전화번호, 날짜 중 하나라도 불일치)
         return res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
     }
 
-    // 모든 확인이 끝나면, 배열에서 해당 예약 정보를 삭제
-    bookings.splice(bookingIndex, 1);
+    // 1. 'bookings' 배열에서 해당 예약 건을 잘라내서 가져옵니다. (삭제 효과)
+    const [completedBooking] = bookings.splice(bookingIndex, 1);
 
-    console.log(`예약 ${pyeongsangId}가 삭제되었습니다.`);
-    res.status(200).json({ message: '예약이 성공적으로 취소되었습니다.' });
+    // 2. 가져온 예약 건의 상태를 '반납 완료'로 변경합니다.
+    completedBooking.status = '반납 완료';
+    completedBooking.completedAt = new Date().toISOString(); // 반납 완료 시간 기록
+
+    // 3. 'completedBookings' 배열에 저장합니다.
+    completedBookings.push(completedBooking);
+
+    console.log(`예약 ${pyeongsangId}가 '반납 완료' 처리되었습니다.`);
+    console.log('완료된 예약 목록:', completedBookings);
+    
+    res.status(200).json({ message: '반납 처리가 완료되었습니다.' });
 });
 
 // ===============================================================
