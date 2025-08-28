@@ -1046,7 +1046,7 @@ body {
 }
 @font-face {
     font-family: 'On-geul-ip'; /* 폰트에 대한 별명(이름)을 지어줍니다. */
-    src: url('fonts/온글잎 박다현체.ttf') format('truetype'); /* 폰트 파일의 경로 */
+    src: url('font/온글잎 박다현체.ttf') format('truetype'); /* 폰트 파일의 경로 */
 }
 
 /* 2. 불러온 폰트를 원하는 요소에 적용하기 */
