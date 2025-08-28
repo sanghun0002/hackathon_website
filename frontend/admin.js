@@ -205,13 +205,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const pyeongsangId = booking.pyeongsangId;
             const name = booking.name;
             const phone = booking.phone;
-            
-            return fetch(`${serverUrl}/api/bookings/${encodeURIComponent(pyeongsangId)}`, {
+            return fetch(`${serverUrl}/api/bookings/cancel/${pyeongsangId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, phone }),
             });
         });
+
 
         try {
             const responses = await Promise.all(deletePromises);
