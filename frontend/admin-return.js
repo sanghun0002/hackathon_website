@@ -1,190 +1,208 @@
-// firebase-config.js에서 필요한 기능들을 import합니다.
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// This script handles the display and filtering of completed booking history.
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- Authentication Check ---
+    const ADMIN_PASSWORD = '123456'; 
+    const password = prompt("관리자 비밀번호를 입력하세요.");
 
-document.addEventListener('DOMContentLoaded', () => {
-    // HTML 요소 가져오기
-    const urlParams = new URLSearchParams(window.location.search);
-    const pyeongsangId = urlParams.get('id');
-    const backBtn = document.getElementById('back-to-choice-btn');
-    const imageInput = document.getElementById('imageInput');
-    const imageInputLabel = document.getElementById('imageInputLabel');
-    const preview = document.getElementById('preview');
-    const uploadButton = document.getElementById('uploadButton');
-    const resultDiv = document.getElementById('result');
-
-    // --- 💻 서버 주소 설정 ---
-    const aiServerUrl = 'https://0566b0459c67.ngrok-free.app/predict';
-    const bookingServerUrl = 'https://o70albxd7n.onrender.com';
-
-    // '이전' 버튼 링크 설정
-    if (pyeongsangId && backBtn) {
-        backBtn.href = `QR.html?id=${pyeongsangId}`;
-    }
-
-    // 모든 기능을 비활성화하는 함수
-    function disableAllFeatures(message) {
-        resultDiv.textContent = `❌ ${message}`;
-        resultDiv.style.color = 'red';
-        imageInputLabel.style.backgroundColor = '#cccccc';
-        imageInputLabel.style.cursor = 'not-allowed';
-        imageInput.disabled = true;
-        uploadButton.disabled = true;
+    if (password !== ADMIN_PASSWORD) {
+        document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
+        alert("비밀번호가 올바르지 않습니다.");
+        return;
     }
     
-    // 로그인 상태 변화를 감지
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // 로그인 상태이면, 예약 상태를 확인하여 버튼 활성화 여부 결정
-            checkBookingStatus(user);
-        } else {
-            // 로그아웃 상태이면, 모든 기능을 비활성화
-            disableAllFeatures('로그인 후 이용해주세요.');
-        }
-    });
+    // --- Get DOM elements ---
+    const filterDate = document.getElementById('filter-date');
+    const filterValley = document.getElementById('filter-valley');
+    const filterSection = document.getElementById('filter-section');
+    const searchName = document.getElementById('search-name');
+    const searchBtn = document.getElementById('search-btn');
+    const totalBookingsSpan = document.getElementById('total-bookings');
+    const tableBody = document.getElementById('booking-table-body');
+    const paginationControls = document.getElementById('pagination-controls');
 
-    // 페이지 로드 시 예약 상태를 확인하는 함수
-    async function checkBookingStatus(user) {
-        if (!pyeongsangId) {
-            disableAllFeatures('유효하지 않은 평상 ID입니다.');
+    // Server URL
+    const serverUrl = 'https://o70albxd7n.onrender.com';
+
+    let allCompletedBookings = [];
+    let filteredBookings = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    
+    // --- Fetch completed booking data with improved error handling ---
+    const fetchAllCompletedBookings = async () => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 타임아웃 설정
+
+        try {
+            const response = await fetch(`${serverUrl}/api/bookings/completed`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            if (data.length === 0) {
+                console.info("데이터 로딩 성공: 서버에 저장된 완료 내역이 없습니다.");
+            }
+            return data;
+
+        } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                console.error('Fetch timed out.');
+                alert('서버 응답이 지연되고 있습니다. 잠시 후 새로고침하여 다시 시도해 주세요. Render 서버의 경우, 첫 요청에 시간이 걸릴 수 있습니다.');
+            } else {
+                console.error('Error fetching completed booking data:', error);
+                alert('완료된 예약 데이터를 불러오는 데 실패했습니다. 서버 상태 및 로그를 확인해주세요.');
+            }
+            return [];
+        }
+    };
+
+    // --- Dynamic Filter Options ---
+    const populateValleyFilter = (bookings) => {
+        filterValley.innerHTML = '<option value="">전체</option>';
+        const valleys = [...new Set(bookings.map(b => b.valley))].sort();
+        valleys.forEach(valley => {
+            const opt = document.createElement('option');
+            opt.value = valley;
+            opt.textContent = valley;
+            filterValley.appendChild(opt);
+        });
+    };
+    
+    const populateSectionOptions = (valley) => {
+        filterSection.innerHTML = '<option value="">전체</option>';
+        if (valley) {
+            const sectionsInValley = [...new Set(allCompletedBookings.filter(b => b.valley === valley).map(b => b.section))].sort();
+            sectionsInValley.forEach(section => {
+                const opt = document.createElement('option');
+                opt.value = section;
+                opt.textContent = section;
+                filterSection.appendChild(opt);
+            });
+            filterSection.disabled = false;
+        } else {
+            filterSection.disabled = true;
+        }
+    };
+
+    // --- Filtering and Rendering Logic ---
+    const applyFilters = () => {
+        const date = filterDate.value;
+        const valley = filterValley.value;
+        const section = filterSection.value;
+        const name = searchName.value.toLowerCase();
+
+        filteredBookings = allCompletedBookings.filter(booking => {
+            const matchesDate = !date || booking.bookingDate === date;
+            const matchesValley = !valley || booking.valley === valley;
+            const matchesSection = !section || booking.section === section;
+            const matchesName = !name || booking.name.toLowerCase().includes(name);
+            return matchesDate && matchesValley && matchesSection && matchesName;
+        });
+        
+        totalBookingsSpan.textContent = filteredBookings.length;
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    };
+
+    const renderTable = () => {
+        tableBody.innerHTML = '';
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const bookingsToRender = filteredBookings.slice(start, end);
+
+        if (bookingsToRender.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">조건에 맞는 내역이 없습니다.</td></tr>`;
             return;
         }
 
-        try {
-            // pyeongsangId는 실제로는 예약 ID(booking id)입니다.
-            const response = await fetch(`${bookingServerUrl}/api/bookings/${pyeongsangId}`);
-            if (!response.ok) {
-                throw new Error(response.status === 404 ? '해당 평상에 대한 유효한 예약이 없습니다.' : '예약 정보 조회 실패');
-            }
-            const booking = await response.json();
+        bookingsToRender.forEach(booking => {
+            const row = document.createElement('tr');
+            const status = booking.status || '알 수 없음';
+            const completedTime = booking.completedAt ? new Date(booking.completedAt).toLocaleString('ko-KR') : 'N/A';
             
-            // 본인 확인: 로그인한 사용자의 정보와 예약자 정보가 일치하는지 확인
-            const userDocRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userDocRef);
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deckName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="status-badge status-completed">${status}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${completedTime}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    };
 
-            if (!docSnap.exists()) throw new Error('Firestore에서 사용자 정보를 찾을 수 없습니다.');
-            const currentUserInfo = docSnap.data();
+    const renderPagination = () => {
+        paginationControls.innerHTML = '';
+        const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+        if (totalPages <= 1) return;
 
-            const normalizedBookingPhone = booking.phone.replace(/\s|-/g, '');
-            const normalizedUserPhone = currentUserInfo.phone.replace(/\s|-/g, '');
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '← 이전';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
+        prevBtn.addEventListener('click', () => {
+            currentPage--;
+            renderTable();
+            renderPagination();
+        });
+        paginationControls.appendChild(prevBtn);
 
-            if (booking.name !== currentUserInfo.name || normalizedBookingPhone !== normalizedUserPhone) {
-                 throw new Error('본인의 예약이 아닙니다.');
-            }
-            
-            if (booking.status === '사용 중') {
-                imageInput.disabled = false;
-                imageInputLabel.style.backgroundColor = '#28a745';
-                imageInputLabel.style.cursor = 'pointer';
-                resultDiv.textContent = '반납을 위해 사진을 촬영해주세요.';
-            } else {
-                throw new Error(`이 평상은 현재 '사용 중' 상태가 아닙니다. (현재 상태: ${booking.status})`);
-            }
-        } catch (error) {
-            disableAllFeatures(error.message);
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.className = `px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                renderTable();
+                renderPagination();
+            });
+            paginationControls.appendChild(pageBtn);
         }
-    }
+
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '다음 →';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
+        nextBtn.addEventListener('click', () => {
+            currentPage++;
+            renderTable();
+            renderPagination();
+        });
+        paginationControls.appendChild(nextBtn);
+    };
     
-    // 이미지 리사이징 함수
-    function resizeImage(file, maxWidth, maxHeight, quality) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > height) {
-                        if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
-                    } else {
-                        if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                    }, 'image/jpeg', quality);
-                };
-                img.onerror = reject;
-            };
-            reader.onerror = reject;
-        });
-    }
+    // --- Initial setup ---
+    const init = async () => {
+        tableBody.innerHTML = '<tr><td colspan="8" class="py-4 text-center text-gray-500">완료 내역을 불러오는 중...</td></tr>';
+        allCompletedBookings = await fetchAllCompletedBookings();
+        populateValleyFilter(allCompletedBookings);
+        applyFilters();
+    };
 
-    // 사진 선택 시 미리보기 기능
-    if (imageInput) {
-        imageInput.addEventListener('change', (event) => {
-            const file = event.target.files?.[0];
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                uploadButton.disabled = false;
-                resultDiv.textContent = '사진이 준비되었습니다. 인증 버튼을 눌러주세요.';
-            }
-        });
-    }
+    // --- Event Listeners ---
+    filterDate.addEventListener('change', applyFilters);
+    filterValley.addEventListener('change', () => {
+        const selectedValley = filterValley.value;
+        populateSectionOptions(selectedValley);
+        applyFilters();
+    });
+    filterSection.addEventListener('change', applyFilters);
+    searchBtn.addEventListener('click', applyFilters);
+    searchName.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
 
-    // '인증하기' 버튼 클릭 이벤트 처리
-    if (uploadButton) {
-        uploadButton.addEventListener('click', async () => {
-            const originalFile = imageInput.files?.[0];
-            if (!originalFile) {
-                alert('사진을 먼저 촬영해주세요!');
-                return;
-            }
-            resultDiv.textContent = 'AI 분석 중...';
-            uploadButton.disabled = true;
-
-            try {
-                // 1. AI 서버로 청결도 분석 요청
-                const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
-                const formData = new FormData();
-                formData.append('file', resizedFile);
-                const predictResponse = await fetch(aiServerUrl, { method: 'POST', body: formData });
-                if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
-                const predictData = await predictResponse.json();
-
-                // 2. AI 분석 결과가 'CLEAN'일 때만 예약 반납 절차 진행
-                if (predictData.status === 'CLEAN') {
-                    resultDiv.textContent = '✅ 청결 확인! 반납 처리 중...';
-                    
-                    // [수정] pyeongsangId(예약 ID)를 사용하여 명확한 반납 API(PUT)를 호출합니다.
-                    const returnUrl = `${bookingServerUrl}/api/bookings/return/${pyeongsangId}`;
-                    const returnResponse = await fetch(returnUrl, {
-                        method: 'PUT' // 메소드를 PUT으로 변경
-                        // body는 필요 없습니다. ID가 URL에 포함되어 있기 때문입니다.
-                    });
-                    
-                    if (!returnResponse.ok) {
-                        const errorData = await returnResponse.json();
-                        throw new Error(`반납 처리 실패: ${errorData.message}`);
-                    }
-                    
-                    resultDiv.textContent = '반납이 완료되었습니다. 이용해주셔서 감사합니다.';
-                    // 성공 후에는 버튼 등을 다시 비활성화 처리할 수 있습니다.
-                    uploadButton.disabled = true;
-                    imageInput.disabled = true;
-
-                } else if (predictData.status === 'DIRTY') {
-                    resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
-                } else if (predictData.status === 'NO_PYEONGSANG') {
-                    resultDiv.textContent = '⚠️ 평상이 인식되지 않습니다. 평상이 보이도록 다시 촬영해주세요.';
-                }
-
-            } catch (error) {
-                console.error('오류 발생:', error);
-                resultDiv.textContent = `🔌 오류가 발생했습니다: ${error.message}`;
-            } finally {
-                // DIRTY 또는 NO_PYEONGSANG 상태일 때 다시 시도할 수 있도록 버튼을 활성화합니다.
-                if (resultDiv.textContent.startsWith('❌') || resultDiv.textContent.startsWith('⚠️')) {
-                    uploadButton.disabled = false;
-                }
-            }
-        });
-    }
+    init();
 });
