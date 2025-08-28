@@ -261,14 +261,14 @@ app.get('/api/bookings', async (req, res) => {
 });
 
 // GET: 모든 '완료된' 예약 목록 조회
-app.get('/api/bookings/completed', async (req, res) => {
-    try {
-        const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
-    }
+app.get('/api/bookings/completed', (req, res) => {
+    // bookings 배열에서 status가 '반납 완료'인 항목만 필터링합니다.
+    const completedBookings = bookings.filter(b => b.status === '반납 완료');
+    
+    // completed_at이 없는 경우를 대비해, 기본적으로 bookingDate로 정렬합니다.
+    const sortedBookings = completedBookings.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate));
+
+    res.json(sortedBookings);
 });
 
 // [신규 추가] GET: 특정 예약 정보 조회 (ID로) - 반납 페이지에서 사용
