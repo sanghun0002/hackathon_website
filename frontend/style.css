@@ -1066,3 +1066,18 @@ body {
     color: white;
     border-color: #007bff;
 }
+/* 메인 페이지 공지사항 위젯 스타일 날짜 안넘어가게 하기 */
+#notice-list-widget li {
+    display: flex; /* 내부 요소를 가로로 정렬 */
+    justify-content: space-between; /* 양쪽 끝으로 밀착 */
+    align-items: center; /* 세로 중앙 정렬 */
+    gap: 15px; /* 제목과 날짜 사이의 최소 간격 */
+}
+#notice-list-widget li a {
+    white-space: nowrap; /* 제목이 길어도 줄바꿈 방지 */
+    overflow: hidden; /* 제목이 영역을 벗어나면 숨김 */
+    text-overflow: ellipsis; /* 숨겨진 텍스트는 ...으로 표시 */
+}
+#notice-list-widget li .date {
+    flex-shrink: 0; /* 날짜가 공간이 부족해도 줄어들지 않음 */
+}
