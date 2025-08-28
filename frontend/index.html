@@ -232,22 +232,19 @@
     <script src="app.js"></script>
 
 <script type="module">
-        import { auth, db, appId } from './firebase-config.js'; 
+        import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- 1. 로그인/사용자 이름 표시 로직 (이전과 동일) ---
         const loginStatusLink = document.getElementById('login-status-link');
-        const adminLink = document.getElementById('admin-link'); // 관리자 링크 요소 가져오기
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // --- 로그인 상태일 경우 ---
-                
-                // 1. 로그인 버튼을 사용자 이름으로 변경
+                // 로그인 상태일 경우
                 try {
-                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
+                    const userDocRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(userDocRef);
-                    
                     if (docSnap.exists() && docSnap.data().name) {
                         const userName = docSnap.data().name;
                         loginStatusLink.textContent = `${userName}님`;
@@ -261,35 +258,33 @@
                     loginStatusLink.textContent = '내 정보';
                     loginStatusLink.href = 'login-status.html';
                 }
-
-                // 2. 관리자 버튼 접근 권한 설정 🔑
-                if (user.email === 'admin@gmaill.com') {
-                    // 이메일이 관리자 계정이면
-                    adminLink.textContent = '관리자';
-                    adminLink.href = 'admin.html';
-                    adminLink.onclick = null; // 혹시 모를 클릭 이벤트 제거
-                } else {
-                    // 일반 사용자 계정이면
-                    adminLink.textContent = '내 예약확인';
-                    adminLink.href = 'booking-check.html';
-                    adminLink.onclick = null;
-                }
-
             } else {
-                // --- 로그아웃 상태일 경우 ---
-
-                // 1. 로그인 버튼 설정
+                // 로그아웃 상태일 경우
                 loginStatusLink.textContent = '로그인';
-                loginStatusLink.href = 'login.html';
-
-                // 2. 관리자 버튼 비활성화
-                adminLink.textContent = '관리자';
-                adminLink.href = '#'; // 페이지 이동 방지
-                adminLink.onclick = (e) => {
-                    e.preventDefault(); // 기본 동작(링크 이동) 막기
-                    alert('관리자 기능은 로그인이 필요합니다.');
-                };
+                loginStatusLink.href = 'login-status.html';
             }
+        });
+
+        // --- 2. [새로 추가] '예약하기' 버튼 로직 ---
+        
+        // 사이드바와 메인 섹션에 있는 '예약하기' 링크를 모두 찾습니다.
+        const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
+
+        bookingLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // 현재 로그인 상태를 확인합니다.
+                const user = auth.currentUser;
+
+                if (!user) {
+                    // 로그아웃 상태이면, 기본 링크 이동을 막습니다.
+                    event.preventDefault(); 
+                    
+                    // 알림 메시지를 보여주고 로그인 페이지로 이동합니다.
+                    alert('로그인 후 이용하시기 바랍니다.');
+                    window.location.href = 'login-status.html';
+                }
+                // 로그인 상태이면, 아무것도 하지 않고 원래 링크(booking.html)로 이동하도록 둡니다.
+            });
         });
     </script>
 </body>
