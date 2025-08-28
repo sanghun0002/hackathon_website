@@ -244,6 +244,7 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
     }
 });
 
+
 // ===============================================================
 // ===== 예약(Booking) API =====
 // ===============================================================
@@ -328,7 +329,6 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     try {
         const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
-        // [수정] SQL 쿼리에 status = '예약 완료' 조건을 추가
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
@@ -345,7 +345,6 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
         if (result.rowCount > 0) {
             res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
         } else {
-            // [수정] 실패 메시지를 더 명확하게 변경
             res.status(404).json({ status: 'failure', message: '정보가 일치하지 않거나 이미 처리된 예약입니다.' });
         }
     } catch (err) {
@@ -361,6 +360,7 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
     
     try {
         const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
+        // [수정] SQL 쿼리에 status = '사용 중' 조건을 추가
         const query = `
             UPDATE bookings 
             SET status = '반납 완료', completed_at = NOW()
@@ -368,7 +368,8 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
                 REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
                 REPLACE(name, ' ', '') = $2 AND 
                 REPLACE(phone, ' ', '') = $3 AND 
-                booking_date = $4
+                booking_date = $4 AND
+                status = '사용 중'
             RETURNING *;
         `;
         const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
@@ -376,7 +377,8 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
         if (result.rowCount > 0) {
             res.status(200).json({ status: 'success', message: '반납 처리가 완료되었습니다.' });
         } else {
-            res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
+            // [수정] 실패 메시지를 더 명확하게 변경
+            res.status(404).json({ message: '정보가 일치하지 않거나 반납할 수 없는 상태의 예약입니다.' });
         }
     } catch (err) {
         console.error(err);
