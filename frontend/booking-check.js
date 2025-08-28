@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
         bookings.forEach(booking => {
             const bookingId = booking._id || booking.id;
 
-            // [수정] '예약 완료' 상태일 때만 활성화된 '취소' 버튼이 나오도록 로직 변경
+            // [수정] 상태별로 버튼을 다르게 표시하도록 로직 강화
             let cancelButtonHTML = '';
             if (booking.status === '예약 완료') {
-                // 상태가 '예약 완료'이면: 활성화된 '취소' 버튼을 만듭니다.
+                // '예약 완료' 상태일 때만 활성화된 '취소' 버튼 표시
                 cancelButtonHTML = `
                     <button 
                         class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 `;
             } else {
-                // 그 외 상태('사용 중', '예약 취소' 등)이면: 비활성화된 버튼을 만듭니다.
+                // 그 외 상태일 때는 비활성화된 버튼 표시
+                // [추가] '예약 취소' 상태일 때는 버튼 텍스트를 '취소 완료'로 변경
                 const buttonText = booking.status === '예약 취소' ? '취소 완료' : '취소 불가';
                 cancelButtonHTML = `
                     <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
@@ -89,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
             
-            // [수정] 문자열 안의 불필요한 주석 제거
             tableHTML += `
                 <tr class="bg-white border-b">
                     <td class="px-6 py-4">${displayDate}</td>
@@ -155,4 +155,4 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`오류가 발생했습니다: ${error.message}`);
         }
     }
-});ㄴ
+});
