@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
+
+        // ⭐ 평점 확인
         const ratingInput = document.querySelector('input[name="rating"]:checked');
         if (!ratingInput) {
             return alert('평점을 선택해주세요.');
@@ -16,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('author', document.getElementById('author').value);
         formData.append('rating', ratingInput.value);
         formData.append('content', document.getElementById('content').value);
-        formData.append('password', document.getElementById('password').value); // 비밀번호 추가
+        formData.append('password', document.getElementById('password').value);
 
         for (const file of imageInput.files) {
             formData.append('images', file);
