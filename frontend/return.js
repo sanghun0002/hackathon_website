@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
 
     // --- 💻 서버 주소 설정 ---
-    const aiServerUrl = 'https://65a8b868fc3c.ngrok-free.app/predict'; // Python AI 서버
+    const aiServerUrl = 'https://ee6b97c890b3.ngrok-free.app/predict'; // Python AI 서버
     const bookingServerUrl = 'https://o70albxd7n.onrender.com'; // Node.js 예약 서버
 
     // --- [핵심 추가] 페이지 로드 시 예약 상태를 확인하는 함수 ---
