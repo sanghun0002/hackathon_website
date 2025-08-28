@@ -680,6 +680,7 @@ body {
     display: flex;
     align-items: flex-start;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 .form-group-static label {
     flex-basis: 100px;
