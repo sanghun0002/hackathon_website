@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <th class="px-6 py-3">계곡</th>
                         <th class="px-6 py-3">구역</th>
                         <th class="px-6 py-3">평상</th>
+                        <th class="px-6 py-3">길찾기</th>
                         <th class="px-6 py-3">예약 상태</th>
                         <th class="px-6 py-3">예약 취소</th> 
                     </tr>
@@ -76,6 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${booking.valley}</td>
                     <td class="px-6 py-4">${booking.section}</td>
                     <td class="px-6 py-4">${booking.deckName}</td>
+                    <td class="px-6 py-4">
+                    <a href="loadsearch.html" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
+                        길찾기
+                    </a>
+                    </td>
                     <td class="px-6 py-4">${booking.status}</td>
                     <td class="px-6 py-4">
                         <button 
@@ -89,6 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         tableHTML += `</tbody></table>`;
+        tableHTML += `
+        <div class="flex justify-center mt-6">
+            <a href="loadsearch.html" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg">
+                길찾기
+            </a>
+        </div>
+    `;
+
         resultDiv.innerHTML = tableHTML;
 
         
