@@ -67,17 +67,14 @@ const upload = multer({ storage: storage });
 // ===============================================================
 app.get('/api/notices', async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = 10; // 한 페이지에 10개씩 표시
+    const limit = 10;
     const offset = (page - 1) * limit;
 
     try {
-        // 1. 고정 공지와 일반 공지를 합친 전체 개수를 세어 총 페이지 수를 계산
         const totalResult = await pool.query('SELECT COUNT(*) FROM notices');
         const totalNotices = parseInt(totalResult.rows[0].count, 10);
         const totalPages = Math.ceil(totalNotices / limit);
 
-        // 2. 모든 공지를 가져오되, 정렬 순서를 '고정 공지 먼저, 그 다음 최신순'으로 지정합니다.
-        //    그 후, LIMIT과 OFFSET을 적용하여 현재 페이지에 맞는 10개의 데이터만 가져옵니다.
         const result = await pool.query(
             `SELECT *,
                 CASE WHEN is_sticky = true THEN 1 ELSE 2 END AS order_priority
@@ -87,8 +84,6 @@ app.get('/api/notices', async (req, res) => {
             [limit, offset]
         );
         
-        // 3. 프론트엔드에 필요한 정보를 담아 응답
-        //    이제 notices 배열 하나만 보내면 됩니다.
         res.json({
             notices: result.rows,
             currentPage: page,
@@ -297,7 +292,8 @@ app.post('/api/bookings', async (req, res) => {
 
 app.get('/api/bookings', async (req, res) => {
     try {
-        const result = await pool.query("SELECT * FROM bookings WHERE status != '반납 완료' ORDER BY created_at DESC");
+        // [수정] '예약 취소' 상태도 함께 제외하도록 SQL 쿼리 변경
+        const result = await pool.query("SELECT * FROM bookings WHERE status NOT IN ('반납 완료', '예약 취소') ORDER BY created_at DESC");
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -403,8 +399,7 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
         `;
         const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
 
-        if (result.rowCount > 0) {
-            res.status(200).json({ message: '반납 처리가 완료되었습니다.' });
+      _message: '반납 처리가 완료되었습니다.' });
         } else {
             res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
         }
@@ -433,3 +428,8 @@ app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
     setupDatabase();
 });
+여기서         const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
+
+        if (result.rowCount > 0) {
+            res.status(200).json({ 
+                        status : 'success', 이부분 추가해주고 수정해줘
