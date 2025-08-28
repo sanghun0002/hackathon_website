@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,45 +8,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .slider-wrapper {
-            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-            gap: 1rem; background-color: #f9fafb; padding: 1rem 0; border-radius: 0.5rem;
-        }
-        .slide { flex: 0 0 100%; scroll-snap-align: center; }
-        .slide img {
-            width: 100%; height: auto; max-height: 400px;
-            object-fit: contain; border-radius: 0.5rem;
+        body {
+            font-family: 'Inter', sans-serif;
         }
 
-        /* ▼▼▼ 1. 요청하신 별점 UI를 위한 CSS 추가 ▼▼▼ */
-        .rating-edit {
+        .slider-wrapper {
             display: flex;
-            flex-direction: row-reverse; /* 별을 오른쪽부터 채우기 위함 */
-            justify-content: flex-end;
-            gap: 2px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1rem;
+            background-color: #f9fafb;
+            padding: 1rem 0;
+            border-radius: 0.5rem;
         }
-        .rating-edit input[type="radio"] {
-            display: none; /* 실제 라디오 버튼 숨기기 */
+
+        .slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
         }
-        .rating-edit label {
-            font-size: 2.5rem; /* 별 크기 */
-            color: #d1d5db; /* 기본 회색 별 */
-            cursor: pointer;
-            transition: color 0.2s;
+
+        .slide img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 0.5rem;
         }
-        /* 마우스를 올렸을 때, 자신과 왼쪽에 있는 모든 별 색상 변경 */
-        .rating-edit label:hover,
-        .rating-edit label:hover ~ label {
-            color: #f59e0b;
-        }
-        /* 선택된 라디오 버튼의 왼쪽에 있는 모든 별 색상 변경 */
-        .rating-edit input[type="radio"]:checked ~ label {
-            color: #f59e0b;
-        }
-        /* ▲▲▲ 여기까지 ▲▲▲ */
     </style>
 </head>
+
 <body class="bg-gray-50">
 
     <div class="container mx-auto max-w-3xl my-8 px-4">
@@ -54,58 +45,26 @@
         </header>
 
         <main class="bg-white p-8 rounded-lg shadow-md">
-            <!-- 보기 모드 -->
             <div id="view-mode">
                 <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4">...</h1>
                 <div class="detail-meta text-sm text-gray-500 flex items-center flex-wrap gap-x-2 mb-6">
-                    <span id="detail-author"></span><span>|</span>
-                    <span id="detail-date"></span><span>|</span>
-                    <span>조회수 <span id="detail-views"></span></span><span>|</span>
+                    <span id="detail-author"></span>
+                    <span>|</span>
+                    <span id="detail-date"></span>
+                    <span>|</span>
+                    <span>조회수 <span id="detail-views"></span></span>
+                    <span>|</span>
                     <span id="detail-rating" class="text-yellow-500"></span>
                 </div>
                 <hr class="border-gray-200">
                 <div id="detail-images-container" class="py-8" style="display: none;">
-                    <div class="slider-wrapper"></div>
+                    <div class="slider-wrapper">
+                    </div>
                 </div>
                 <div class="detail-content text-gray-800 leading-relaxed" id="detail-content">
                     <p>... 내용을 불러오는 중 ...</p>
                 </div>
                 <hr class="border-gray-200 mt-8">
-            </div>
-
-            <!-- 수정 모드 (숨겨져 있음) -->
-            <div id="edit-mode" class="hidden">
-                <form id="edit-form">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-6">후기 수정</h1>
-                    
-                    <div class="mb-4">
-                        <label for="edit-title" class="block text-gray-700 text-sm font-bold mb-2">제목</label>
-                        <input type="text" id="edit-title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
-                    </div>
-
-                    <!-- ▼▼▼ 2. 요청하신 별점 HTML 구조로 교체 ▼▼▼ -->
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">별점 수정</label>
-                        <div class="rating-edit">
-                            <input type="radio" name="rating" id="rate5" value="5" required><label for="rate5">★</label>
-                            <input type="radio" name="rating" id="rate4" value="4"><label for="rate4">★</label>
-                            <input type="radio" name="rating" id="rate3" value="3"><label for="rate3">★</label>
-                            <input type="radio" name="rating" id="rate2" value="2"><label for="rate2">★</label>
-                            <input type="radio" name="rating" id="rate1" value="1"><label for="rate1">★</label>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="edit-content" class="block text-gray-700 text-sm font-bold mb-2">내용</label>
-                        <textarea id="edit-content" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required></textarea>
-                    </div>
-                    <!-- ▲▲▲ 여기까지 ▲▲▲ -->
-                    
-                    <div class="flex items-center justify-end gap-4">
-                        <button type="button" id="cancel-edit-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg">취소</button>
-                        <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-5 rounded-lg">수정 완료</button>
-                    </div>
-                </form>
             </div>
 
             <div class="detail-footer mt-6 flex justify-between items-center">
@@ -122,4 +81,5 @@
 
     <script src="review_detail.js"></script>
 </body>
+
 </html>
