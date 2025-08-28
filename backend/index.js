@@ -348,27 +348,33 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
     }
 });
 
-// DELETE: 특정 예약 취소 (평상 ID로 찾고, 이름/전화번호로 본인 확인)
+// DELETE: 특정 예약 취소 (본인 확인 + 날짜 확인)
 app.delete('/api/bookings/:pyeongsangId', (req, res) => {
     // URL에서 취소할 예약의 평상 ID를 가져옴
     const { pyeongsangId } = req.params;
     // 본인 확인을 위해 요청 본문(body)에서 이름과 전화번호를 가져옴
     const { name, phone } = req.body;
+    // --- 오늘 날짜 확인 ---
+    const today = new Date().toISOString().split('T')[0];    
 
     if (!name || !phone) {
         return res.status(400).json({ message: '본인 확인을 위해 이름과 전화번호가 필요합니다.' });
     }
 
-    // bookings 배열에서 해당 평상 ID, 이름, 전화번호가 모두 일치하는 예약 건의 인덱스를 찾음
+    // bookings 배열에서 해당 평상 ID, 이름, 전화번호, 그리고 '오늘 날짜'까지 모두 일치하는 예약 건의 인덱스를 찾음
     const bookingIndex = bookings.findIndex(b => {
         const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`.replace(/\s/g, '');
+        
+        // --- [핵심 수정] 예약 날짜(b.bookingDate)가 오늘(today)과 일치하는지 확인 ---
         return fullIdFromDB === pyeongsangId.replace(/\s/g, '') &&
                b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
-               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '');
+               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
+               b.bookingDate === today; // <-- 날짜 비교 조건 추가!
     });
 
     if (bookingIndex === -1) {
-        return res.status(404).json({ message: '취소할 예약을 찾을 수 없습니다.' });
+        // 조건에 맞는 예약을 찾지 못한 경우 (ID, 이름, 전화번호, 날짜 중 하나라도 불일치)
+        return res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
     }
 
     // 모든 확인이 끝나면, 배열에서 해당 예약 정보를 삭제
