@@ -1,7 +1,6 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Authentication Check ---
-    
     const ADMIN_PASSWORD = '123456'; 
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert("비밀번호가 올바르지 않습니다.");
         return;
     }
-    
     
     // --- Get DOM elements ---
     const filterDate = document.getElementById('filter-date');
@@ -83,8 +81,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = searchName.value.toLowerCase();
 
         filteredBookings = allBookings.filter(booking => {
-            // [최종 수정] 서버 데이터에 맞춰 booking.booking_date로 변경
-            const matchesDate = !date || booking.booking_date === date;
+            // [수정] 서버에서 받은 날짜 데이터(시간 포함)에서 날짜 부분만 잘라내어 비교
+            const matchesDate = !date || (booking.booking_date && booking.booking_date.split('T')[0] === date);
             const matchesValley = !valley || booking.valley === valley;
             const matchesSection = !section || booking.section === section;
             const matchesName = !name || booking.name.toLowerCase().includes(name);
@@ -124,8 +122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const status = booking.status || '대기';
             const statusClass = getStatusClass(status);
             
-            // [최종 수정] 서버 데이터에 맞춰 booking.booking_date와 booking.deck_name으로 변경
-            // 또한, 날짜 형식이 길게 나오는 것을 방지하기 위해 .split('T')[0] 추가
             const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
 
             row.innerHTML = `
@@ -194,13 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
             return;
         }
-        /*
-        const password = prompt("삭제를 위해 관리자 비밀번호를 다시 입력하세요.");
-        if (password !== ADMIN_PASSWORD) {
-            alert("비밀번호가 올바르지 않아 삭제할 수 없습니다.");
-            return;
-        }
-        */
+        
         const deletePromises = ids.map(id => {
             return fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
                 method: 'DELETE',
