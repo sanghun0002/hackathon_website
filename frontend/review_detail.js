@@ -8,14 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!reviewId) {
         alert('잘못된 접근입니다.');
         window.location.href = 'review.html';
-        return; 
+        return;
     }
 
     // --- 함수: 후기 데이터를 화면에 표시 ---
     function displayReview(review) {
         document.getElementById('detail-title').textContent = review.title;
         document.getElementById('detail-author').textContent = review.author;
-        document.getElementById('detail-date').textContent = new Date(review.date).toISOString().split('T')[0];
+
+        // [문제 해결] 서버 데이터 필드명인 'created_at'으로 수정하고, 사용자 친화적인 날짜 형식으로 변경
+        document.getElementById('detail-date').textContent = new Date(review.created_at).toLocaleDateString();
+        
         document.getElementById('detail-views').textContent = review.views;
         document.getElementById('detail-rating').textContent = '⭐'.repeat(review.rating || 0);
         document.getElementById('detail-content').innerHTML = `<p>${(review.content || '').replace(/\n/g, '<br>')}</p>`;
@@ -41,7 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- 메인 로직: 데이터 가져오기 및 이벤트 연결 ---
     try {
         // 1. 후기 데이터 가져오기
-        // 문법 수정: 템플릿 리터럴 사용
         const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`);
         if (!response.ok) throw new Error('후기를 불러오는 데 실패했습니다.');
         
@@ -56,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!password) return;
 
             try {
-                // 문법 수정: 템플릿 리터럴 사용
                 const verifyResponse = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -65,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!verifyResponse.ok) throw new Error('비밀번호가 일치하지 않습니다.');
                 
                 alert('인증되었습니다. 수정 페이지로 이동합니다.');
-                // 문법 수정: 따옴표 추가 및 템플릿 리터럴 사용
                 window.location.href = `review_edit.html?id=${reviewId}`;
             } catch (err) {
                 alert(err.message);
@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (confirm('정말로 이 후기를 삭제하시겠습니까?')) {
                 try {
-                    
                     const deleteResponse = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
@@ -102,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
     } catch (error) {
-        document.getElementById('view-mode').innerHTML = `<p class="text-center text-red-500">${error.message}</p>`;
+        console.error(error); // 콘솔에 에러 로그를 남겨 디버깅에 용이하게 함
+        document.getElementById('view-mode').innerHTML = `<p style="text-align: center; color: red;">${error.message}</p>`;
     }
 });
