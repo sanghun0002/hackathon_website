@@ -1,6 +1,8 @@
 // ===============================================================
 // ===== 라이브러리 및 초기 설정 =====
 // ===============================================================
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
