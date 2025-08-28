@@ -56,9 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } else {
-            // --- 로그아웃 상태 ---
+            // --- [핵심 수정] 로그아웃 상태일 경우 ---
             loggedOutView.classList.remove('hidden');
             loggedInView.classList.add('hidden');
+            
+            // '로그인 페이지로 이동' 버튼을 찾습니다.
+            const loginBtn = document.querySelector('#logged-out-view a.btn');
+            if(loginBtn) {
+                // 현재 QR 페이지의 전체 주소를 가져옵니다. (예: .../QR.html?id=평상1)
+                const redirectUrl = window.location.href;
+                // 로그인 버튼의 링크에 '돌아올 주소' 정보를 추가합니다.
+                loginBtn.href = `login.html?redirect=${encodeURIComponent(redirectUrl)}`;
+            }
         }
     });
 });
