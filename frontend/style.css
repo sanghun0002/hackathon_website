@@ -1037,7 +1037,9 @@ body {
     gap: 10px; /* 요소들 사이의 간격을 줍니다. (선택 사항) */
 }
 /* .logo-box의 첫 번째 자식(.logo)과 마지막 자식(.logo)을 선택 */
-.logo-box .logo:first-child,
+.logo-box .logo:first-child{
+    font-size: 1.15em;
+},
 .logo-box .logo:last-child {
     font-size: 1.2em; /* 이 숫자를 조절해서 크기를 맞추세요 */
 }
