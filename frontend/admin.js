@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
     if (password !== ADMIN_PASSWORD) {
-        // 관리자 비밀번호가 올바르지 않으면 내용을 숨기고 경고창을 띄웁니다.
         document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
         alert("비밀번호가 올바르지 않습니다.");
         return;
@@ -24,8 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Server URL
     const serverUrl = 'https://o70albxd7n.onrender.com';
 
-    let allBookings = []; // All booking data from the server
-    let filteredBookings = []; // Filtered data for display
+    let allBookings = [];
+    let filteredBookings = [];
     let currentPage = 1;
     const itemsPerPage = 10;
     
@@ -39,29 +38,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             return await response.json();
         } catch (error) {
             console.error('Error fetching booking data:', error);
-            alert('예약 데이터를 불러오는 데 실패했습니다.');
+            alert('예약 데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
             return [];
         }
     };
 
     // --- Dynamic Filter Options ---
-    const getFilterOptions = (bookings) => {
-        const regions = [...new Set(bookings.map(b => b.region))].sort();
+    const populateValleyFilter = (bookings) => {
+        filterValley.innerHTML = '<option value="">전체</option>';
         const valleys = [...new Set(bookings.map(b => b.valley))].sort();
-        const sections = [...new Set(bookings.map(b => b.section))].sort();
-        return { regions, valleys, sections };
-    };
-
-    const populateFilterOptions = (options) => {
-        // ... (필터링 코드 유지)
-    };
-
-    const populateValleyOptions = (region) => {
-        // ... (필터링 코드 유지)
+        valleys.forEach(valley => {
+            const opt = document.createElement('option');
+            opt.value = valley;
+            opt.textContent = valley;
+            filterValley.appendChild(opt);
+        });
     };
     
     const populateSectionOptions = (valley) => {
-        // ... (필터링 코드 유지)
+        filterSection.innerHTML = '<option value="">전체</option>';
+        if (valley) {
+            const sectionsInValley = [...new Set(allBookings.filter(b => b.valley === valley).map(b => b.section))].sort();
+            sectionsInValley.forEach(section => {
+                const opt = document.createElement('option');
+                opt.value = section;
+                opt.textContent = section;
+                filterSection.appendChild(opt);
+            });
+            filterSection.disabled = false;
+        } else {
+            filterSection.disabled = true;
+        }
     };
 
     // --- Filtering and Rendering Logic ---
@@ -86,10 +93,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const getStatusClass = (status) => {
-        if (status === '예약 완료' || status === '예약 및 결제 완료') {
+        const lowerCaseStatus = status ? status.toLowerCase() : 'pending';
+        if (lowerCaseStatus.includes('완료')) {
             return 'status-completed';
         }
-        if (status === '사용 중') {
+        if (lowerCaseStatus.includes('사용중')) {
             return 'status-using';
         }
         return 'status-pending';
@@ -131,14 +139,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
         if (totalPages <= 1) return;
 
-        // ... (페이지네이션 코드 유지)
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '← 이전';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
+        prevBtn.addEventListener('click', () => {
+            currentPage--;
+            renderTable();
+            renderPagination();
+        });
+        paginationControls.appendChild(prevBtn);
+
+        const pageNumbers = Math.min(totalPages, 5);
+        let startPage = Math.max(1, currentPage - Math.floor(pageNumbers / 2));
+        let endPage = Math.min(totalPages, startPage + pageNumbers - 1);
+        if (endPage - startPage + 1 < pageNumbers) {
+            startPage = Math.max(1, endPage - pageNumbers + 1);
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.className = `px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                renderTable();
+                renderPagination();
+            });
+            paginationControls.appendChild(pageBtn);
+        }
+
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '다음 →';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
+        nextBtn.addEventListener('click', () => {
+            currentPage++;
+            renderTable();
+            renderPagination();
+        });
+        paginationControls.appendChild(nextBtn);
     };
 
     const init = async () => {
         tableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
         allBookings = await fetchAllBookings();
-        // [변경] init 함수에서 필터 옵션을 채운 후, applyFilters()를 호출하면
-        // 필터 값이 비어있으므로 모든 예약 목록이 표시됩니다.
         populateValleyFilter(allBookings);
         applyFilters();
     };
