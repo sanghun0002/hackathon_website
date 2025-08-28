@@ -6,7 +6,7 @@ const cors = require('cors');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const { Pool } = require('pg'); // [DB 추가] PostgreSQL 라이브러리
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
@@ -19,15 +19,13 @@ app.use(express.json());
 // ===============================================================
 // ===== 데이터베이스 연결 설정 =====
 // ===============================================================
-// [DB 변경] 데이터베이스 연결 풀(Pool) 생성
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Render 환경 변수에 설정된 DB 주소
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
 });
 
-// [DB 추가] 서버 시작 시 데이터베이스 테이블 자동 생성 함수
 const setupDatabase = async () => {
   const client = await pool.connect();
   try {
@@ -52,7 +50,7 @@ const setupDatabase = async () => {
         rating INTEGER,
         content TEXT,
         password VARCHAR(100) NOT NULL,
-        images TEXT[], -- 이미지 URL 배열
+        images TEXT[],
         views INTEGER DEFAULT 0,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
@@ -68,7 +66,7 @@ const setupDatabase = async () => {
         section VARCHAR(100),
         deck_name VARCHAR(100),
         capacity INTEGER,
-        status VARCHAR(50) DEFAULT '예약 완료', -- '예약 완료', '사용 중', '반납 완료'
+        status VARCHAR(50) DEFAULT '예약 완료',
         created_at TIMESTAMPTZ DEFAULT NOW(),
         completed_at TIMESTAMPTZ
       );
@@ -81,8 +79,7 @@ const setupDatabase = async () => {
   }
 };
 
-
-// Cloudinary 설정 (변경 없음)
+// Cloudinary 설정
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -104,6 +101,7 @@ const upload = multer({ storage: storage });
 // ===== 공지사항(Notice) API (DB 연동) =====
 // ===============================================================
 
+// (공지사항 및 후기 API는 변경사항 없으므로 생략)
 // GET: 모든 공지사항 조회
 app.get('/api/notices', async (req, res) => {
     try {
@@ -118,7 +116,6 @@ app.get('/api/notices', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // POST: 새 공지사항 작성
 app.post('/api/notices', async (req, res) => {
     const { title, department, isSticky, content, password } = req.body;
@@ -136,7 +133,6 @@ app.post('/api/notices', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // GET: 특정 공지사항 조회 및 조회수 증가
 app.get('/api/notices/:id', async (req, res) => {
     const { id } = req.params;
@@ -152,7 +148,6 @@ app.get('/api/notices/:id', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // PUT: 특정 공지사항 수정
 app.put('/api/notices/:id', async (req, res) => {
     const { id } = req.params;
@@ -171,7 +166,6 @@ app.put('/api/notices/:id', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // DELETE: 특정 공지사항 삭제
 app.delete('/api/notices/:id', async (req, res) => {
      const { password } = req.body;
@@ -187,11 +181,9 @@ app.delete('/api/notices/:id', async (req, res) => {
     }
 });
 
-
 // ===============================================================
 // ===== 후기(Review) API (DB 연동) =====
 // ===============================================================
-
 // GET: 모든 후기 조회
 app.get('/api/reviews', async (req, res) => {
     try {
@@ -202,7 +194,6 @@ app.get('/api/reviews', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // POST: 새 후기 작성
 app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
     const { title, author, rating, content, password } = req.body;
@@ -218,7 +209,6 @@ app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-
 // DELETE: 특정 후기 삭제
 app.delete('/api/reviews/:id', async (req, res) => {
     const { id } = req.params;
@@ -281,6 +271,20 @@ app.get('/api/bookings/completed', async (req, res) => {
     }
 });
 
+// [신규 추가] GET: 특정 예약 정보 조회 (ID로) - 반납 페이지에서 사용
+app.get('/api/bookings/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM bookings WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: '예약 정보를 찾을 수 없습니다.' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
+});
 
 // DELETE: 예약 취소 (ID로)
 app.delete('/api/bookings/cancel/:id', async (req, res) => {
@@ -301,23 +305,17 @@ app.delete('/api/bookings/cancel/:id', async (req, res) => {
     }
 });
 
-// [신규 추가] PUT: 예약 반납 처리 (상태 변경)
+// PUT: 예약 반납 처리 (상태 변경)
 app.put('/api/bookings/return/:id', async (req, res) => {
-    const { id } = req.params; // URL 경로에서 예약 ID를 가져옵니다.
-
+    const { id } = req.params;
     try {
-        // ID를 사용하여 해당 예약의 status를 '반납 완료'로, completed_at을 현재 시간으로 업데이트합니다.
         const result = await pool.query(
             "UPDATE bookings SET status = '반납 완료', completed_at = NOW() WHERE id = $1 RETURNING *",
             [id]
         );
-
-        // 업데이트된 행이 없으면(ID가 잘못된 경우) 404 에러를 보냅니다.
         if (result.rowCount === 0) {
             return res.status(404).json({ message: '반납할 예약 정보를 찾을 수 없습니다.' });
         }
-
-        // 성공적으로 처리되면 메시지와 함께 업데이트된 예약 정보를 응답합니다.
         res.status(200).json({ message: '반납 처리가 완료되었습니다.', booking: result.rows[0] });
     } catch (err) {
         console.error('반납 처리 중 오류 발생:', err);
@@ -325,35 +323,10 @@ app.put('/api/bookings/return/:id', async (req, res) => {
     }
 });
 
-
-// [주석 처리] 기존의 혼란을 유발하던 반납 로직은 주석 처리하거나 삭제합니다.
-/*
-app.delete('/api/bookings/:pyeongsangId', async (req, res) => {
-    const { id } = req.body; 
-
-    try {
-        const result = await pool.query(
-            "UPDATE bookings SET status = '반납 완료', completed_at = NOW() WHERE id = $1 RETURNING *",
-            [id]
-        );
-        if (result.rowCount === 0) {
-            return res.status(404).json({ message: '반납할 예약 정보를 찾을 수 없습니다.' });
-        }
-        res.status(200).json({ message: '반납 처리가 완료되었습니다.' });
-    } catch (err)
-    {
-        console.error(err);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
-    }
-});
-*/
-
-
 // ===============================================================
 // ===== 서버 실행 =====
 // ===============================================================
 app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
-    // [DB 추가] 서버 시작 시 DB 셋업 함수 호출
     setupDatabase();
 });
