@@ -3,10 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const paginationContainer = document.getElementById('pagination');
     const serverUrl = 'https://o70albxd7n.onrender.com';
 
-    // 페이지 로드 및 페이지 번호 클릭 시 공지사항을 불러오는 함수
+    /**
+     * 페이지 로드 및 페이지 번호 클릭 시 공지사항을 불러오는 함수
+     */
     async function loadNotices(page = 1) {
         try {
-            // 백엔드에 현재 페이지 번호를 알려주고 데이터를 요청합니다.
             const response = await fetch(`${serverUrl}/api/notices?page=${page}`);
             if (!response.ok) throw new Error('서버에서 데이터를 가져오지 못했습니다.');
             
@@ -20,62 +21,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 받아온 데이터로 테이블 내용을 채우는 함수
+    /**
+     * 받아온 데이터로 테이블 내용을 채우는 함수 (수정됨)
+     */
     function renderTable(data) {
         boardBody.innerHTML = ''; // 기존 목록 초기화
-        const { notices, stickyNotices, currentPage, totalNormalNotices } = data;
+
+        // 서버에서 오는 데이터 구조에 맞게 수정
+        const { notices, currentPage, totalNotices } = data;
         const itemsPerPage = 10;
+        
+        // 페이지의 시작 번호를 계산 (전체 개수 - 이전 페이지들의 게시글 수)
+        const startNumber = totalNotices - ((currentPage - 1) * itemsPerPage);
 
-        // 1페이지일 때만 고정 공지를 표시합니다.
-        if (currentPage === 1) {
-            stickyNotices.forEach(notice => {
-                const row = createRow(notice, '공지');
-                row.classList.add('sticky', 'font-bold', 'bg-yellow-50');
-                boardBody.appendChild(row);
-            });
-        }
-
-        // 일반 공지를 렌더링합니다.
+        // 이제 고정/일반 구분 없이 받은 notices 배열을 바로 렌더링합니다.
         notices.forEach((notice, index) => {
-            // 페이지 번호에 맞춰 정확한 게시글 번호를 계산합니다.
-            const noticeNumber = totalNormalNotices - ((currentPage - 1) * itemsPerPage) - index;
+            // is_sticky 값에 따라 번호를 '공지' 또는 계산된 숫자로 표시
+            const noticeNumber = notice.is_sticky ? '공지' : startNumber - index;
             const row = createRow(notice, noticeNumber);
+
+            // is_sticky가 true이면 고정 공지 스타일 적용
+            if (notice.is_sticky) {
+                row.classList.add('sticky', 'font-bold', 'bg-yellow-50');
+            }
             boardBody.appendChild(row);
         });
 
-        if (stickyNotices.length === 0 && notices.length === 0) {
+        if (notices.length === 0) {
             boardBody.innerHTML = `<tr><td colspan="5" class="text-center py-4">등록된 공지사항이 없습니다.</td></tr>`;
         }
     }
 
-    // 받아온 페이지 정보로 하단 페이지 번호를 만드는 함수
+    /**
+     * 받아온 페이지 정보로 하단 페이지 번호를 만드는 함수 (변경 없음)
+     */
     function renderPagination(data) {
         paginationContainer.innerHTML = '';
         const { totalPages, currentPage } = data;
 
-        if (totalPages <= 1) return; // 페이지가 1개 이하면 페이지 번호를 표시하지 않음
+        if (totalPages <= 1) return;
 
         for (let i = 1; i <= totalPages; i++) {
             const pageLink = document.createElement('a');
             pageLink.href = '#';
             pageLink.textContent = i;
             if (i === currentPage) {
-                pageLink.classList.add('active'); // 현재 페이지는 다른 스타일 적용
+                pageLink.classList.add('active');
             }
             pageLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (i !== currentPage) {
-                    loadNotices(i); // 다른 페이지 번호를 클릭하면 해당 페이지 데이터 로드
+                    loadNotices(i);
                 }
             });
             paginationContainer.appendChild(pageLink);
         }
     }
     
-    // 테이블의 한 줄(row)을 만드는 함수
+    /**
+     * 테이블의 한 줄(row)을 만드는 함수 (날짜 형식만 개선)
+     */
     function createRow(notice, number) {
         const tr = document.createElement('tr');
-        const formattedDate = new Date(notice.created_at).toISOString().split('T')[0];
+        // 사용자 친화적인 날짜 형식으로 변경
+        const formattedDate = new Date(notice.created_at).toLocaleDateString();
 
         tr.innerHTML = `
             <td>${number}</td>
