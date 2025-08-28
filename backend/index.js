@@ -63,9 +63,9 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // ===============================================================
-// ===== 공지사항(Notice) API =====
+// ===== 공지사항 및 후기 API (변경 없음, 생략) =====
 // ===============================================================
-// (공지사항 및 후기 API 코드는 변경 사항이 없으므로 생략)
+// (코드는 이전과 동일)
 app.get('/api/notices', async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = 10;
@@ -244,7 +244,6 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
     }
 });
 
-
 // ===============================================================
 // ===== 예약(Booking) API =====
 // ===============================================================
@@ -329,6 +328,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     try {
         const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
+        // [수정] SQL 쿼리에 status = '예약 완료' 조건을 추가
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
@@ -336,7 +336,8 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
                 REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
                 REPLACE(name, ' ', '') = $2 AND 
                 REPLACE(phone, ' ', '') = $3 AND 
-                booking_date = $4
+                booking_date = $4 AND
+                status = '예약 완료'
             RETURNING *;
         `;
         const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
@@ -344,7 +345,8 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
         if (result.rowCount > 0) {
             res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
         } else {
-            res.status(404).json({ status: 'failure', message: '예약자 정보가 올바르지 않습니다.' });
+            // [수정] 실패 메시지를 더 명확하게 변경
+            res.status(404).json({ status: 'failure', message: '정보가 일치하지 않거나 이미 처리된 예약입니다.' });
         }
     } catch (err) {
         console.error(err);
@@ -372,7 +374,6 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
         const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
 
         if (result.rowCount > 0) {
-            // [수정] 요청하신 대로 status: 'success'를 응답에 추가했습니다.
             res.status(200).json({ status: 'success', message: '반납 처리가 완료되었습니다.' });
         } else {
             res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
