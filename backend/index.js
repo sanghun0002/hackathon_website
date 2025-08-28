@@ -331,6 +331,23 @@ app.delete('/api/bookings/:pyeongsangId', async (req, res) => {
     }
 });
 
+// [수정] 반납 완료된 예약 목록을 실제 DB에서 조회하는 API
+app.get('/api/bookings/completed', async (req, res) => {
+    try {
+        // bookings 테이블에서 status가 '반납 완료'인 모든 데이터를 조회합니다.
+        // completed_at 컬럼을 기준으로 최신순으로 정렬합니다.
+        const result = await pool.query(
+            "SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC"
+        );
+        
+        // 조회된 데이터를 JSON 형태로 응답합니다.
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
+});
 
 // ===============================================================
 // ===== 서버 실행 =====
