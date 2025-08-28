@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const totalBookingsSpan = document.getElementById('total-bookings');
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
 
     // Server URL
     const serverUrl = 'https://o70albxd7n.onrender.com';
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bookingsToRender = filteredBookings.slice(start, end);
 
         if (bookingsToRender.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">조건에 맞는 예약 내역이 없습니다.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">조건에 맞는 예약 내역이 없습니다.</td></tr>`;
             return;
         }
 
@@ -120,6 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const statusClass = getStatusClass(status);
 
             row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
@@ -180,27 +184,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginationControls.appendChild(nextBtn);
     };
 
+    // --- 삭제 기능 ---
+    const deleteBookings = async (ids) => {
+        if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
+            return;
+        }
+
+        const password = prompt("삭제를 위해 관리자 비밀번호를 다시 입력하세요.");
+        if (password !== ADMIN_PASSWORD) {
+            alert("비밀번호가 올바르지 않아 삭제할 수 없습니다.");
+            return;
+        }
+        
+        // 백엔드 API 호출 (여러 개를 한 번에 삭제하는 API가 없으므로 반복 호출)
+        const deletePromises = ids.map(id => 
+            fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                // DELETE 메서드에 body를 포함시키기 위해, 백엔드 코드의 DELETE API를 수정해야 합니다.
+                // 현재 백엔드 코드의 DELETE는 params로 id를 받습니다.
+            })
+        );
+
+        try {
+            const responses = await Promise.all(deletePromises);
+            const successfulDeletions = responses.filter(r => r.ok).length;
+            alert(`${successfulDeletions}개의 예약 내역을 삭제했습니다.`);
+            
+            // 삭제 후 목록 다시 불러오기
+            await init();
+
+        } catch (error) {
+            console.error('예약 삭제 중 오류 발생:', error);
+            alert('예약 삭제에 실패했습니다.');
+        }
+    };
+    
+    // --- Initial setup ---
     const init = async () => {
-        tableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="8" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
         allBookings = await fetchAllBookings();
         populateValleyFilter(allBookings);
         applyFilters();
     };
 
-    const bindEventListeners = () => {
-        filterDate.addEventListener('change', applyFilters);
-        filterValley.addEventListener('change', () => {
-            const selectedValley = filterValley.value;
-            populateSectionOptions(selectedValley);
-            applyFilters();
-        });
-        filterSection.addEventListener('change', applyFilters);
-        searchBtn.addEventListener('click', applyFilters);
-        searchName.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') applyFilters();
-        });
-    };
-    
+    // --- Event Listeners ---
+    filterDate.addEventListener('change', applyFilters);
+    filterValley.addEventListener('change', () => {
+        const selectedValley = filterValley.value;
+        populateSectionOptions(selectedValley);
+        applyFilters();
+    });
+    filterSection.addEventListener('change', applyFilters);
+    searchBtn.addEventListener('click', applyFilters);
+    searchName.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
+    deleteSelectedBtn.addEventListener('click', () => {
+        const selectedCheckboxes = document.querySelectorAll('.booking-checkbox:checked');
+        const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+
+        if (idsToDelete.length === 0) {
+            alert('삭제할 예약 내역을 선택해주세요.');
+            return;
+        }
+
+        deleteBookings(idsToDelete);
+    });
+
     init();
-    bindEventListeners();
 });
