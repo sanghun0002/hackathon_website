@@ -291,24 +291,29 @@ app.get('/api/bookings/check', (req, res) => {
 // ===============================================================
 // =====  ID로 예약을 찾아 취소(삭제)하는 API =====
 // ===============================================================
-    app.delete('/api/bookings/cancel/:id',  (req, res) => {
-    // URL에서 :id 부분에 해당하는 값을 가져옵니다. 숫자로 변환합니다.
+    app.delete('/api/bookings/cancel/:id', (req, res) => {
     const bookingId = parseInt(req.params.id, 10);
+    
+    // 1. ID로 해당 예약을 먼저 찾습니다.
+    const bookingToCancel = bookings.find(b => b.id === bookingId);
 
-    // 'bookings' 배열에서 해당 id를 가진 예약의 순번(인덱스)를 찾습니다.
-    const bookingIndex = bookings.findIndex(b => b.id === bookingId);
-
-    // 만약 해당 예약을 찾지 못했다면(인덱스가 -1이면), 404 에러를 보냅니다.
-    if (bookingIndex === -1) {
+    // 2. 예약이 없는 경우, 404 에러를 보냅니다.
+    if (!bookingToCancel) {
         return res.status(404).json({ message: '취소할 예약 정보를 찾을 수 없습니다.' });
     }
+    
+    // 3. 예약 상태가 '사용 중'인지 확인하고, 맞다면 400 에러를 보냅니다.
+    if (bookingToCancel.status === '사용 중') {
+        return res.status(400).json({ message: '이미 사용 중인 예약은 취소할 수 없습니다.' });
+    }
 
-    // 'bookings' 배열에서 찾은 순번의 항목을 1개 제거합니다.
+    // 4. '사용 중'이 아닐 경우에만 삭제를 진행합니다.
+    const bookingIndex = bookings.findIndex(b => b.id === bookingId);
     bookings.splice(bookingIndex, 1);
 
-    // 성공적으로 처리되었음을 프론트엔드에 알립니다.
     res.status(200).json({ message: '예약이 성공적으로 취소되었습니다.' });
-});
+    });
+
 // ===============================================================
 // ===== [추가된 코드] 특정 날짜/구역의 예약 현황 조회 API =====
 // ===============================================================
