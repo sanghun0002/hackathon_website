@@ -9,25 +9,41 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .slider-wrapper {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 1rem;
-            background-color: #f9fafb;
-            padding: 1rem 0;
-            border-radius: 0.5rem;
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+            gap: 1rem; background-color: #f9fafb; padding: 1rem 0; border-radius: 0.5rem;
         }
-        .slide {
-            flex: 0 0 100%;
-            scroll-snap-align: center;
-        }
+        .slide { flex: 0 0 100%; scroll-snap-align: center; }
         .slide img {
-            width: 100%;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 0.5rem;
+            width: 100%; height: auto; max-height: 400px;
+            object-fit: contain; border-radius: 0.5rem;
         }
+
+        /* ▼▼▼ 1. 요청하신 별점 UI를 위한 CSS 추가 ▼▼▼ */
+        .rating-edit {
+            display: flex;
+            flex-direction: row-reverse; /* 별을 오른쪽부터 채우기 위함 */
+            justify-content: flex-end;
+            gap: 2px;
+        }
+        .rating-edit input[type="radio"] {
+            display: none; /* 실제 라디오 버튼 숨기기 */
+        }
+        .rating-edit label {
+            font-size: 2.5rem; /* 별 크기 */
+            color: #d1d5db; /* 기본 회색 별 */
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        /* 마우스를 올렸을 때, 자신과 왼쪽에 있는 모든 별 색상 변경 */
+        .rating-edit label:hover,
+        .rating-edit label:hover ~ label {
+            color: #f59e0b;
+        }
+        /* 선택된 라디오 버튼의 왼쪽에 있는 모든 별 색상 변경 */
+        .rating-edit input[type="radio"]:checked ~ label {
+            color: #f59e0b;
+        }
+        /* ▲▲▲ 여기까지 ▲▲▲ */
     </style>
 </head>
 <body class="bg-gray-50">
@@ -38,16 +54,13 @@
         </header>
 
         <main class="bg-white p-8 rounded-lg shadow-md">
-            <!-- 1. 기본 보기 모드 -->
+            <!-- 보기 모드 -->
             <div id="view-mode">
                 <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4">...</h1>
                 <div class="detail-meta text-sm text-gray-500 flex items-center flex-wrap gap-x-2 mb-6">
-                    <span id="detail-author"></span>
-                    <span>|</span>
-                    <span id="detail-date"></span>
-                    <span>|</span>
-                    <span>조회수 <span id="detail-views"></span></span>
-                    <span>|</span>
+                    <span id="detail-author"></span><span>|</span>
+                    <span id="detail-date"></span><span>|</span>
+                    <span>조회수 <span id="detail-views"></span></span><span>|</span>
                     <span id="detail-rating" class="text-yellow-500"></span>
                 </div>
                 <hr class="border-gray-200">
@@ -60,7 +73,7 @@
                 <hr class="border-gray-200 mt-8">
             </div>
 
-            <!-- 2. 수정 모드 (기본적으로 숨겨져 있음) -->
+            <!-- 수정 모드 (숨겨져 있음) -->
             <div id="edit-mode" class="hidden">
                 <form id="edit-form">
                     <h1 class="text-2xl font-bold text-gray-900 mb-6">후기 수정</h1>
@@ -70,15 +83,15 @@
                         <input type="text" id="edit-title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
                     </div>
 
-                    
+                    <!-- ▼▼▼ 2. 요청하신 별점 HTML 구조로 교체 ▼▼▼ -->
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">별점 수정</label>
-                        <div class="flex items-center text-2xl">
-                            <input type="radio" name="rating" id="rate5" value="5" class="mr-1" required><label for="rate5" class="mr-2">5점</label>
-                            <input type="radio" name="rating" id="rate4" value="4" class="mr-1"><label for="rate4" class="mr-2">4점</label>
-                            <input type="radio" name="rating" id="rate3" value="3" class="mr-1"><label for="rate3" class="mr-2">3점</label>
-                            <input type="radio" name="rating" id="rate2" value="2" class="mr-1"><label for="rate2" class="mr-2">2점</label>
-                            <input type="radio" name="rating" id="rate1" value="1" class="mr-1"><label for="rate1" class="mr-2">1점</label>
+                        <div class="rating-edit">
+                            <input type="radio" name="rating" id="rate5" value="5" required><label for="rate5">★</label>
+                            <input type="radio" name="rating" id="rate4" value="4"><label for="rate4">★</label>
+                            <input type="radio" name="rating" id="rate3" value="3"><label for="rate3">★</label>
+                            <input type="radio" name="rating" id="rate2" value="2"><label for="rate2">★</label>
+                            <input type="radio" name="rating" id="rate1" value="1"><label for="rate1">★</label>
                         </div>
                     </div>
                     
