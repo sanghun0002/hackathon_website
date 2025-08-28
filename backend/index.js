@@ -11,8 +11,6 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// 관리자 비밀번호 (하드코딩)
 const ADMIN_PASSWORD = '0000';
 
 app.use(cors());
