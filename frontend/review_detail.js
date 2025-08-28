@@ -13,7 +13,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detail-author').textContent = review.author;
         document.getElementById('detail-date').textContent = new Date(review.date).toISOString().split('T')[0];
         document.getElementById('detail-views').textContent = review.views;
-        document.getElementById('detail-rating').textContent = '⭐'.repeat(review.rating || 0);
+        const ratingInputs = document.querySelectorAll('input[name="rating"]');
+        ratingInputs.forEach(input => {
+            input.checked = (parseInt(input.value) === review.rating);
+        });
+        
+        // 별점은 읽기 전용으로 (보기 페이지니까)
+        ratingInputs.forEach(input => input.disabled = true);
+
         document.getElementById('detail-content').innerHTML = `<p>${(review.content || '').replace(/\n/g, '<br>')}</p>`;
 
         const sliderWrapper = document.querySelector('.slider-wrapper');
