@@ -3,8 +3,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Authentication Check ---
     const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
     if (!isAdminLoggedIn) {
-        alert("관리자만 접근할 수 있는 페이지입니다. 로그인 페이지로 이동합니다.");
-        window.location.href = 'admin-login.html'; // Redirect to the new login page
+        // [수정] 로그인 페이지로 이동하는 대신, 페이지 콘텐츠를 숨기고 경고창만 띄웁니다.
+        document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
+        alert("관리자만 접근할 수 있는 페이지입니다.");
         return;
     }
     
