@@ -197,12 +197,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        const deletePromises = ids.map(id => 
-            fetch(`${serverUrl}/api/bookings/${id}`, {
+        // --- [수정] 백엔드 API와 일치하도록 DELETE 요청을 수정했습니다. ---
+        const deletePromises = ids.map(id => {
+            const booking = allBookings.find(b => b.id.toString() === id);
+            if (!booking) {
+                console.error(`Booking with id ${id} not found locally.`);
+                return Promise.resolve({ ok: false });
+            }
+            
+            return fetch(`${serverUrl}/api/bookings/cancel/${booking.id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-            })
-        );
+                body: JSON.stringify({ name: booking.name, phone: booking.phone }),
+            });
+        });
 
         try {
             const responses = await Promise.all(deletePromises);
