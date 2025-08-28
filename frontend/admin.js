@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = searchName.value.toLowerCase();
 
         filteredBookings = allBookings.filter(booking => {
-            const matchesDate = !date || booking.bookingDate === date;
+            // [수정] booking.bookingDate를 booking.date로 변경
+            const matchesDate = !date || booking.date === date;
             const matchesValley = !valley || booking.valley === valley;
             const matchesSection = !section || booking.section === section;
             const matchesName = !name || booking.name.toLowerCase().includes(name);
@@ -121,15 +122,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const status = booking.status || '대기';
             const statusClass = getStatusClass(status);
 
-            // [수정] data-id에 booking.id만 할당합니다.
+            // [수정] booking.bookingDate -> booking.date, booking.deckName -> booking.deck
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.date}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deckName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deck}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -203,7 +204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         const deletePromises = ids.map(id => {
-            // [수정] 백엔드 API는 id를 받으므로, id만 전달합니다.
             return fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
