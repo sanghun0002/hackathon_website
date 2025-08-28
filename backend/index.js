@@ -9,7 +9,6 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,11 +31,8 @@ const setupDatabase = async () => {
     const client = await pool.connect();
     try {
         await client.query('CREATE TABLE IF NOT EXISTS notices (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, department VARCHAR(100), content TEXT NOT NULL, is_sticky BOOLEAN DEFAULT false, views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
-        
         await client.query('CREATE TABLE IF NOT EXISTS reviews (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, author VARCHAR(100), rating INTEGER, content TEXT, password VARCHAR(255) NOT NULL, images TEXT[], views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
-        
-        await client.query('CREATE TABLE IF NOT EXISTS booki2gs (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
-        
+        await client.query('CREATE TABLE IF NOT EXISTS bookings (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
         console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
     } catch (err) {
         console.error('❌ 데이터베이스 테이블 생성 실패:', err);
@@ -75,15 +71,21 @@ app.get('/api/notices', async (req, res) => {
     const offset = (page - 1) * limit;
 
     try {
+        // 1. 고정 공지는 항상 모두 가져옴
         const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY created_at DESC');
+        
+        // 2. 일반 공지의 전체 개수를 세어 총 페이지 수를 계산
         const totalResult = await pool.query('SELECT COUNT(*) FROM notices WHERE is_sticky = false');
         const totalNormalNotices = parseInt(totalResult.rows[0].count, 10);
         const totalPages = Math.ceil(totalNormalNotices / limit);
+
+        // 3. 현재 페이지에 해당하는 일반 공지만 10개 가져옴 (LIMIT, OFFSET 사용)
         const normalResult = await pool.query(
             'SELECT * FROM notices WHERE is_sticky = false ORDER BY created_at DESC LIMIT $1 OFFSET $2',
             [limit, offset]
         );
-
+        
+        // 4. 프론트엔드에 필요한 모든 정보를 담아 응답
         res.json({
             notices: normalResult.rows,
             stickyNotices: stickyResult.rows,
@@ -166,6 +168,7 @@ app.delete('/api/notices/:id', async (req, res) => {
 // ===============================================================
 // ===== 후기(Review) API =====
 // ===============================================================
+// ... (이하 코드는 변경 없음)
 app.get('/api/reviews', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title, author, rating, content, images, views, created_at FROM reviews ORDER BY created_at DESC');
