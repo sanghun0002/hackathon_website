@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultContainer = document.getElementById('check-result-container');
     const resultDiv = document.getElementById('check-result');
     const submitButton = checkForm.querySelector('button[type="submit"]');
+    const serverUrl = 'https://o70albxd7n.onrender.com'; // 실제 서버 주소
 
     checkForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -18,14 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = '조회 중...';
         resultContainer.style.display = 'none';
 
-        // ===============================================================
-        // ===== [수정된 부분] 잘못된 주소를 올바른 API 경로로 변경 =====
-        // ===============================================================
-        // 'https://o70albxd7n.onrender.com'는 실제 배포된 서버 주소입니다.
-        // 뒤에 '/api/bookings/check' 경로와 '?name=...' 파라미터를 정확히 붙여줍니다.
-        const serverUrl = 'https://o70albxd7n.onrender.com'; // 실제 서버 주소
         const fetchUrl = `${serverUrl}/api/bookings/check?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
-        // ===============================================================
 
         fetch(fetchUrl)
             .then(response => {
@@ -56,35 +50,83 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // 이 함수는 가격을 표시하지 않으므로 수정할 필요 없습니다.
+    // ⭐ [수정됨] 예약 결과를 표시하는 함수
     function displayBookingsAsTable(bookings) {
         let tableHTML = `
-            <table class="booking-table">
-                <thead>
+            <table class="booking-table w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
-                        <th>예약 날짜</th>
-                        <th>계곡</th>
-                        <th>구역</th>
-                        <th>평상</th>
-                        <th>예약 상태</th>
+                        <th class="px-6 py-3">예약 날짜</th>
+                        <th class="px-6 py-3">계곡</th>
+                        <th class="px-6 py-3">구역</th>
+                        <th class="px-6 py-3">평상</th>
+                        <th class="px-6 py-3">예약 상태</th>
+                        <th class="px-6 py-3">취소</th> 
                     </tr>
                 </thead>
                 <tbody>
         `;
 
         bookings.forEach(booking => {
+            // 서버에서 오는 예약 ID 필드 이름이 'id' 또는 '_id'일 수 있습니다. 환경에 맞게 확인하세요.
+            const bookingId = booking._id || booking.id; 
             tableHTML += `
-                <tr>
-                    <td>${booking.bookingDate}</td>
-                    <td>${booking.valley}</td>
-                    <td>${booking.section}</td>
-                    <td>${booking.deckName}</td>
-                    <td><span class="status-${booking.status === '결제 대기 중' ? 'completed' : 'pending'}">${booking.status}</span></td>
+                <tr class="bg-white border-b">
+                    <td class="px-6 py-4">${booking.bookingDate}</td>
+                    <td class="px-6 py-4">${booking.valley}</td>
+                    <td class="px-6 py-4">${booking.section}</td>
+                    <td class="px-6 py-4">${booking.deckName}</td>
+                    <td class="px-6 py-4">${booking.status}</td>
+                    <td class="px-6 py-4">
+                        <button 
+                            class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
+                            data-id="${bookingId}">
+                            취소
+                        </button>
+                    </td>
                 </tr>
             `;
         });
 
         tableHTML += `</tbody></table>`;
         resultDiv.innerHTML = tableHTML;
+
+        // ⭐ [추가됨] 생성된 모든 '취소' 버튼에 클릭 이벤트 추가
+        attachCancelButtonListeners();
+    }
+
+    // ⭐ [추가됨] '취소' 버튼에 이벤트 리스너를 추가하는 함수
+    function attachCancelButtonListeners() {
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const bookingId = e.target.dataset.id;
+                if (confirm('정말로 이 예약을 취소하시겠습니까?')) {
+                    cancelBooking(bookingId);
+                }
+            });
+        });
+    }
+
+    // ⭐ [추가됨] 예약을 취소하는 API를 호출하는 함수
+    async function cancelBooking(bookingId) {
+        try {
+            const response = await fetch(`${serverUrl}/api/bookings/${bookingId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '예약 취소에 실패했습니다.');
+            }
+
+            alert('예약이 성공적으로 취소되었습니다.');
+            // 취소 성공 후, 다시 조회 폼을 클릭하여 결과를 새로고침하게 유도
+            submitButton.click(); 
+
+        } catch (error) {
+            console.error('예약 취소 중 오류 발생:', error);
+            alert(`오류가 발생했습니다: ${error.message}`);
+        }
     }
 });
