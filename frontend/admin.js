@@ -121,9 +121,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const status = booking.status || '대기';
             const statusClass = getStatusClass(status);
 
+            // [수정] data-id에 booking.id만 할당합니다.
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}" data-name="${booking.name}" data-phone="${booking.phone}" data-pyeongsang-id="${encodeURIComponent(booking.valley.replace(/\s/g, ''))}-${encodeURIComponent(booking.section.replace(/\s/g, ''))}-${encodeURIComponent(booking.deckName.replace(/\s/g, ''))}">
+                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
@@ -185,13 +186,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginationControls.appendChild(nextBtn);
     };
 
-    const deleteBookings = async (selectedBookings) => {
-        if (selectedBookings.length === 0) {
+    const deleteBookings = async (ids) => {
+        if (ids.length === 0) {
             alert('삭제할 예약 내역을 선택해주세요.');
             return;
         }
 
-        if (!confirm(`${selectedBookings.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
+        if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
             return;
         }
 
@@ -201,15 +202,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        const deletePromises = selectedBookings.map(booking => {
-            const pyeongsangId = encodeURIComponent(booking.pyeongsangId);
-            const name = booking.name;
-            const phone = booking.phone;
-            
-            return fetch(`${serverUrl}/api/bookings/cancel/${pyeongsangId}`, {
+        const deletePromises = ids.map(id => {
+            // [수정] 백엔드 API는 id를 받으므로, id만 전달합니다.
+            return fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, phone }),
             });
         });
 
@@ -251,21 +248,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     deleteSelectedBtn.addEventListener('click', () => {
         const selectedCheckboxes = document.querySelectorAll('.booking-checkbox:checked');
-        const selectedBookings = Array.from(selectedCheckboxes).map(cb => {
-            return {
-                id: cb.dataset.id,
-                name: cb.dataset.name,
-                phone: cb.dataset.phone,
-                pyeongsangId: cb.dataset.pyeongsangId
-            };
-        });
+        const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
 
-        if (selectedBookings.length === 0) {
+        if (idsToDelete.length === 0) {
             alert('삭제할 예약 내역을 선택해주세요.');
             return;
         }
         
-        deleteBookings(selectedBookings);
+        deleteBookings(idsToDelete);
     });
     
     selectAllCheckbox.addEventListener('change', (e) => {
