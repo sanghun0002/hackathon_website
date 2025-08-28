@@ -11,7 +11,6 @@
     <main class="booking-container">
         <h1 class="text-3xl font-bold text-center mb-6">예약 내역 조회</h1>
         
-        <!-- 이름/전화번호 입력 폼 -->
         <form id="check-form" class="bg-white p-6 rounded-lg shadow-lg mb-8">
             <p class="text-center text-gray-600 mb-6">예약 시 입력하신 이름과 전화번호를 입력해주세요.</p>
             <div class="grid md:grid-cols-2 gap-4 mb-4">
@@ -27,12 +26,16 @@
             <button type="submit" class="btn btn-primary w-full text-lg">조회하기</button>
         </form>
         
-        <!-- 조회 결과 표시 영역 -->
         <div id="check-result-container" class="bg-white p-6 rounded-lg shadow-lg" style="display: none;">
-            <h2 class="text-2xl font-bold mb-4 text-center">조회 결과</h2>
-            <div id="check-result" class="overflow-x-auto">
-                <!-- 결과가 여기에 동적으로 삽입됩니다. -->
+            
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">조회 결과</h2>
+                <button id="cancel-booking-btn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    예약 취소
+                </button>
             </div>
+            <div id="check-result" class="overflow-x-auto">
+                </div>
         </div>
     </main>
     <div class="buttons">
