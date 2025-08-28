@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     async function cancelBooking(bookingId) {
         try {
-            const response = await fetch(`${serverUrl}/api/bookings/${bookingId}`, {
+            const response = await fetch(`${serverUrl}/api/bookings/cancel/${bookingId}`, {
                 method: 'DELETE',
             });
 
