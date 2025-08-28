@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* 기존 스타일은 변경 없이 그대로 유지됩니다. */
+        /* 헤더 전체를 감싸는 컨테이너 */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -19,6 +19,8 @@
             padding: 10px 20px;
             box-sizing: border-box;
         }
+        
+        /* 로고를 감싸는 메인 박스 */
         .logo-box {
             flex-grow: 1;
             text-align: center;
@@ -28,6 +30,8 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        /* 관리자/로그인 버튼을 감싸는 작은 박스 */
         .header-button-box {
             width: 120px;
             padding: 10px;
@@ -47,6 +51,8 @@
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 14px;
         }
+
+        /* 후기 슬라이더 카드 스타일 */
         .review-slider-card {
             width: 100%;
             height: 100%;
@@ -64,6 +70,8 @@
         .review-slider-card .title:hover { color: #007bff; }
         .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
         .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
+        
+        /* 슬라이더 레이아웃 문제 해결 */
         .content-section {
             display: flex;
             gap: 20px;
@@ -75,36 +83,39 @@
         .content-right {
             flex: 1;
         }
+
+        /* ----- 스와이퍼 화살표 스타일 추가 및 조정 ----- */
         .review-swiper {
-            position: relative;
-            padding: 0 40px;
+            position: relative; /* 자식 요소인 화살표의 위치를 위해 필요 */
+            padding: 0 40px; /* 화살표 공간 확보 */
         }
         .review-swiper .swiper-button-next,
         .review-swiper .swiper-button-prev {
-            color: #333;
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: #333; /* 화살표 색상 */
+            width: 30px; /* 화살표 버튼 너비 */
+            height: 30px; /* 화살표 버튼 높이 */
+            background: rgba(255, 255, 255, 0.8); /* 배경색 */
+            border-radius: 50%; /* 원형 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 */
             transition: all 0.2s ease;
         }
         .review-swiper .swiper-button-next::after,
         .review-swiper .swiper-button-prev::after {
-            font-size: 16px;
+            font-size: 16px; /* 화살표 아이콘 크기 */
             font-weight: bold;
         }
         .review-swiper .swiper-button-next:hover,
         .review-swiper .swiper-button-prev:hover {
             background: rgba(255, 255, 255, 1);
-            color: #007bff;
+            color: #007bff; /* 호버 시 색상 변경 */
         }
         .review-swiper .swiper-button-prev {
-            left: 5px;
+            left: 5px; /* 왼쪽에서 약간 떨어뜨리기 */
         }
         .review-swiper .swiper-button-next {
-            right: 5px;
+            right: 5px; /* 오른쪽에서 약간 떨어뜨리기 */
         }
+        /* ------------------------------------------- */
     </style>
 </head>
     
@@ -220,16 +231,12 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="app.js"></script>
 
-    <!-- =============================================================== -->
-    <!-- ===== [수정된 부분] 로그인 상태 확인 및 예약 버튼 제어 ===== -->
-    <!-- =============================================================== -->
-    <script type="module">
-        // firebase-config.js에서 auth와 db 객체를 가져옵니다.
+<script type="module">
         import { auth, db } from './firebase-config.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- 1. 로그인 상태에 따라 우측 상단 텍스트 변경 (기존과 동일) ---
+        // --- 1. 로그인/사용자 이름 표시 로직 (이전과 동일) ---
         const loginStatusLink = document.getElementById('login-status-link');
 
         onAuthStateChanged(auth, async (user) => {
@@ -258,25 +265,25 @@
             }
         });
 
-        // --- 2. [새로 추가] '예약하기' 링크 클릭 시 로그인 상태 확인 ---
+        // --- 2. [새로 추가] '예약하기' 버튼 로직 ---
         
-        // 사이드바와 메인 섹션에 있는 모든 '예약하기' 링크를 선택합니다.
+        // 사이드바와 메인 섹션에 있는 '예약하기' 링크를 모두 찾습니다.
         const bookingLinks = document.querySelectorAll('a[href="booking.html"]');
 
         bookingLinks.forEach(link => {
             link.addEventListener('click', function(event) {
-                // Firebase Auth를 통해 현재 로그인된 사용자가 있는지 확인합니다.
+                // 현재 로그인 상태를 확인합니다.
                 const user = auth.currentUser;
 
                 if (!user) {
-                    // 로그아웃 상태이면, booking.html로 이동하는 기본 동작을 막습니다.
+                    // 로그아웃 상태이면, 기본 링크 이동을 막습니다.
                     event.preventDefault(); 
                     
-                    // 사용자에게 알림을 보여주고, 로그인/회원가입을 유도하는 페이지로 보냅니다.
-                    alert('로그인이 필요한 서비스입니다.');
+                    // 알림 메시지를 보여주고 로그인 페이지로 이동합니다.
+                    alert('로그인 후 이용하시기 바랍니다.');
                     window.location.href = 'login-status.html';
                 }
-                // 로그인 상태라면, 아무런 제약을 걸지 않으므로 원래의 href 속성에 따라 booking.html로 이동합니다.
+                // 로그인 상태이면, 아무것도 하지 않고 원래 링크(booking.html)로 이동하도록 둡니다.
             });
         });
     </script>
