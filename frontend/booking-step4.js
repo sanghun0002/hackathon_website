@@ -126,18 +126,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // --- localStorage에서 정보 가져오기 ---
-  const selectedDate = localStorage.getItem('selectedDate');
-  const selectedValley  = localStorage.getItem('selectedValley');
-  const selectedSection = localStorage.getItem('selectedSection');
+ // [수정] localStorage 대신 URL 파라미터에서 정보를 읽어옵니다.
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDate = urlParams.get('date');
+  const selectedValley = urlParams.get('valley');
+  const selectedSection = urlParams.get('section');
 
-  // --- DOM elements ---
   const bookingInfoDisplay = document.getElementById('booking-info-display');
   const deckSectionImage   = document.getElementById('deck-section-image');
   const payBtn             = document.getElementById('payment-btn');
 
-  if (!selectedDate || !selectedSection) {
-    alert('유효한 날짜 또는 구역 정보가 없습니다. 처음 단계부터 다시 시도해주세요.');
+  // [수정] 이전 페이지로 돌아갈 때도 URL 파라미터를 유지합니다.
+  const prevBtn = document.querySelector('a[href="booking-step3.html"]');
+  if (prevBtn) {
+      prevBtn.href = `booking-step3.html?date=${selectedDate}&valley=${encodeURIComponent(selectedValley)}`;
+  }
+
+  if (!selectedDate || !selectedValley || !selectedSection) {
+    alert('유효한 예약 정보가 없습니다. 처음 단계부터 다시 시도해주세요.');
     window.location.href = 'booking.html';
     return;
   }
@@ -150,13 +156,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 이미지 세팅
   deckSectionImage.src = sectionData.image_url;
   deckSectionImage.alt = `${selectedSection} 구역 이미지`;
 
-  // ===============================================================
-  // ===== [추가] 서버에서 실시간 예약 현황 가져오기 =====
-  // ===============================================================
   let bookedDecksFromServer = [];
   try {
     const serverUrl = 'https://o70albxd7n.onrender.com';
@@ -164,7 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (response.ok) {
       bookedDecksFromServer = await response.json();
-      console.log(`[${selectedDate}] '${selectedSection}'의 예약된 평상 목록:`, bookedDecksFromServer);
     } else {
       console.error('서버에서 예약 현황을 불러오는 데 실패했습니다.');
     }
@@ -172,9 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('예약 현황 조회 중 네트워크 오류 발생:', error);
     alert('예약 현황을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
   }
-  // ===============================================================
 
-  // hotspot container 준비
   const hotspotContainer = document.createElement('div');
   hotspotContainer.style.position = 'absolute';
   hotspotContainer.style.top = '0';
@@ -183,13 +182,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   hotspotContainer.style.height = '100%';
   hotspotContainer.id = "deck-hotspot-container";
 
-  // 평상 버튼 생성
   let selectedBtn = null;
+  let selectedDeckData = null;
+
   sectionData.decks.forEach(deck => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'absolute deck-dot';
-    // 위치/크기(%)
     btn.style.top = deck.top;
     btn.style.left = deck.left;
     btn.style.width = deck.width;
@@ -197,40 +196,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.style.transform = 'translate(-50%, -50%)';
     btn.title = `${deck.name} · 수용 ${deck.capacity}인`;
 
-    // [수정] 서버에서 받은 bookedDecksFromServer 목록에 현재 평상이 포함되어 있는지 확인
     if (bookedDecksFromServer.includes(deck.name)) {
-      // 예약 불가 스타일
       btn.classList.add('unavailable', 'bg-gray-400');
       btn.setAttribute('aria-disabled', 'true');
     } else {
-      // 예약 가능 스타일
       btn.classList.add('available', 'bg-emerald-400');
       btn.addEventListener('mouseenter', () => { btn.classList.add('scale-105'); });
       btn.addEventListener('mouseleave', () => { btn.classList.remove('scale-105'); });
 
-      // 클릭해서 선택
       btn.addEventListener('click', () => {
         if (selectedBtn) selectedBtn.classList.remove('selected');
         btn.classList.add('selected');
-
         selectedBtn = btn;
-        localStorage.setItem('selectedDeck', JSON.stringify(deck));
+        selectedDeckData = deck; // 선택한 평상 객체를 저장
         document.getElementById('payment-btn').disabled = false;
       });
     }
-
     hotspotContainer.appendChild(btn);
   });
 
-  // 이미지 부모에 hotspot 붙이기
   deckSectionImage.parentElement.appendChild(hotspotContainer);
 
-  // 결제 버튼
   payBtn.addEventListener('click', () => {
-    if (!selectedBtn) {
+    if (!selectedDeckData) {
       alert('평상을 먼저 선택해주세요.');
       return;
     }
-    window.location.href = 'booking-confirm.html';
+    // [수정] URL 파라미터에 모든 정보를 담아 다음 페이지로 이동합니다.
+    const deckJsonString = JSON.stringify(selectedDeckData);
+    const nextUrl = `booking-confirm.html?date=${selectedDate}&valley=${encodeURIComponent(selectedValley)}&section=${encodeURIComponent(selectedSection)}&deck=${encodeURIComponent(deckJsonString)}`;
+    window.location.href = nextUrl;
   });
 });
