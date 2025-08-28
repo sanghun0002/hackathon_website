@@ -946,7 +946,6 @@ body {
 }
 
 /* admin.css */
-
 /* admin.css */
 
 /* 기본 설정 */
@@ -1007,7 +1006,7 @@ body {
     background-color: #f97316; /* 주황색 */
 }
 
-.status-사용중 {
+.status-using {
     background-color: #3b82f6; /* 파란색 */
 }
 
