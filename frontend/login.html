@@ -45,7 +45,17 @@
                 // 우리가 만든 login 함수를 호출합니다.
                 await login(email, password);
                 alert('로그인 성공!');
-                window.location.href = 'index.html'; // 로그인 후 메인 페이지로 이동
+                // 현재 페이지 URL에서 'redirect' 정보를 찾습니다.
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect');
+
+                if (redirectUrl) {
+                    // '돌아올 주소' 정보가 있다면, 그 주소로 이동합니다.
+                    window.location.href = redirectUrl;
+                } else {
+                    // 정보가 없다면, 기본값인 메인 페이지로 이동합니다.
+                    window.location.href = 'index.html';
+                }
             } catch(error) {
                 if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     errorMessage.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
