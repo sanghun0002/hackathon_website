@@ -70,33 +70,36 @@ app.get('/api/notices', async (req, res) => {
     const limit = 10; // 한 페이지에 10개씩 표시
     const offset = (page - 1) * limit;
 
-    try {
-        // 1. 고정 공지는 항상 모두 가져옴
-        const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY created_at DESC');
-        
-        // 2. 일반 공지의 전체 개수를 세어 총 페이지 수를 계산
-        const totalResult = await pool.query('SELECT COUNT(*) FROM notices WHERE is_sticky = false');
-        const totalNormalNotices = parseInt(totalResult.rows[0].count, 10);
-        const totalPages = Math.ceil(totalNormalNotices / limit);
+    try {
+        // 1. 고정 공지와 일반 공지를 합친 전체 개수를 세어 총 페이지 수를 계산
+        const totalResult = await pool.query('SELECT COUNT(*) FROM notices');
+        const totalNotices = parseInt(totalResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalNotices / limit);
 
-        // 3. 현재 페이지에 해당하는 일반 공지만 10개 가져옴 (LIMIT, OFFSET 사용)
-        const normalResult = await pool.query(
-            'SELECT * FROM notices WHERE is_sticky = false ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+        // 2. 모든 공지를 가져오되, 정렬 순서를 '고정 공지 먼저, 그 다음 최신순'으로 지정합니다.
+        //    그 후, LIMIT과 OFFSET을 적용하여 현재 페이지에 맞는 10개의 데이터만 가져옵니다.
+        const result = await pool.query(
+            `SELECT *,
+                CASE WHEN is_sticky = true THEN 1 ELSE 2 END AS order_priority
+             FROM notices
+             ORDER BY order_priority, created_at DESC
+             LIMIT $1 OFFSET $2`,
             [limit, offset]
         );
-        
-        // 4. 프론트엔드에 필요한 모든 정보를 담아 응답
-        res.json({
-            notices: normalResult.rows,
-            stickyNotices: stickyResult.rows,
+        
+        // 3. 프론트엔드에 필요한 정보를 담아 응답
+        //    이제 notices 배열 하나만 보내면 됩니다.
+        res.json({
+            notices: result.rows,
             currentPage: page,
             totalPages: totalPages,
-            totalNormalNotices: totalNormalNotices
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: '서버 오류' });
-    }
+            totalNotices: totalNotices
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: '서버 오류' });
+    }
 });
 
 app.post('/api/notices', async (req, res) => {
