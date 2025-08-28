@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}" data-name="${booking.name}" data-phone="${booking.phone}" data-pyeongsang-id="${booking.valley.replace(/\s/g, '')}-${booking.section.replace(/\s/g, '')}-${booking.deckName.replace(/\s/g, '')}">
+                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}" data-name="${booking.name}" data-phone="${booking.phone}" data-pyeongsang-id="${encodeURIComponent(booking.valley.replace(/\s/g, ''))}-${encodeURIComponent(booking.section.replace(/\s/g, ''))}-${encodeURIComponent(booking.deckName.replace(/\s/g, ''))}">
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
@@ -202,16 +202,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         const deletePromises = selectedBookings.map(booking => {
-            const pyeongsangId = booking.pyeongsangId;
+            const pyeongsangId = encodeURIComponent(booking.pyeongsangId);
             const name = booking.name;
             const phone = booking.phone;
+            
             return fetch(`${serverUrl}/api/bookings/cancel/${pyeongsangId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, phone }),
             });
         });
-
 
         try {
             const responses = await Promise.all(deletePromises);
