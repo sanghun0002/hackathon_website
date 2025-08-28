@@ -97,12 +97,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const getStatusClass = (status) => {
         const lowerCaseStatus = status ? status.toLowerCase() : 'pending';
         if (lowerCaseStatus.includes('완료')) {
-            return 'status-completed';
+            return 'completed';
         }
         if (lowerCaseStatus.includes('사용중')) {
-            return 'status-using';
+            return 'using';
         }
-        return 'status-pending';
+        return 'pending';
     };
 
     const renderTable = () => {
@@ -197,7 +197,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // --- [수정] 백엔드 API와 일치하도록 DELETE 요청을 수정했습니다. ---
         const deletePromises = ids.map(id => {
             const booking = allBookings.find(b => b.id.toString() === id);
             if (!booking) {
