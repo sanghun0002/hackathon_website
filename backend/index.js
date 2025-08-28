@@ -168,7 +168,6 @@ app.delete('/api/notices/:id', async (req, res) => {
 // ===============================================================
 // ===== 후기(Review) API =====
 // ===============================================================
-// ... (이하 코드는 변경 없음)
 app.get('/api/reviews', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title, author, rating, content, images, views, created_at FROM reviews ORDER BY created_at DESC');
