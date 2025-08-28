@@ -65,7 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!docSnap.exists()) throw new Error('Firestore에서 사용자 정보를 찾을 수 없습니다.');
             const currentUserInfo = docSnap.data();
 
-            if (booking.name !== currentUserInfo.name || booking.phone !== currentUserInfo.phone) {
+            const normalizedBookingPhone = booking.phone.replace(/\s|-/g, '');
+            const normalizedUserPhone = currentUserInfo.phone.replace(/\s|-/g, '');
+
+            if (booking.name !== currentUserInfo.name || normalizedBookingPhone !== normalizedUserPhone) {
                  throw new Error('본인의 예약이 아닙니다.');
             }
             
