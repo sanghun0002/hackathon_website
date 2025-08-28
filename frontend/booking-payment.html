@@ -40,6 +40,7 @@
             }
 
             try {
+                // 1. URL 파라미터의 JSON 문자열을 객체로 변환 (decodeURIComponent 제거)
                 const deck = JSON.parse(deckString);
 
                 const bookingInfo = {
@@ -54,6 +55,7 @@
                 
                 const productName = `${bookingInfo.valley} ${bookingInfo.section} ${bookingInfo.deck.name}`;
                 
+                // 2. 화면에 최종 주문 정보 표시
                 document.getElementById('product-name').textContent = productName;
                 document.getElementById('buyer-name').textContent = bookingInfo.name;
                 document.getElementById('payment-amount').textContent = bookingInfo.amount.toLocaleString();
@@ -109,13 +111,13 @@
                                 `;
                                 resultDiv.classList.remove('hidden');
 
-                                // ✅ [수정된 부분] querySelectorAll을 사용하여 모든 관련 창을 숨깁니다.
+                                // 3. querySelectorAll을 사용하여 결제 관련 모든 창을 숨김
                                 document.querySelectorAll('.max-w-lg > .bg-white').forEach(el => {
-                                    if(el.id !== 'result-message') { // 결과 메시지 창은 제외하고 숨김
+                                    if(el.id !== 'result-message') {
                                         el.classList.add('hidden');
                                     }
                                 });
-                                document.querySelector('h1').classList.add('hidden'); // '결제하기' 제목도 숨김
+                                document.querySelector('h1').classList.add('hidden');
 
                             })
                             .catch(err => {
