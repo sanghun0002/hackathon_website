@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // pyeongsangId는 실제로는 예약 ID(booking id)입니다.
             const response = await fetch(`${bookingServerUrl}/api/bookings/${pyeongsangId}`);
             if (!response.ok) {
                 throw new Error(response.status === 404 ? '해당 평상에 대한 유효한 예약이 없습니다.' : '예약 정보 조회 실패');
@@ -148,32 +149,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
                 const predictData = await predictResponse.json();
 
-                // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
+                // 2. AI 분석 결과가 'CLEAN'일 때만 예약 반납 절차 진행
                 if (predictData.status === 'CLEAN') {
-                    resultDiv.textContent = '✅ 청결 확인!';
+                    resultDiv.textContent = '✅ 청결 확인! 반납 처리 중...';
                     
-                    const user = auth.currentUser;
-                    if (!user) throw new Error('로그인 정보가 없습니다. 다시 로그인해주세요.');
-                    
-                    const userDocRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(userDocRef);
-                    if (!docSnap.exists()) throw new Error('Firestore 사용자 정보를 찾을 수 없습니다.');
-                    
-                    const { name, phone } = docSnap.data();
-                    
-                    const cancelUrl = `${bookingServerUrl}/api/bookings/${pyeongsangId}`;
-                    const cancelResponse = await fetch(cancelUrl, {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, phone })
+                    // [수정] pyeongsangId(예약 ID)를 사용하여 명확한 반납 API(PUT)를 호출합니다.
+                    const returnUrl = `${bookingServerUrl}/api/bookings/return/${pyeongsangId}`;
+                    const returnResponse = await fetch(returnUrl, {
+                        method: 'PUT' // 메소드를 PUT으로 변경
+                        // body는 필요 없습니다. ID가 URL에 포함되어 있기 때문입니다.
                     });
                     
-                    if (!cancelResponse.ok) {
-                        const errorData = await cancelResponse.json();
-                        throw new Error(`예약 삭제 실패: ${errorData.message}`);
+                    if (!returnResponse.ok) {
+                        const errorData = await returnResponse.json();
+                        throw new Error(`반납 처리 실패: ${errorData.message}`);
                     }
                     
-                    resultDiv.textContent = '반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
+                    resultDiv.textContent = '반납이 완료되었습니다. 이용해주셔서 감사합니다.';
+                    // 성공 후에는 버튼 등을 다시 비활성화 처리할 수 있습니다.
+                    uploadButton.disabled = true;
+                    imageInput.disabled = true;
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
@@ -185,7 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('오류 발생:', error);
                 resultDiv.textContent = `🔌 오류가 발생했습니다: ${error.message}`;
             } finally {
-                uploadButton.disabled = false;
+                // DIRTY 또는 NO_PYEONGSANG 상태일 때 다시 시도할 수 있도록 버튼을 활성화합니다.
+                if (resultDiv.textContent.startsWith('❌') || resultDiv.textContent.startsWith('⚠️')) {
+                    uploadButton.disabled = false;
+                }
             }
         });
     }
