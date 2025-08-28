@@ -29,53 +29,20 @@ const pool = new Pool({
 });
 
 const setupDatabase = async () => {
-    const client = await pool.connect();
-    try {
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS notices (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                department VARCHAR(100),
-                content TEXT NOT NULL,
-                is_sticky BOOLEAN DEFAULT false,
-                views INTEGER DEFAULT 0,
-                created_at TIMESTAMPTZ DEFAULT NOW()
-            );
-        `);
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS reviews (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                author VARCHAR(100),
-                rating INTEGER,
-                content TEXT,
-                password VARCHAR(255) NOT NULL,
-                images TEXT[],
-                views INTEGER DEFAULT 0,
-                created_at TIMESTAMPTZ DEFAULT NOW()
-            );
-        `);
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS bookings (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                phone VARCHAR(100) NOT NULL,
-                booking_date DATE NOT NULL,
-                valley VARCHAR(100),
-                section VARCHAR(100),
-                deck_name VARCHAR(100),
-                capacity INTEGER,
-                status VARCHAR(50) DEFAULT '예약 완료',
-                created_at TIMESTAMPTZ DEFAULT NOW(),
-                completed_at TIMESTAMPTZ
-            );
-        `);
-        console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
-    } catch (err) {
-        console.error('❌ 데이터베이스 테이블 생성 실패:', err);
-    } finally {
-        client.release();
-    }
+    const client = await pool.connect();
+    try {
+        await client.query('CREATE TABLE IF NOT EXISTS notices (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, department VARCHAR(100), content TEXT NOT NULL, is_sticky BOOLEAN DEFAULT false, views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
+        
+        await client.query('CREATE TABLE IF NOT EXISTS reviews (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, author VARCHAR(100), rating INTEGER, content TEXT, password VARCHAR(255) NOT NULL, images TEXT[], views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
+        
+        await client.query('CREATE TABLE IF NOT EXISTS bookings (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
+        
+        console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
+    } catch (err) {
+        console.error('❌ 데이터베이스 테이블 생성 실패:', err);
+    } finally {
+        client.release();
+    }
 };
 
 // ===============================================================
