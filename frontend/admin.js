@@ -1,6 +1,7 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
-    /*// --- Authentication Check ---
+    // --- Authentication Check ---
+    /*
     const ADMIN_PASSWORD = '123456'; 
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
@@ -8,7 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
         alert("비밀번호가 올바르지 않습니다.");
         return;
-    }*/
+    }
+    */
     
     // --- Get DOM elements ---
     const filterDate = document.getElementById('filter-date');
@@ -81,8 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = searchName.value.toLowerCase();
 
         filteredBookings = allBookings.filter(booking => {
-            // [수정] booking.bookingDate를 booking.date로 변경
-            const matchesDate = !date || booking.date === date;
+            // [최종 수정] 서버 데이터에 맞춰 booking.booking_date로 변경
+            const matchesDate = !date || booking.booking_date === date;
             const matchesValley = !valley || booking.valley === valley;
             const matchesSection = !section || booking.section === section;
             const matchesName = !name || booking.name.toLowerCase().includes(name);
@@ -121,16 +123,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const row = document.createElement('tr');
             const status = booking.status || '대기';
             const statusClass = getStatusClass(status);
+            
+            // [최종 수정] 서버 데이터에 맞춰 booking.booking_date와 booking.deck_name으로 변경
+            // 또한, 날짜 형식이 길게 나오는 것을 방지하기 위해 .split('T')[0] 추가
+            const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
 
-            // [수정] booking.bookingDate -> booking.date, booking.deckName -> booking.deck
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${displayDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deck}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deck_name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -157,20 +162,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         paginationControls.appendChild(prevBtn);
 
-        const pageNumbers = Math.min(totalPages, 5);
-        let startPage = Math.max(1, currentPage - Math.floor(pageNumbers / 2));
-        let endPage = Math.min(totalPages, startPage + pageNumbers - 1);
-        if (endPage - startPage + 1 < pageNumbers) {
-            startPage = Math.max(1, endPage - pageNumbers + 1);
-        }
-        for (let i = startPage; i <= endPage; i++) {
+        for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.textContent = i;
             pageBtn.className = `px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
             pageBtn.addEventListener('click', () => {
                 currentPage = i;
                 renderTable();
-                renderPagination();
             });
             paginationControls.appendChild(pageBtn);
         }
@@ -196,13 +194,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
             return;
         }
-
+        /*
         const password = prompt("삭제를 위해 관리자 비밀번호를 다시 입력하세요.");
         if (password !== ADMIN_PASSWORD) {
             alert("비밀번호가 올바르지 않아 삭제할 수 없습니다.");
             return;
         }
-        
+        */
         const deletePromises = ids.map(id => {
             return fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
                 method: 'DELETE',
