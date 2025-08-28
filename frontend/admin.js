@@ -1,11 +1,13 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Authentication Check ---
-    const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
-    if (!isAdminLoggedIn) {
-        // [수정] 로그인 페이지로 이동하는 대신, 페이지 콘텐츠를 숨기고 경고창만 띄웁니다.
+    const ADMIN_PASSWORD = '0000';
+    const password = prompt("관리자 비밀번호를 입력하세요.");
+
+    if (password !== ADMIN_PASSWORD) {
+        // 관리자 비밀번호가 올바르지 않으면 내용을 숨기고 경고창을 띄웁니다.
         document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
-        alert("관리자만 접근할 수 있는 페이지입니다.");
+        alert("비밀번호가 올바르지 않습니다.");
         return;
     }
     
@@ -132,7 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // ... (페이지네이션 코드 유지)
     };
 
-    // --- 초기 설정 ---
     const init = async () => {
         tableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
         allBookings = await fetchAllBookings();
@@ -140,18 +141,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyFilters();
     };
 
-    // --- 이벤트 리스너 ---
-    filterDate.addEventListener('change', applyFilters);
-    filterValley.addEventListener('change', () => {
-        const selectedValley = filterValley.value;
-        populateSectionOptions(selectedValley);
-        applyFilters();
-    });
-    filterSection.addEventListener('change', applyFilters);
-    searchBtn.addEventListener('click', applyFilters);
-    searchName.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') applyFilters();
-    });
-
+    const bindEventListeners = () => {
+        filterDate.addEventListener('change', applyFilters);
+        filterValley.addEventListener('change', () => {
+            const selectedValley = filterValley.value;
+            populateSectionOptions(selectedValley);
+            applyFilters();
+        });
+        filterSection.addEventListener('change', applyFilters);
+        searchBtn.addEventListener('click', applyFilters);
+        searchName.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') applyFilters();
+        });
+    };
+    
     init();
+    bindEventListeners();
 });
