@@ -18,30 +18,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // --- 완료 및 취소된 예약 데이터 가져오기 ---
     const fetchAllClosedBookings = async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
-
         try {
-            const response = await fetch(`${serverUrl}/api/bookings/completed`, {
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
+            const response = await fetch(`${serverUrl}/api/bookings/completed`);
             if (!response.ok) {
                 throw new Error(`서버 응답 오류: ${response.status}`);
             }
-            
-            const data = await response.json();
-            console.log("서버로부터 받은 데이터:", data);
-            return data;
-
+            return await response.json();
         } catch (error) {
-            clearTimeout(timeoutId);
-            if (error.name === 'AbortError') {
-                alert('서버 응답이 지연되고 있습니다. 잠시 후 새로고침하여 다시 시도해 주세요.');
-            } else {
-                alert('데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
-            }
+            alert('데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
             return [];
         }
     };
@@ -82,7 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = searchName.value.toLowerCase();
 
         filteredBookings = allBookings.filter(booking => {
-            const matchesDate = !date || booking.booking_date === date;
+            // [수정] 날짜 필터링이 정상적으로 동작하도록 시간 값을 제외하고 비교
+            const matchesDate = !date || (booking.booking_date && booking.booking_date.split('T')[0] === date);
             const matchesValley = !valley || booking.valley === valley;
             const matchesSection = !section || booking.section === section;
             const matchesName = !name || booking.name.toLowerCase().includes(name);
@@ -109,18 +94,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         bookingsToRender.forEach(booking => {
             const row = document.createElement('tr');
             const status = booking.status || '알 수 없음';
-            const processTime = booking.completed_at ? new Date(booking.completed_at).toLocaleString('ko-KR') : 'N/A';
             
-            // 상태에 따라 배지 스타일을 동적으로 변경
-            let statusBadgeClass = 'bg-gray-100 text-gray-800'; // 기본값
+            // [수정] 처리 일시가 'N/A'로 나오지 않도록 한국 시간 형식으로 변환
+            const processTime = booking.completed_at 
+                ? new Date(booking.completed_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : (booking.created_at ? new Date(booking.created_at).toLocaleString('ko-KR') : 'N/A'); // 취소된 경우 created_at을 사용
+            
+            let statusBadgeClass = 'bg-gray-100 text-gray-800';
             if (status === '반납 완료') {
                 statusBadgeClass = 'bg-blue-100 text-blue-800';
             } else if (status === '예약 취소') {
                 statusBadgeClass = 'bg-red-100 text-red-800';
             }
+            
+            // [수정] 예약 날짜가 시간 없이 깔끔하게 나오도록 수정
+            const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
 
             row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.booking_date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${displayDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deck_name}</td>
@@ -160,7 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             pageBtn.addEventListener('click', () => {
                 currentPage = i;
                 renderTable();
-                renderPagination();
             });
             paginationControls.appendChild(pageBtn);
         }
