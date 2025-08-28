@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
+                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}" data-name="${booking.name}" data-phone="${booking.phone}" data-pyeongsang-id="${booking.valley.replace(/\s/g, '')}-${booking.section.replace(/\s/g, '')}-${booking.deckName.replace(/\s/g, '')}">
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.bookingDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
@@ -185,9 +185,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginationControls.appendChild(nextBtn);
     };
 
-    // --- 삭제 기능 ---
-    const deleteBookings = async (ids) => {
-        if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
+    const deleteBookings = async (selectedBookings) => {
+        if (selectedBookings.length === 0) {
+            alert('삭제할 예약 내역을 선택해주세요.');
+            return;
+        }
+
+        if (!confirm(`${selectedBookings.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
             return;
         }
 
@@ -197,17 +201,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        const deletePromises = ids.map(id => {
-            const booking = allBookings.find(b => b.id.toString() === id);
-            if (!booking) {
-                console.error(`Booking with id ${id} not found locally.`);
-                return Promise.resolve({ ok: false });
-            }
+        const deletePromises = selectedBookings.map(booking => {
+            const pyeongsangId = booking.pyeongsangId;
+            const name = booking.name;
+            const phone = booking.phone;
             
-            return fetch(`${serverUrl}/api/bookings/cancel/${booking.id}`, {
+            return fetch(`${serverUrl}/api/bookings/cancel/${pyeongsangId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: booking.name, phone: booking.phone }),
+                body: JSON.stringify({ name, phone }),
             });
         });
 
@@ -221,7 +223,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 alert('예약 내역 삭제에 실패했습니다. 서버 로그를 확인해주세요.');
             }
-
         } catch (error) {
             console.error('예약 삭제 중 오류 발생:', error);
             alert('예약 삭제에 실패했습니다.');
@@ -250,17 +251,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     deleteSelectedBtn.addEventListener('click', () => {
         const selectedCheckboxes = document.querySelectorAll('.booking-checkbox:checked');
-        const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+        const selectedBookings = Array.from(selectedCheckboxes).map(cb => {
+            return {
+                id: cb.dataset.id,
+                name: cb.dataset.name,
+                phone: cb.dataset.phone,
+                pyeongsangId: cb.dataset.pyeongsangId
+            };
+        });
 
-        if (idsToDelete.length === 0) {
+        if (selectedBookings.length === 0) {
             alert('삭제할 예약 내역을 선택해주세요.');
             return;
         }
-
-        deleteBookings(idsToDelete);
+        
+        deleteBookings(selectedBookings);
     });
     
-    // 전체 선택/해제 체크박스 이벤트 리스너 추가
     selectAllCheckbox.addEventListener('change', (e) => {
         const checkboxes = document.querySelectorAll('.booking-checkbox');
         checkboxes.forEach(checkbox => {
