@@ -72,47 +72,55 @@
             ]
         };
         // --- 여기까지 기존 데이터 ---
-
+        
         const mapContainer = document.getElementById('map');
         const selectedRegionNameSpan = document.getElementById('selected-region-name');
         const valleyList = document.getElementById('valley-list');
-        const nextStepBtn = document.getElementById('next-step-btn'); // 다음 버튼
-
+        const nextStepBtn = document.getElementById('next-step-btn');
+        
+        // [수정] URL에서 날짜 정보를 읽어옵니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedDate = urlParams.get('date');
+        
+        // 날짜 정보가 없으면 첫 단계로 돌려보냅니다.
+        if (!selectedDate) {
+            alert('날짜를 먼저 선택해주세요.');
+            window.location.href = 'booking.html';
+        }
+        
         let map;
         let polygons = [];
         let markers = [];
-        let selectedValleyInfo = null; // 선택된 계곡 정보를 임시 저장할 변수
+        let selectedValleyInfo = null;
         let previousSelectedItem = null;
-
-        // '다음' 버튼 클릭 이벤트 리스너 추가
+        
         nextStepBtn.addEventListener('click', () => {
             if (selectedValleyInfo) {
-                // 선택된 정보가 있으면 localStorage에 저장하고 페이지 이동
-                localStorage.setItem('selectedRegion', selectedValleyInfo.region);
-                localStorage.setItem('selectedValley', selectedValleyInfo.name);
-                window.location.href = 'booking-step3.html';
+                // [수정] URL 파라미터에 날짜와 계곡 정보를 함께 담아 다음 페이지로 이동합니다.
+                const nextUrl = `booking-step3.html?date=${selectedDate}&valley=${encodeURIComponent(selectedValleyInfo.name)}`;
+                window.location.href = nextUrl;
             } else {
                 alert('계곡을 먼저 선택해주세요.');
             }
         });
-
+        
         kakao.maps.load(() => {
             const mapOption = {
                 center: new kakao.maps.LatLng(36.5, 127.8),
                 level: 12
             };
             map = new kakao.maps.Map(mapContainer, mapOption);
-
+        
             map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
             map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
-
+        
             fetch('./skorea-provinces.json')
                 .then(response => response.json())
                 .then(geojson => {
                     const areas = geojson.features.map(feature => {
                         const coords = feature.geometry.coordinates;
                         let paths = [];
-
+        
                         if (feature.geometry.type === "Polygon") {
                             paths = getPathFromCoords(coords);
                         } else if (feature.geometry.type === "MultiPolygon") {
@@ -129,7 +137,7 @@
                     mapContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 font-bold">지도 데이터를 불러오는 데 실패했습니다.</div>';
                 });
         });
-
+        
         function getPathFromCoords(coords) {
             const paths = [];
             coords.forEach(ring => {
@@ -138,17 +146,17 @@
             });
             return paths;
         }
-
+        
         function displayArea(areaData) {
             const colors = ['#F9E2AF', '#A8D8EA', '#F1A7A7', '#B5EAD7', '#C7CEEA',
                             '#FFD1DC', '#E0BBE4', '#FFDAC1', '#D4F0F0'];
             let colorIndex = 0;
             let selectedPolygon = null;
-
+        
             areaData.forEach((area) => {
                 const color = colors[colorIndex % colors.length];
                 colorIndex++;
-
+        
                 const polygon = new kakao.maps.Polygon({
                     map: map,
                     path: area.path,
@@ -159,17 +167,17 @@
                     fillOpacity: 0.7
                 });
                 polygons.push(polygon);
-
+        
                 kakao.maps.event.addListener(polygon, 'mouseover', () => {
                     if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 1 });
                     map.setCursor('pointer');
                 });
-
+        
                 kakao.maps.event.addListener(polygon, 'mouseout', () => {
                     if (polygon !== selectedPolygon) polygon.setOptions({ fillOpacity: 0.7 });
                     map.setCursor('');
                 });
-
+        
                 kakao.maps.event.addListener(polygon, 'click', () => {
                     if (selectedPolygon) {
                         selectedPolygon.setOptions({ fillOpacity: 0.7, strokeColor: '#004c80' });
@@ -180,17 +188,16 @@
                 });
             });
         }
-
+        
         function updateValleyList(regionName) {
-            // 새로운 지역 선택 시 모든 마커 및 선택 정보 초기화
             removeMarkers();
             selectedValleyInfo = null;
-            nextStepBtn.disabled = true; // 다음 버튼 비활성화
-
+            nextStepBtn.disabled = true;
+        
             selectedRegionNameSpan.textContent = regionName;
             valleyList.innerHTML = '';
             previousSelectedItem = null;
-
+        
             const valleys = valleyData[regionName];
             if (valleys && valleys.length > 0) {
                 const bounds = new kakao.maps.LatLngBounds();
@@ -199,44 +206,40 @@
                     const li = document.createElement('li');
                     li.className = 'p-2 rounded valley-list-item';
                     li.textContent = valley.name;
-
+        
                     const markerPosition = new kakao.maps.LatLng(valley.lat, valley.lng);
                     bounds.extend(markerPosition);
-
-                    // 리스트 아이템 클릭 시
+        
                     li.onclick = () => {
-                        // 이전에 선택된 항목의 클래스 제거
                         if (previousSelectedItem) {
                             previousSelectedItem.classList.remove('selected');
                         }
-                        // 현재 클릭된 항목에 'selected' 클래스 추가
                         li.classList.add('selected');
-                        // 현재 항목을 이전 선택 항목으로 저장
                         previousSelectedItem = li;
-
+        
                         selectedValleyInfo = { region: regionName, name: valley.name };
                         nextStepBtn.disabled = false;
                     };
-
+        
                     valleyList.appendChild(li);
-
+        
                     const marker = new kakao.maps.Marker({ position: markerPosition });
                     marker.setMap(map);
                     markers.push(marker);
-
+        
                     const infowindow = new kakao.maps.InfoWindow({
                         content: `<div style="padding:5px;font-size:12px;">${valley.name}</div>`
                     });
                     kakao.maps.event.addListener(marker, 'mouseover', () => infowindow.open(map, marker));
                     kakao.maps.event.addListener(marker, 'mouseout', () => infowindow.close());
                 });
-
+        
                 map.setBounds(bounds);
             } else {
                 valleyList.innerHTML = '<li class="text-gray-500">등록된 계곡이 없습니다.</li>';
             }
         }
-
+        
         function removeMarkers() {
             for (let i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
