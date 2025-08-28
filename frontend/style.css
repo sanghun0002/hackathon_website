@@ -676,16 +676,19 @@ body {
 /*            후기  작성           */
 /*                                */
 /* 후기 수정 페이지의 기존 이미지 표시 영역 스타일 */
-.form-group-static {
-      display: grid;                 
+
+.form-group-static ,
+.form-group{
+      display: grid;                  
     grid-template-columns: 160px 1fr; 
-    align-items: center;         
-    gap: 0 20px;                    
+    align-items: center;           
+    gap: 0 20px;                   
     margin-bottom: 20px;
 }
-.form-group-static label {
+.form-group-static label,
+.form-group label {
      font-weight: 500;
-    padding: 0;
+    padding-top: 8px;
 }
 
 .existing-images {
@@ -693,6 +696,7 @@ body {
     flex-wrap: wrap;
     gap: 10px;
 }
+
 
 .existing-images img {
     width: 150px;
