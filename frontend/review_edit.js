@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const imgWrapper = document.createElement('div');
                 imgWrapper.className = 'image-preview-wrapper';
                 
+                // Cloudinary 썸네일 URL로 변경하여 로딩 속도 개선
                 const parts = imageUrl.split('/upload/');
                 const thumbnailUrl = `${parts[0]}/upload/w_150,h_150,c_fill/${parts[1]}`;
 
@@ -59,10 +60,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // --- [문제 해결] 시작 ---
+        // 1. 최종 수정을 위해 비밀번호를 다시 한번 입력받습니다.
+        const password = prompt('수정을 완료하려면 비밀번호를 다시 입력하세요.');
+        if (!password) {
+            alert('비밀번호를 입력해야 수정할 수 있습니다.');
+            return; // 사용자가 취소하면 전송 중단
+        }
+        // --- [문제 해결] 끝 ---
+
         const imagesToDelete = Array.from(document.querySelectorAll('.delete-image-cb:checked'))
                                      .map(cb => cb.value);
 
         const formData = new FormData();
+        
+        // --- [문제 해결] 시작 ---
+        // 2. 입력받은 비밀번호를 formData에 추가합니다.
+        formData.append('password', password);
+        // --- [문제 해결] 끝 ---
+
         formData.append('title', titleInput.value);
         formData.append('author', authorInput.value);
         formData.append('content', contentInput.value);
