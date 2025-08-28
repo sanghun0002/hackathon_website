@@ -279,7 +279,7 @@ app.get('/api/bookings/completed', async (req, res) => {
     try {
          //[DB 변경] '반납 완료' 상태인 예약만 조회
         const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
-    /  res.json(result.rows);
+      res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
