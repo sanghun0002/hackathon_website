@@ -351,39 +351,37 @@ app.post('/api/bookings/verify-on-site', (req, res) => {
 
     const foundBooking = bookings.find(b => {
         const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
-        return fullIdFromDB.replace(/\s/g, '') === pyeongsangId.replace(/\s/g, '') &&
-               b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
-               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
+        
+        // --- [핵심 수정] ---
+        // 비교하기 전에 모든 공백과 하이픈(-)을 제거합니다.
+        return fullIdFromDB.replace(/\s|-/g, '') === pyeongsangId.replace(/\s|-/g, '') &&
+               b.name.replace(/\s|-/g, '') === name.replace(/\s|-/g, '') &&
+               b.phone.replace(/\s|-/g, '') === phone.replace(/\s|-/g, '') &&
                b.bookingDate === today;
     });
 
     if (foundBooking) {
-        // --- [핵심 수정] ---
-        // 찾은 예약 데이터의 상태(status)를 '사용 중'으로 변경합니다.
         foundBooking.status = '사용 중';
-        
-        console.log('예약 상태 변경 완료:', foundBooking); // 상태 변경 확인용 로그
-        // -----------------------
-
-        // 모든 정보가 일치
         res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
     } else {
-        // 정보 불일치
         res.status(404).json({ status: 'failure', message: '예약자 정보가 올바르지 않습니다. 다시 입력해주세요.' });
     }
 });
 
-// [수정] 예약 '삭제'가 아닌 '반납 처리' API로 변경
+// DELETE: 특정 예약 취소 (본인 확인 + 날짜 확인)
 app.delete('/api/bookings/:pyeongsangId', (req, res) => {
     const { pyeongsangId } = req.params;
     const { name, phone } = req.body;
     const today = new Date().toISOString().split('T')[0];
 
     const bookingIndex = bookings.findIndex(b => {
-        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`.replace(/\s/g, '');
-        return fullIdFromDB === pyeongsangId.replace(/\s/g, '') &&
-               b.name.replace(/\s/g, '') === name.replace(/\s/g, '') &&
-               b.phone.replace(/\s/g, '') === phone.replace(/\s/g, '') &&
+        const fullIdFromDB = `${b.valley}-${b.section}-${b.deckName}`;
+        
+        // --- [핵심 수정] ---
+        // 비교하기 전에 모든 공백과 하이픈(-)을 제거합니다.
+        return fullIdFromDB.replace(/\s|-/g, '') === pyeongsangId.replace(/\s|-/g, '') &&
+               b.name.replace(/\s|-/g, '') === name.replace(/\s|-/g, '') &&
+               b.phone.replace(/\s|-/g, '') === phone.replace(/\s|-/g, '') &&
                b.bookingDate === today;
     });
 
@@ -391,18 +389,10 @@ app.delete('/api/bookings/:pyeongsangId', (req, res) => {
         return res.status(404).json({ message: '오늘 날짜로 된 일치하는 예약 정보를 찾을 수 없습니다.' });
     }
 
-    // 1. 'bookings' 배열에서 해당 예약 건을 잘라내서 가져옵니다. (삭제 효과)
     const [completedBooking] = bookings.splice(bookingIndex, 1);
-
-    // 2. 가져온 예약 건의 상태를 '반납 완료'로 변경합니다.
     completedBooking.status = '반납 완료';
-    completedBooking.completedAt = new Date().toISOString(); // 반납 완료 시간 기록
-
-    // 3. 'completedBookings' 배열에 저장합니다.
+    completedBooking.completedAt = new Date().toISOString();
     completedBookings.push(completedBooking);
-
-    console.log(`예약 ${pyeongsangId}가 '반납 완료' 처리되었습니다.`);
-    console.log('완료된 예약 목록:', completedBookings);
     
     res.status(200).json({ message: '반납 처리가 완료되었습니다.' });
 });
