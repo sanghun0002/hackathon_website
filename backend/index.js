@@ -413,17 +413,3 @@ app.delete('/api/bookings/:pyeongsangId', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
 });
-// 관리자 삭제 기능
-app.delete('/api/notices/:id', (req, res) => {
-    const { password } = req.body;
-    if (password !== ADMIN_PASSWORD) {
-        return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
-    }
-    const noticeIndex = notices.findIndex(n => n.id === parseInt(req.params.id));
-    if (noticeIndex !== -1) {
-        notices.splice(noticeIndex, 1);
-        res.status(200).json({ message: '삭제 완료' });
-    } else {
-        res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
-    }
-});
