@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
 
-    // Server URL - 배포된 Render 서버 주소로 변경되었습니다.
+    // Server URL
     const serverUrl = 'https://o70albxd7n.onrender.com';
 
     let allCompletedBookings = [];
@@ -28,18 +28,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     const itemsPerPage = 10;
     
-    // --- Fetch completed booking data from the new backend API endpoint ---
+    // --- Fetch completed booking data with improved error handling ---
     const fetchAllCompletedBookings = async () => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 타임아웃 설정
+
         try {
-            // Fetch data from the '/api/bookings/completed' endpoint
-            const response = await fetch(`${serverUrl}/api/bookings/completed`);
+            const response = await fetch(`${serverUrl}/api/bookings/completed`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
-                throw new Error('Failed to fetch completed booking data');
+                throw new Error(`Server responded with status: ${response.status}`);
             }
-            return await response.json();
+            
+            const data = await response.json();
+            if (data.length === 0) {
+                console.info("데이터 로딩 성공: 서버에 저장된 완료 내역이 없습니다.");
+            }
+            return data;
+
         } catch (error) {
-            console.error('Error fetching completed booking data:', error);
-            alert('완료된 예약 데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                console.error('Fetch timed out.');
+                alert('서버 응답이 지연되고 있습니다. 잠시 후 새로고침하여 다시 시도해 주세요. Render 서버의 경우, 첫 요청에 시간이 걸릴 수 있습니다.');
+            } else {
+                console.error('Error fetching completed booking data:', error);
+                alert('완료된 예약 데이터를 불러오는 데 실패했습니다. 서버 상태 및 로그를 확인해주세요.');
+            }
             return [];
         }
     };
@@ -141,13 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         paginationControls.appendChild(prevBtn);
 
-        const pageNumbers = Math.min(totalPages, 5);
-        let startPage = Math.max(1, currentPage - Math.floor(pageNumbers / 2));
-        let endPage = Math.min(totalPages, startPage + pageNumbers - 1);
-        if (endPage - startPage + 1 < pageNumbers) {
-            startPage = Math.max(1, endPage - pageNumbers + 1);
-        }
-        for (let i = startPage; i <= endPage; i++) {
+        for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.textContent = i;
             pageBtn.className = `px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
