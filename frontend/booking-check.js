@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <th class="px-6 py-3">구역</th>
                         <th class="px-6 py-3">평상</th>
                         <th class="px-6 py-3">예약 상태</th>
-                        <th class="px-6 py-3">취소</th> 
+                        <th class="px-6 py-3">예약 취소</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button 
                             class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
                             data-id="${bookingId}">
-                            예약 취소
+                            취소
                         </button>
                     </td>
                 </tr>
