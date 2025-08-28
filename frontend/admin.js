@@ -1,10 +1,6 @@
-// firebase-config.js에서 db 객체를 가져옵니다.
-import { db } from './firebase-config.js';
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// 이 스크립트는 예약 관리 페이지의 모든 관리 기능을 처리합니다.
+// This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- DOM 요소 가져오기 ---
+    // --- Get DOM elements ---
     const filterDate = document.getElementById('filter-date');
     const filterValley = document.getElementById('filter-valley');
     const filterSection = document.getElementById('filter-section');
@@ -14,29 +10,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
 
-    let allBookings = []; // Firestore에서 가져온 모든 예약 데이터
-    let filteredBookings = []; // 필터링된 후 화면에 표시될 데이터
+    // Server URL
+    const serverUrl = 'https://o70albxd7n.onrender.com';
+
+    let allBookings = []; // All booking data from the server
+    let filteredBookings = []; // Filtered data for display
     let currentPage = 1;
     const itemsPerPage = 10;
     
-    // --- Firestore에서 모든 예약 데이터 가져오기 ---
+    // --- [수정] 백엔드 API를 호출하여 실제 예약 데이터를 가져옵니다. ---
     const fetchAllBookings = async () => {
         try {
-            // 'bookings' 컬렉션의 모든 문서를 'createdAt' 필드 기준 내림차순으로 정렬하여 가져옴
-            const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            
-            const bookingsData = [];
-            querySnapshot.forEach((doc) => {
-                // 문서 ID와 데이터를 함께 저장
-                bookingsData.push({ id: doc.id, ...doc.data() });
-            });
-            return bookingsData;
-
+            const response = await fetch(`${serverUrl}/api/bookings`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch booking data');
+            }
+            return await response.json();
         } catch (error) {
-            console.error('예약 데이터 가져오기 오류:', error);
+            console.error('Error fetching booking data:', error);
             alert('예약 데이터를 불러오는 데 실패했습니다.');
-            return []; // 오류 발생 시 빈 배열 반환
+            return [];
         }
     };
 
