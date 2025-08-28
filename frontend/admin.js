@@ -1,3 +1,7 @@
+// firebase-config.js에서 db 객체를 가져옵니다.
+import { db } from './firebase-config.js';
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 // 이 스크립트는 예약 관리 페이지의 모든 관리 기능을 처리합니다.
 document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM 요소 가져오기 ---
@@ -10,22 +14,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
 
-    // 서버 URL
-    const serverUrl = 'https://o70albxd7n.onrender.com';
-
-    let allBookings = []; // 서버에서 가져온 모든 예약 데이터
+    let allBookings = []; // Firestore에서 가져온 모든 예약 데이터
     let filteredBookings = []; // 필터링된 후 화면에 표시될 데이터
     let currentPage = 1;
     const itemsPerPage = 10;
     
-    // --- 서버에서 모든 예약 데이터 가져오기 ---
+    // --- Firestore에서 모든 예약 데이터 가져오기 ---
     const fetchAllBookings = async () => {
         try {
-            const response = await fetch(`${serverUrl}/api/bookings`);
-            if (!response.ok) {
-                throw new Error('예약 데이터를 가져오는 데 실패했습니다.');
-            }
-            return await response.json();
+            // 'bookings' 컬렉션의 모든 문서를 'createdAt' 필드 기준 내림차순으로 정렬하여 가져옴
+            const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            const bookingsData = [];
+            querySnapshot.forEach((doc) => {
+                // 문서 ID와 데이터를 함께 저장
+                bookingsData.push({ id: doc.id, ...doc.data() });
+            });
+            return bookingsData;
+
         } catch (error) {
             console.error('예약 데이터 가져오기 오류:', error);
             alert('예약 데이터를 불러오는 데 실패했습니다.');
@@ -84,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 상태에 따라 CSS 클래스 이름을 반환하는 함수
     const getStatusClass = (status) => {
-        if (status === '예약 및 결제 완료') {
+        if (status === '예약 완료' || status === '예약 및 결제 완료') {
             return 'status-completed';
         }
         if (status === '사용 중') {
@@ -100,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bookingsToRender = filteredBookings.slice(start, end);
 
         if (bookingsToRender.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 내역이 없습니다.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">조건에 맞는 예약 내역이 없습니다.</td></tr>`;
             return;
         }
 
@@ -175,6 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 초기 설정 ---
     const init = async () => {
+        tableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
         allBookings = await fetchAllBookings();
         populateValleyFilter(allBookings);
         applyFilters();
