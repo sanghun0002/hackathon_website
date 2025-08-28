@@ -35,7 +35,7 @@ const setupDatabase = async () => {
         
         await client.query('CREATE TABLE IF NOT EXISTS reviews (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, author VARCHAR(100), rating INTEGER, content TEXT, password VARCHAR(255) NOT NULL, images TEXT[], views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
         
-        await client.query('CREATE TABLE IF NOT EXISTS bookings (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
+        await client.query('CREATE TABLE IF NOT EXISTS booki2gs (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
         
         console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
     } catch (err) {
@@ -70,13 +70,26 @@ const upload = multer({ storage: storage });
 // ===== 공지사항(Notice) API =====
 // ===============================================================
 app.get('/api/notices', async (req, res) => {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = 10; // 한 페이지에 10개씩 표시
+    const offset = (page - 1) * limit;
+
     try {
         const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY created_at DESC');
-        const normalResult = await pool.query('SELECT * FROM notices WHERE is_sticky = false ORDER BY created_at DESC');
-        
+        const totalResult = await pool.query('SELECT COUNT(*) FROM notices WHERE is_sticky = false');
+        const totalNormalNotices = parseInt(totalResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalNormalNotices / limit);
+        const normalResult = await pool.query(
+            'SELECT * FROM notices WHERE is_sticky = false ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+
         res.json({
             notices: normalResult.rows,
             stickyNotices: stickyResult.rows,
+            currentPage: page,
+            totalPages: totalPages,
+            totalNormalNotices: totalNormalNotices
         });
     } catch (err) {
         console.error(err);
