@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
 
-    // Server URL
+    // Server URL - 배포된 Render 서버 주소로 변경되었습니다.
     const serverUrl = 'https://o70albxd7n.onrender.com';
 
     let allCompletedBookings = [];
