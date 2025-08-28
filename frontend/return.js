@@ -111,7 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // ... (AI 분석 요청 부분은 이전과 동일)
-                const predictResponse = await fetch(aiServerUrl, { /* ... */ });
+                const resizedFile = await resizeImage(originalFile, 800, 800, 0.8);
+                const formData = new FormData();
+                formData.append('file', resizedFile);
+                
+                const predictResponse = await fetch(aiServerUrl, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
                 const predictData = await predictResponse.json();
 
                 if (predictData.status === 'CLEAN') {
@@ -140,9 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
-                } else {
-                    // ... (DIRTY, NO_PYEONGSANG 처리)
+                } else if (predictData.status === 'DIRTY') {
+                    resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
+                } else if (predictData.status === 'NO_PYEONSANG') {
+                    resultDiv.textContent = '⚠️ 평상이 인식되지 않습니다. 평상이 보이도록 다시 촬영해주세요.';
                 }
+
 
             } catch (error) {
                 resultDiv.textContent = `🔌 오류가 발생했습니다: ${error.message}`;
