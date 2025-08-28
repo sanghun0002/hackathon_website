@@ -6,30 +6,9 @@
     <title>현장 인증</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        body { 
-            font-family: -apple-system, sans-serif; 
-            text-align: center; 
-            margin: auto; 
-            padding: 20px; 
-            background-color: #f4f7f6; 
-            /* --- [추가] 중앙 정렬 --- */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .container { 
-            background-color: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-        }
+        html, body { height: 100%; margin: 0; }
+        body { font-family: -apple-system, sans-serif; text-align: center; margin: auto; padding: 20px; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; box-sizing: border-box; }
+        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
         h1 { color: #333; }
         input[type="text"], input[type="tel"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; }
         .btn { width: 100%; padding: 15px; font-size: 1.2em; cursor: pointer; border: none; border-radius: 8px; color: white; background-color: #007bff; }
@@ -46,7 +25,9 @@
             <a href="#" id="back-to-choice-btn" class="back-link"><i class="fas fa-arrow-left"></i> 선택 화면으로</a>
         </header>
         <h1>현장 인증</h1>
+        
         <p><strong>평상 ID: <span id="pyeongsang-id-display"></span></strong></p>
+        
         <p>예약자 정보를 입력해주세요.</p>
         <form id="auth-form">
             <input type="text" id="name-input" placeholder="이름" required>
@@ -55,6 +36,8 @@
         </form>
         <div id="result-message"></div>
     </div>
-    <script src="checkQR.js"></script>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="checkQR.js"></script>
 </body>
 </html>
