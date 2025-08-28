@@ -1,6 +1,6 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- Authentication Check ---
+    /*// --- Authentication Check ---
     const ADMIN_PASSWORD = '123456'; 
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
         alert("비밀번호가 올바르지 않습니다.");
         return;
-    }
+    }*/
     
     // --- Get DOM elements ---
     const filterDate = document.getElementById('filter-date');
