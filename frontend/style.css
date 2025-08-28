@@ -1023,10 +1023,30 @@ body {
     display: inline-block; /* transform을 적용하려면 블록 또는 인라인블록 요소여야 합니다. */
     transform: scale(1.25); /* 1.5배 확대. 2로 하면 2배가 됩니다. */
 }
-/*메인 로고 쉬어가 ~계곡 */
+/* 1. 로고 전체를 감싸는 박스: 나란히 배치하고 정렬합니다. */
 .logo-box {
-    display: flex; /* 자식 요소들을 나란히 배치합니다. */
-    justify-content: center; /* 수평 방향으로 가운데 정렬합니다. */
-    align-items: center; /* 수직 방향으로 가운데 정렬합니다. */
-    gap: 10px; /* 요소들 사이의 간격을 줍니다. (선택 사항) */
+    display: flex;            /* 자식 요소들을 가로로 나란히 배치 */
+    justify-content: center;  /* 수평 방향 가운데 정렬 */
+    align-items: center;      /* 수직 방향 가운데 정렬 (이모지와 텍스트 높이 맞춤) */
+    gap: 15px;                /* 요소들 사이의 간격 (원하는 만큼 조절) */
+    
+    /* --- 기존 스타일 유지 --- */
+    flex-grow: 1;
+    text-align: center;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 2. '쉬어가~ 계곡' 텍스트 스타일: 크기를 키우고 굵게 만듭니다. */
+.logo-text {
+    font-size: 2rem;    /* 원하는 크기로 조절하세요 (e.g., 32px) */
+    font-weight: 700;   /* 굵은 글씨체 */
+}
+
+/* 3. 나무 이모지 스타일: 양쪽 크기를 동일하게 맞춥니다. */
+.logo-icon {
+    font-size: 1.8rem;  /* 텍스트와 어울리도록 크기 조절 (e.g., 28px) */
 }
