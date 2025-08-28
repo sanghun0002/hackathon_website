@@ -1021,5 +1021,5 @@ body {
 /*이모티콘 조절 크기*/
 .shortcut-item .icon {
     display: inline-block; /* transform을 적용하려면 블록 또는 인라인블록 요소여야 합니다. */
-    transform: scale(1.5); /* 1.5배 확대. 2로 하면 2배가 됩니다. */
+    transform: scale(1.25); /* 1.5배 확대. 2로 하면 2배가 됩니다. */
 }
