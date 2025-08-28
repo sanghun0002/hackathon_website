@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button 
                             class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
                             data-id="${bookingId}">
-                            취소
+                            예약 취소
                         </button>
                     </td>
                 </tr>
