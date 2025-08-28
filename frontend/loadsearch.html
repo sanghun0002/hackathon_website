@@ -38,7 +38,7 @@
             font-size: 16px;
         }
         .search-box select {
-            flex: 1; /* select 태그가 가능한 많은 공간을 차지하도록 설정 */
+            flex: 1;
         }
         .search-box button {
             background-color: #007bff;
@@ -81,7 +81,7 @@
             <select id="province-select">
                 <option value="">-- 도/특별시 선택 --</option>
             </select>
-            <select id="valley-select">
+            <select id="valley-select" disabled>
                 <option value="">-- 계곡 선택 --</option>
             </select>
             <button id="search-btn">검색</button>
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <!-- JavaScript 파일 연결 (파일 이름 변경) -->
+    <!-- JavaScript 파일 연결 -->
     <script src="loadsearch.js"></script>
 </body>
 </html>
