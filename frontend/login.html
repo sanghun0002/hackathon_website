@@ -29,18 +29,11 @@
     </div>
 
     <script type="module">
-        import { auth } from './firebase-config.js';
-        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // auth.js에서 login 함수를 가져옵니다.
+        import { login } from './auth.js';
 
         const loginForm = document.getElementById('login-form');
         const errorMessage = document.getElementById('error-message');
-
-        // 이미 로그인 상태라면 바로 메인 페이지로 보냅니다.
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                window.location.href = 'index.html'; 
-            }
-        });
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -49,11 +42,16 @@
             errorMessage.textContent = '';
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // 로그인이 성공하면 onAuthStateChanged가 감지하여 index.html로 보냅니다.
+                // 우리가 만든 login 함수를 호출합니다.
+                await login(email, password);
+                alert('로그인 성공!');
+                window.location.href = 'index.html'; // 로그인 후 메인 페이지로 이동
             } catch(error) {
-                errorMessage.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
-                console.error(error);
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+                } else {
+                    errorMessage.textContent = '로그인 실패: ' + error.message;
+                }
             }
         });
     </script>
