@@ -1,3 +1,8 @@
+// firebase-config.js와 auth.js에서 필요한 기능들을 모두 import합니다.
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('페이지 로딩 완료, 반납 스크립트 실행 시작.');
 
@@ -155,15 +160,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (predictData.status === 'CLEAN') {
                     resultDiv.textContent = '✅ 청결 확인! 본인 확인을 위해 정보를 입력해주세요.';
                     
-                    const userName = prompt("예약자 성함을 입력하세요:");
-                    if (userName === null || userName.trim() === '') return; // 사용자가 취소하거나 아무것도 입력하지 않으면 중단
+                    // prompt 대신, 현재 로그인된 사용자 정보를 가져옵니다.
+                    const user = auth.currentUser;
+                    if (!user) {
+                        throw new Error('로그인 정보가 없습니다. 다시 로그인해주세요.');
+                    }
 
-                    const userPhone = prompt("예약 시 사용한 전화번호를 입력하세요:");
-                    if (userPhone === null || userPhone.trim() === '') return; // 사용자가 취소하거나 아무것도 입력하지 않으면 중단
+                    // Firestore에서 로그인된 사용자의 이름과 전화번호를 조회합니다.
+                    const userDocRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userDocRef);
 
-                    resultDiv.textContent = '예약 내역을 삭제 중입니다...';
-
-                    // 3. Node.js 예약 서버로 예약 삭제 요청
+                    if (!docSnap.exists() || !docSnap.data().name || !docSnap.data().phone) {
+                        throw new Error('데이터베이스에서 사용자 정보를 찾을 수 없습니다.');
+                    }
+                    const userName = docSnap.data().name;
+                    const userPhone = docSnap.data().phone;
+                    // -----------------------
+                    
+                    // 3. Node.js 예약 서버로 예약 삭제 요청 (가져온 정보 사용)
                     const cancelUrl = `${bookingServerUrl}/api/bookings/${pyeongsangId}`;
                     const cancelResponse = await fetch(cancelUrl, {
                         method: 'DELETE',
@@ -176,8 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         throw new Error(`예약 내역 삭제에 실패했습니다: ${errorData.message}`);
                     }
                     
-                    // 4. 최종 성공 메시지 표시
-                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 영업일 기준 최대 7일이 소요될 수 있습니다.';
+                    resultDiv.textContent = '🎉 반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
