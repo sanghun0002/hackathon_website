@@ -158,8 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
                 if (predictData.status === 'CLEAN') {
-                    resultDiv.textContent = '✅ 청결 확인! 본인 확인을 위해 정보를 입력해주세요.';
-                    
+                    resultDiv.textContent = '✅ 청결 확인! 예약 내역을 자동으로 정리합니다...';
+
+                    // --- [핵심 수정] ---
                     // prompt 대신, 현재 로그인된 사용자 정보를 가져옵니다.
                     const user = auth.currentUser;
                     if (!user) {
@@ -194,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
-                } else if (predictData.status === 'NO_PYEONGSANG') {
+                } else if (predictData.status === 'NO_PYEONSANG') {
                     resultDiv.textContent = '⚠️ 평상이 인식되지 않습니다. 평상이 보이도록 다시 촬영해주세요.';
                 }
 
@@ -206,4 +207,5 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
 });
