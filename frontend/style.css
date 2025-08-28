@@ -1040,13 +1040,18 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* 2. '쉬어가~ 계곡' 텍스트 스타일: 크기를 키우고 굵게 만듭니다. */
-.logo-text {
-    font-size: 1.8rem;    /* 원하는 크기로 조절하세요 (e.g., 32px) */
-    font-weight: 700;   /* 굵은 글씨체 */
-}
-
 /* 3. 나무 이모지 스타일: 양쪽 크기를 동일하게 맞춥니다. */
 .logo-icon {
     font-size: 1.8rem;  /* 텍스트와 어울리도록 크기 조절 (e.g., 28px) */
+}
+@font-face {
+    font-family: 'On-geul-ip'; /* 폰트에 대한 별명(이름)을 지어줍니다. */
+    src: url('fonts/온글잎 박다현체.ttf') format('truetype'); /* 폰트 파일의 경로 */
+}
+
+/* 2. 불러온 폰트를 원하는 요소에 적용하기 */
+.logo-text {
+    font-family: 'On-geul-ip', sans-serif; /* 방금 지어준 폰트 이름을 적용합니다. */
+    font-size: 2.2rem;   /* 폰트에 맞게 크기를 미세 조정할 수 있습니다. */
+    font-weight: normal; /* 폰트가 자체 굵기를 가질 경우 normal로 초기화하는 것이 좋습니다. */
 }
