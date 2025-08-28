@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitButton.textContent = '조회하기';
             });
     });
-
     
     function displayBookingsAsTable(bookings) {
         let tableHTML = `
@@ -69,81 +68,75 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         bookings.forEach(booking => {
-    const bookingId = booking._id || booking.id;
+            const bookingId = booking._id || booking.id;
 
-    // ⭐ [추가] 예약 상태에 따라 취소 버튼의 HTML을 다르게 생성합니다.
-    let cancelButtonHTML = '';
-    if (booking.status === '사용 중') {
-        // 상태가 '사용 중'이면: 비활성화된 '취소 불가' 버튼을 만듭니다.
-        cancelButtonHTML = `
-            <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
-                취소 불가
-            </button>
-        `;
-    } else {
-        // 그 외의 상태이면: 원래의 '취소' 버튼을 만듭니다.
-        cancelButtonHTML = `
-            <button 
-                class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
-                data-id="${bookingId}">
-                취소
-            </button>
-        `;
-    }
-
-    
-    tableHTML += `
-        <tr class="bg-white border-b">
-            <td class="px-6 py-4">${booking.bookingDate}</td>
-            <td class="px-6 py-4">${booking.valley}</td>
-            <td class="px-6 py-4">${booking.section}</td>
-            <td class="px-6 py-4">${booking.deckName}</td>
-            <td class="px-6 py-4">
-                <a href="loadsearch.html" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
-                    길찾기
-                </a>
-            </td>
-            <td class="px-6 py-4">${booking.status}</td>
-            <td class="px-6 py-4">
-                ${cancelButtonHTML}
-            </td>
-        </tr>
-    `;
-});
+            let cancelButtonHTML = '';
+            if (booking.status === '사용 중') {
+                cancelButtonHTML = `
+                    <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
+                        취소 불가
+                    </button>
+                `;
+            } else {
+                cancelButtonHTML = `
+                    <button 
+                        class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
+                        data-id="${bookingId}">
+                        취소
+                    </button>
+                `;
+            }
+            
+            // [수정] 날짜 형식을 'YYYY-MM-DD'로 깔끔하게 변경
+            const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
+            
+            tableHTML += `
+                <tr class="bg-white border-b">
+                    // [수정] booking.bookingDate -> booking.booking_date, booking.deckName -> booking.deck_name
+                    <td class="px-6 py-4">${displayDate}</td>
+                    <td class="px-6 py-4">${booking.valley}</td>
+                    <td class="px-6 py-4">${booking.section}</td>
+                    <td class="px-6 py-4">${booking.deck_name}</td>
+                    <td class="px-6 py-4">
+                        <a href="loadsearch.html" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
+                            길찾기
+                        </a>
+                    </td>
+                    <td class="px-6 py-4">${booking.status}</td>
+                    <td class="px-6 py-4">
+                        ${cancelButtonHTML}
+                    </td>
+                </tr>
+            `;
+        });
 
         tableHTML += `</tbody></table>`;
-
         resultDiv.innerHTML = tableHTML;
-
         
         attachCancelButtonListeners();
     }
 
-    
-  
-function attachCancelButtonListeners() {
-    const cancelButtons = document.querySelectorAll('.cancel-btn');
-    cancelButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const bookingId = e.target.dataset.id;
+    function attachCancelButtonListeners() {
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const bookingId = e.target.dataset.id;
+                
+                const confirmationMessage = `정말로 이 예약을 취소하시겠습니까?\n\n` +
+                    `취소 시 아래의 환불 정책이 적용되오니, 반드시 확인해 주시기 바랍니다.\n\n` +
+                    `[환불 규정 안내]\n` +
+                    `• 예약일로부터 7일 이상 남은 경우: 100% 환불\n` +
+                    `• 예약일로부터 3일 ~ 6일 전: 50% 환불\n` +
+                    `• 예약일로부터 2일 전 ~ 당일: 환불 불가\n\n` +
+                    `※ 환불 처리에는 영업일 기준 3일에서 최대 7일까지 소요될 수 있습니다.`;
 
-           
-            const confirmationMessage = `정말로 이 예약을 취소하시겠습니까?\n\n` +
-                `취소 시 아래의 환불 정책이 적용되오니, 반드시 확인해 주시기 바랍니다.\n\n` +
-                `[환불 규정 안내]\n` +
-                `• 예약일로부터 7일 이상 남은 경우: 100% 환불\n` +
-                `• 예약일로부터 3일 ~ 6일 전: 50% 환불\n` +
-                `• 예약일로부터 2일 전 ~ 당일: 환불 불가\n\n` +
-                `※ 환불 처리에는 영업일 기준 3일에서 최대 7일까지 소요될 수 있습니다.`;
-
-            if (confirm(confirmationMessage)) {
-                cancelBooking(bookingId);
-            }
+                if (confirm(confirmationMessage)) {
+                    cancelBooking(bookingId);
+                }
+            });
         });
-    });
-}
+    }
 
-  
     async function cancelBooking(bookingId) {
         try {
             const response = await fetch(`${serverUrl}/api/bookings/cancel/${bookingId}`, {
@@ -156,7 +149,6 @@ function attachCancelButtonListeners() {
             }
 
             alert('예약이 성공적으로 취소되었습니다.');
-            // 취소 성공 후, 다시 조회 폼을 클릭하여 결과를 새로고침하게 유도
             submitButton.click(); 
 
         } catch (error) {
