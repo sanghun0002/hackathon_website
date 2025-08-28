@@ -1059,3 +1059,10 @@ body {
     font-size: 2.2rem;   /* 폰트에 맞게 크기를 미세 조정할 수 있습니다. */
     font-weight: normal; /* 폰트가 자체 굵기를 가질 경우 normal로 초기화하는 것이 좋습니다. */
 }
+/* 리뷰 창 스타일 설정 */
+.pagination .page-link.active {
+    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
