@@ -7,9 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .slider-wrapper {
             display: flex;
             overflow-x: auto;
@@ -40,6 +38,7 @@
         </header>
 
         <main class="bg-white p-8 rounded-lg shadow-md">
+            <!-- 1. 기본 보기 모드 -->
             <div id="view-mode">
                 <h1 id="detail-title" class="text-3xl font-bold text-gray-900 mb-4">...</h1>
                 <div class="detail-meta text-sm text-gray-500 flex items-center flex-wrap gap-x-2 mb-6">
@@ -49,32 +48,51 @@
                     <span>|</span>
                     <span>조회수 <span id="detail-views"></span></span>
                     <span>|</span>
-                    <div class="form-group">
-                    <label for="rating" class="block text-sm font-medium text-gray-700">별점</label>
-                    <div class="rating-edit flex gap-1 text-yellow-500 text-2xl">
-                        <input type="radio" name="rating" id="rate5" value="5" class="hidden">
-                        <label for="rate5" class="cursor-pointer">★</label>
-                        <input type="radio" name="rating" id="rate4" value="4" class="hidden">
-                        <label for="rate4" class="cursor-pointer">★</label>
-                        <input type="radio" name="rating" id="rate3" value="3" class="hidden" checked>
-                        <label for="rate3" class="cursor-pointer">★</label>
-                        <input type="radio" name="rating" id="rate2" value="2" class="hidden">
-                        <label for="rate2" class="cursor-pointer">★</label>
-                        <input type="radio" name="rating" id="rate1" value="1" class="hidden">
-                        <label for="rate1" class="cursor-pointer">★</label>
-                    </div>
-</div>
-
+                    <span id="detail-rating" class="text-yellow-500"></span>
                 </div>
                 <hr class="border-gray-200">
                 <div id="detail-images-container" class="py-8" style="display: none;">
-                    <div class="slider-wrapper">
-                    </div>
+                    <div class="slider-wrapper"></div>
                 </div>
                 <div class="detail-content text-gray-800 leading-relaxed" id="detail-content">
                     <p>... 내용을 불러오는 중 ...</p>
                 </div>
                 <hr class="border-gray-200 mt-8">
+            </div>
+
+            <!-- 2. 수정 모드 (기본적으로 숨겨져 있음) -->
+            <div id="edit-mode" class="hidden">
+                <form id="edit-form">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-6">후기 수정</h1>
+                    
+                    <div class="mb-4">
+                        <label for="edit-title" class="block text-gray-700 text-sm font-bold mb-2">제목</label>
+                        <input type="text" id="edit-title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+                    </div>
+
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">별점 수정</label>
+                        <div class="flex items-center text-2xl">
+                            <input type="radio" name="rating" id="rate5" value="5" class="mr-1" required><label for="rate5" class="mr-2">5점</label>
+                            <input type="radio" name="rating" id="rate4" value="4" class="mr-1"><label for="rate4" class="mr-2">4점</label>
+                            <input type="radio" name="rating" id="rate3" value="3" class="mr-1"><label for="rate3" class="mr-2">3점</label>
+                            <input type="radio" name="rating" id="rate2" value="2" class="mr-1"><label for="rate2" class="mr-2">2점</label>
+                            <input type="radio" name="rating" id="rate1" value="1" class="mr-1"><label for="rate1" class="mr-2">1점</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="edit-content" class="block text-gray-700 text-sm font-bold mb-2">내용</label>
+                        <textarea id="edit-content" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required></textarea>
+                    </div>
+                    <!-- ▲▲▲ 여기까지 ▲▲▲ -->
+                    
+                    <div class="flex items-center justify-end gap-4">
+                        <button type="button" id="cancel-edit-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg">취소</button>
+                        <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-5 rounded-lg">수정 완료</button>
+                    </div>
+                </form>
             </div>
 
             <div class="detail-footer mt-6 flex justify-between items-center">
