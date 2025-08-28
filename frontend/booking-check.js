@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // ⭐ [수정됨] 예약 결과를 표시하는 함수
+    
     function displayBookingsAsTable(bookings) {
         let tableHTML = `
             <table class="booking-table w-full text-sm text-left text-gray-500">
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         bookings.forEach(booking => {
-            // 서버에서 오는 예약 ID 필드 이름이 'id' 또는 '_id'일 수 있습니다. 환경에 맞게 확인하세요.
+            
             const bookingId = booking._id || booking.id; 
             tableHTML += `
                 <tr class="bg-white border-b">
@@ -91,11 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
         tableHTML += `</tbody></table>`;
         resultDiv.innerHTML = tableHTML;
 
-        // ⭐ [추가됨] 생성된 모든 '취소' 버튼에 클릭 이벤트 추가
+        
         attachCancelButtonListeners();
     }
 
-    // ⭐ [추가됨] '취소' 버튼에 이벤트 리스너를 추가하는 함수
+    
     function attachCancelButtonListeners() {
         const cancelButtons = document.querySelectorAll('.cancel-btn');
         cancelButtons.forEach(button => {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ⭐ [추가됨] 예약을 취소하는 API를 호출하는 함수
+  
     async function cancelBooking(bookingId) {
         try {
             const response = await fetch(`${serverUrl}/api/bookings/${bookingId}`, {
