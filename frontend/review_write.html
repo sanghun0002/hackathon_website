@@ -4,86 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>후기 작성</title>
-    <!-- 1. Tailwind CSS 스크립트 추가 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* 2. 별점 UI를 위한 스타일 추가 */
-        .rating-edit {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-            gap: 2px;
-        }
-        .rating-edit input[type="radio"] { display: none; }
-        .rating-edit label {
-            font-size: 2.5rem;
-            color: #d1d5db;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .rating-edit label:hover,
-        .rating-edit label:hover ~ label { color: #f59e0b; }
-        .rating-edit input[type="radio"]:checked ~ label { color: #f59e0b; }
-    </style>
+    <!-- 원래 연결되어 있던 style.css 파일을 다시 사용합니다. -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50">
-
-    <div class="container mx-auto max-w-3xl my-8 px-4">
-        <header class="text-center mb-10">
-            <a href="index.html" class="text-3xl font-bold text-gray-800">쉬어가~ 계곡</a>
-        </header>
-
-        <main class="bg-white p-8 rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold text-gray-900 mb-6">후기 작성</h1>
+<body>
+    <div class="board-container">
+        <main style="padding: 30px;">
+            <h1 class="board-title">후기 작성</h1>
             <form id="review-form">
                 
-                <!-- 3. Tailwind CSS 클래스를 각 요소에 적용 -->
-                <div class="mb-4">
-                    <label for="title" class="block text-gray-700 text-sm font-bold mb-2">제목</label>
-                    <input type="text" id="title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+                <!-- 제목 -->
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" required>
                 </div>
 
-                <div class="mb-4">
-                    <label for="author" class="block text-gray-700 text-sm font-bold mb-2">작성자</label>
-                    <input type="text" id="author" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
+                <!-- 작성자 -->
+                <div class="form-group">
+                    <label for="author">작성자</label>
+                    <input type="text" id="author" required>
                 </div>
 
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">평점</label>
+                <!-- 평점 -->
+                <div class="form-group">
+                    <label for="rating">평점</label>
                     <div class="rating-edit">
-                        <input type="radio" name="rating" id="rate5" value="5" required><label for="rate5">★</label>
-                        <input type="radio" name="rating" id="rate4" value="4"><label for="rate4">★</label>
-                        <input type="radio" name="rating" id="rate3" value="3"><label for="rate3">★</label>
-                        <input type="radio" name="rating" id="rate2" value="2"><label for="rate2">★</label>
-                        <input type="radio" name="rating" id="rate1" value="1"><label for="rate1">★</label>
+                        <input type="radio" name="rating" id="rate5" value="5">
+                        <label for="rate5">★</label>
+                        <input type="radio" name="rating" id="rate4" value="4">
+                        <label for="rate4">★</label>
+                        <input type="radio" name="rating" id="rate3" value="3">
+                        <label for="rate3">★</label>
+                        <input type="radio" name="rating" id="rate2" value="2">
+                        <label for="rate2">★</label>
+                        <input type="radio" name="rating" id="rate1" value="1">
+                        <label for="rate1">★</label>
                     </div>
                 </div>
 
-                <div class="mb-6">
-                    <label for="content" class="block text-gray-700 text-sm font-bold mb-2">내용</label>
-                    <textarea id="content" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required></textarea>
+                <!-- 내용 -->
+                <div class="form-group">
+                    <label for="content">내용</label>
+                    <textarea id="content" rows="10" required></textarea>
                 </div>
 
-                <div class="mb-6">
-                    <label for="images" class="block text-gray-700 text-sm font-bold mb-2">사진 첨부 (최대 5장)</label>
-                    <input type="file" id="images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <div id="image-preview-container" class="mt-4 grid grid-cols-3 gap-4"></div>
+                <!-- 사진 첨부 -->
+                <div class="form-group">
+                    <label>사진 첨부 (최대 5장)</label>
+                    <label for="images" class="file-label">파일 선택</label>
+                    <input type="file" id="images" accept="image/*" multiple>
+                    <div class="image-preview-container" id="image-preview-container" style="display: none;"></div>
+                </div>
+                
+                <hr class="form-divider">
+
+                <!-- 비밀번호 -->
+                <div class="form-group">
+                    <label for="password">비밀번호 설정 (수정/삭제 시 필요)</label>
+                    <input type="password" id="password" required autocomplete="new-password">
                 </div>
 
-                <hr class="my-6">
-
-                <div class="mb-6">
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">비밀번호 설정</label>
-                    <input type="password" id="password" placeholder="수정/삭제 시 필요합니다." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
-                </div>
-
-                <div class="flex items-center justify-end gap-4">
-                    <a href="review.html" class="bg-gray-200 text-gray-800 font-bold py-2 px-5 rounded-lg hover:bg-gray-300 transition">취소</a>
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition">저장하기</button>
-                </div>
+                <!-- 저장 버튼 -->
+                <button type="submit" class="save-btn">저장하기</button>
             </form>
         </main>
     </div>
