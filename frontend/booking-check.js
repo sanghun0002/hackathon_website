@@ -96,25 +96,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     
-    function attachCancelButtonListeners() {
-        const cancelButtons = document.querySelectorAll('.cancel-btn');
-        cancelButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const bookingId = e.target.dataset.id;
-                if (confirm('정말로 이 예약을 취소하시겠습니까?<br>취소 시 아래의 환불 정책이 적용되오니, 반드시 확인해 주시기 바랍니다.
+  
+function attachCancelButtonListeners() {
+    const cancelButtons = document.querySelectorAll('.cancel-btn');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const bookingId = e.target.dataset.id;
 
-                    **[환불 규정 안내]**
-                    • **예약일로부터 7일 이상 남은 경우:** 100% 환불
-                    • **예약일로부터 3일 ~ 6일 전:** 50% 환불
-                    • **예약일로부터 2일 전 ~ 당일:** 환불 불가
-                    
-                    ※ 환불 처리에는 영업일 기준 3일에서 최대 7일까지 소요될 수 있습니다.
-')) {
-                    cancelBooking(bookingId);
-                }
-            });
+           
+            const confirmationMessage = `정말로 이 예약을 취소하시겠습니까?\n\n` +
+                `취소 시 아래의 환불 정책이 적용되오니, 반드시 확인해 주시기 바랍니다.\n\n` +
+                `[환불 규정 안내]\n` +
+                `• 예약일로부터 7일 이상 남은 경우: 100% 환불\n` +
+                `• 예약일로부터 3일 ~ 6일 전: 50% 환불\n` +
+                `• 예약일로부터 2일 전 ~ 당일: 환불 불가\n\n` +
+                `※ 환불 처리에는 영업일 기준 3일에서 최대 7일까지 소요될 수 있습니다.`;
+
+            if (confirm(confirmationMessage)) {
+                cancelBooking(bookingId);
+            }
         });
-    }
+    });
+}
 
   
     async function cancelBooking(bookingId) {
