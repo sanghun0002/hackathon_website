@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const deck = JSON.parse(decodeURIComponent(deckString));
+    // ✅ [수정된 부분] 불필요한 decodeURIComponent()를 제거했습니다.
+    const deck = JSON.parse(deckString);
 
     // 화면에 요약 정보 표시
     summaryDiv.innerHTML = `
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // [수정] 폼 제출 시, 결제 페이지로 모든 정보를 URL에 담아 전달합니다.
+    // 폼 제출 시, 결제 페이지로 모든 정보를 URL에 담아 전달합니다.
     confirmForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
