@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>반납 완료 내역</title>
+    <title>완료 및 취소 내역</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,7 +13,7 @@
     </header>
 
     <main class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold mb-4">반납 완료 내역</h1>
+        <h1 class="text-3xl font-bold mb-4">완료 및 취소 내역</h1>
         
         <div class="filters grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 rounded-lg bg-gray-50">
             <div>
@@ -28,7 +28,7 @@
             </div>
             <div>
                 <label for="filter-section" class="block text-sm font-medium text-gray-700">구역</label>
-                <select id="filter-section" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select id="filter-section" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" disabled>
                     <option value="">전체</option>
                 </select>
             </div>
@@ -44,8 +44,8 @@
         </div>
 
         <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-xl font-bold">완료 내역 현황</h2>
-            <div class="text-gray-600">총 완료 건수: <span id="total-bookings" class="font-bold">0</span>건</div>
+            <h2 class="text-xl font-bold">전체 내역 현황</h2>
+            <div class="text-gray-600">총 건수: <span id="total-bookings" class="font-bold">0</span>건</div>
         </div>
         
         <div class="overflow-x-auto bg-white rounded-lg shadow">
@@ -59,11 +59,12 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전화번호</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">반납일시</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">처리 일시</th>
                     </tr>
                 </thead>
                 <tbody id="booking-table-body" class="bg-white divide-y divide-gray-200">
-                    </tbody>
+                    <!-- 데이터가 여기에 동적으로 추가됩니다. -->
+                </tbody>
             </table>
         </div>
 
