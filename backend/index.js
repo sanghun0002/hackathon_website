@@ -291,7 +291,7 @@ app.get('/api/bookings/check', (req, res) => {
 // ===============================================================
 // =====  ID로 예약을 찾아 취소(삭제)하는 API =====
 // ===============================================================
-app.delete('/api/bookings/:id', (req, res) => {
+app.delete('/api/bookings/return/:pyeongsangId', (req, res) => {
     // URL에서 :id 부분에 해당하는 값을 가져옵니다. 숫자로 변환합니다.
     const bookingId = parseInt(req.params.id, 10);
 
