@@ -1,3 +1,6 @@
+// ===============================================================
+// ===== 라이브러리 및 초기 설정 =====
+// ===============================================================
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -13,6 +16,9 @@ const ADMIN_PASSWORD = '0000';
 app.use(cors());
 app.use(express.json());
 
+// ===============================================================
+// ===== 데이터베이스 연결 및 테이블 생성 =====
+// ===============================================================
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -70,6 +76,9 @@ const setupDatabase = async () => {
     }
 };
 
+// ===============================================================
+// ===== 이미지 업로드 (Cloudinary) 설정 =====
+// ===============================================================
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -88,6 +97,9 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
+// ===============================================================
+// ===== 공지사항(Notice) API =====
+// ===============================================================
 app.get('/api/notices', async (req, res) => {
     try {
         const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY created_at DESC');
@@ -169,6 +181,9 @@ app.delete('/api/notices/:id', async (req, res) => {
     }
 });
 
+// ===============================================================
+// ===== 후기(Review) API =====
+// ===============================================================
 app.get('/api/reviews', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title, author, rating, content, images, views, created_at FROM reviews ORDER BY created_at DESC');
@@ -273,6 +288,9 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
     }
 });
 
+// ===============================================================
+// ===== 예약(Booking) API =====
+// ===============================================================
 app.post('/api/bookings', async (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity } = req.body;
     if (!name || !phone || !bookingDate || !valley || !section || !deckName) {
@@ -421,6 +439,9 @@ app.get('/api/bookings/completed', async (req, res) => {
     }
 });
 
+// ===============================================================
+// ===== 서버 실행 =====
+// ===============================================================
 app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
     setupDatabase();
