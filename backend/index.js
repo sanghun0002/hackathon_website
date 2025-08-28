@@ -396,7 +396,12 @@ app.delete('/api/bookings/:pyeongsangId', (req, res) => {
     
     res.status(200).json({ message: '반납 처리가 완료되었습니다.' });
 });
-
+/*반납리스트 수정 파일*/
+app.get('/api/bookings/completed', (req, res) => {
+    // completedBookings 배열의 데이터를 id 역순으로 정렬하여 응답합니다.
+    const sortedBookings = [...completedBookings].sort((a, b) => b.id - a.id);
+    res.json(sortedBookings);
+});
 // ===============================================================
 // ===== 서버 실행 =====
 // ===============================================================
