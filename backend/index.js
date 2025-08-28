@@ -20,63 +20,60 @@ app.use(express.json());
 // ===== 데이터베이스 연결 설정 =====
 // ===============================================================
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 const setupDatabase = async () => {
-  const client = await pool.connect();
-  try {
-    // 공지사항 테이블
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS notices (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        department VARCHAR(100),
-        content TEXT NOT NULL,
-        is_sticky BOOLEAN DEFAULT false,
-        views INTEGER DEFAULT 0,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `);
-    // 후기 테이블
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS reviews (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        author VARCHAR(100),
-        rating INTEGER,
-        content TEXT,
-        password VARCHAR(100) NOT NULL,
-        images TEXT[],
-        views INTEGER DEFAULT 0,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `);
-    // 예약 테이블
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS bookings (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        phone VARCHAR(100) NOT NULL,
-        booking_date DATE NOT NULL,
-        valley VARCHAR(100),
-        section VARCHAR(100),
-        deck_name VARCHAR(100),
-        capacity INTEGER,
-        status VARCHAR(50) DEFAULT '예약 완료',
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        completed_at TIMESTAMPTZ
-      );
-    `);
-    console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
-  } catch (err) {
-    console.error('❌ 데이터베이스 테이블 생성 실패:', err);
-  } finally {
-    client.release();
-  }
+    const client = await pool.connect();
+    try {
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS notices (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                department VARCHAR(100),
+                content TEXT NOT NULL,
+                is_sticky BOOLEAN DEFAULT false,
+                views INTEGER DEFAULT 0,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS reviews (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                author VARCHAR(100),
+                rating INTEGER,
+                content TEXT,
+                password VARCHAR(100) NOT NULL,
+                images TEXT[],
+                views INTEGER DEFAULT 0,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS bookings (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                phone VARCHAR(100) NOT NULL,
+                booking_date DATE NOT NULL,
+                valley VARCHAR(100),
+                section VARCHAR(100),
+                deck_name VARCHAR(100),
+                capacity INTEGER,
+                status VARCHAR(50) DEFAULT '예약 완료',
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                completed_at TIMESTAMPTZ
+            );
+        `);
+        console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
+    } catch (err) {
+        console.error('❌ 데이터베이스 테이블 생성 실패:', err);
+    } finally {
+        client.release();
+    }
 };
 
 // Cloudinary 설정
@@ -96,13 +93,10 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage: storage });
 
-
 // ===============================================================
 // ===== 공지사항(Notice) API (DB 연동) =====
 // ===============================================================
 
-// (공지사항 및 후기 API는 변경사항 없으므로 생략)
-// GET: 모든 공지사항 조회
 app.get('/api/notices', async (req, res) => {
     try {
         const stickyResult = await pool.query('SELECT * FROM notices WHERE is_sticky = true ORDER BY id DESC');
@@ -116,7 +110,6 @@ app.get('/api/notices', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// POST: 새 공지사항 작성
 app.post('/api/notices', async (req, res) => {
     const { title, department, isSticky, content, password } = req.body;
     if (password !== ADMIN_PASSWORD) {
@@ -133,7 +126,6 @@ app.post('/api/notices', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// GET: 특정 공지사항 조회 및 조회수 증가
 app.get('/api/notices/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -148,11 +140,10 @@ app.get('/api/notices/:id', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// PUT: 특정 공지사항 수정
 app.put('/api/notices/:id', async (req, res) => {
     const { id } = req.params;
     const { title, department, isSticky, content, password } = req.body;
-     if (password !== ADMIN_PASSWORD) {
+    if (password !== ADMIN_PASSWORD) {
         return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
     }
     try {
@@ -166,9 +157,8 @@ app.put('/api/notices/:id', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// DELETE: 특정 공지사항 삭제
 app.delete('/api/notices/:id', async (req, res) => {
-     const { password } = req.body;
+    const { password } = req.body;
     if (password !== ADMIN_PASSWORD) {
         return res.status(403).json({ message: '비밀번호가 올바르지 않습니다.' });
     }
@@ -184,7 +174,7 @@ app.delete('/api/notices/:id', async (req, res) => {
 // ===============================================================
 // ===== 후기(Review) API (DB 연동) =====
 // ===============================================================
-// GET: 모든 후기 조회
+
 app.get('/api/reviews', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title, author, rating, content, images, views, created_at FROM reviews ORDER BY id DESC');
@@ -194,7 +184,6 @@ app.get('/api/reviews', async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// POST: 새 후기 작성
 app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
     const { title, author, rating, content, password } = req.body;
     const images = req.files ? req.files.map(file => file.path) : [];
@@ -209,17 +198,16 @@ app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 });
-// DELETE: 특정 후기 삭제
 app.delete('/api/reviews/:id', async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
     try {
         const result = await pool.query('SELECT password FROM reviews WHERE id = $1', [id]);
         if (result.rows.length === 0) {
-             return res.status(404).json({ message: '삭제할 후기를 찾을 수 없습니다.' });
+            return res.status(404).json({ message: '삭제할 후기를 찾을 수 없습니다.' });
         }
         if (result.rows[0].password !== password) {
-             return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
+            return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
         await pool.query('DELETE FROM reviews WHERE id = $1', [id]);
         res.status(200).json({ message: '삭제 완료' });
@@ -229,12 +217,10 @@ app.delete('/api/reviews/:id', async (req, res) => {
     }
 });
 
-
 // ===============================================================
 // ===== 예약(Booking) API (DB 연동) =====
 // ===============================================================
 
-// POST: 새 예약 생성
 app.post('/api/bookings', async (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity, status } = req.body;
     try {
@@ -249,7 +235,6 @@ app.post('/api/bookings', async (req, res) => {
     }
 });
 
-// GET: 모든 '활성' 예약 목록 조회 (관리자용)
 app.get('/api/bookings', async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM bookings WHERE status != '반납 완료' ORDER BY id DESC");
@@ -261,17 +246,17 @@ app.get('/api/bookings', async (req, res) => {
 });
 
 // GET: 모든 '완료된' 예약 목록 조회
-app.get('/api/bookings/completed', (req, res) => {
-    // bookings 배열에서 status가 '반납 완료'인 항목만 필터링합니다.
-    const completedBookings = bookings.filter(b => b.status === '반납 완료');
-    
-    // completed_at이 없는 경우를 대비해, 기본적으로 bookingDate로 정렬합니다.
-    const sortedBookings = completedBookings.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate));
-
-    res.json(sortedBookings);
+app.get('/api/bookings/completed', async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM bookings WHERE status = '반납 완료' ORDER BY completed_at DESC");
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
 });
 
-// [신규 추가] GET: 특정 예약 정보 조회 (ID로) - 반납 페이지에서 사용
+// GET: 특정 예약 정보 조회 (ID로) - 반납 페이지에서 사용
 app.get('/api/bookings/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -286,7 +271,6 @@ app.get('/api/bookings/:id', async (req, res) => {
     }
 });
 
-// DELETE: 예약 취소 (ID로)
 app.delete('/api/bookings/cancel/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -305,7 +289,6 @@ app.delete('/api/bookings/cancel/:id', async (req, res) => {
     }
 });
 
-// PUT: 예약 반납 처리 (상태 변경)
 app.put('/api/bookings/return/:id', async (req, res) => {
     const { id } = req.params;
     try {
