@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('booking-table-body');
     const paginationControls = document.getElementById('pagination-controls');
     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
     // Server URL
     const serverUrl = 'https://o70albxd7n.onrender.com';
@@ -131,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="${statusClass}">${status}</span>
+                    <span class="status-badge status-${statusClass}">${status}</span>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -196,23 +197,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // 백엔드 API 호출 (여러 개를 한 번에 삭제하는 API가 없으므로 반복 호출)
         const deletePromises = ids.map(id => 
-            fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
+            fetch(`${serverUrl}/api/bookings/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                // DELETE 메서드에 body를 포함시키기 위해, 백엔드 코드의 DELETE API를 수정해야 합니다.
-                // 현재 백엔드 코드의 DELETE는 params로 id를 받습니다.
             })
         );
 
         try {
             const responses = await Promise.all(deletePromises);
             const successfulDeletions = responses.filter(r => r.ok).length;
-            alert(`${successfulDeletions}개의 예약 내역을 삭제했습니다.`);
             
-            // 삭제 후 목록 다시 불러오기
-            await init();
+            if (successfulDeletions > 0) {
+                alert(`${successfulDeletions}개의 예약 내역을 삭제했습니다.`);
+                await init();
+            } else {
+                alert('예약 내역 삭제에 실패했습니다. 서버 로그를 확인해주세요.');
+            }
 
         } catch (error) {
             console.error('예약 삭제 중 오류 발생:', error);
@@ -250,6 +251,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         deleteBookings(idsToDelete);
+    });
+    
+    // 전체 선택/해제 체크박스 이벤트 리스너 추가
+    selectAllCheckbox.addEventListener('change', (e) => {
+        const checkboxes = document.querySelectorAll('.booking-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
     });
 
     init();
