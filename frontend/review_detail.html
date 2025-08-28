@@ -49,7 +49,22 @@
                     <span>|</span>
                     <span>조회수 <span id="detail-views"></span></span>
                     <span>|</span>
-                    <span id="detail-rating" class="text-yellow-500"></span>
+                    <div class="form-group">
+                    <label for="rating" class="block text-sm font-medium text-gray-700">별점</label>
+                    <div class="rating-edit flex gap-1 text-yellow-500 text-2xl">
+                        <input type="radio" name="rating" id="rate5" value="5" class="hidden">
+                        <label for="rate5" class="cursor-pointer">★</label>
+                        <input type="radio" name="rating" id="rate4" value="4" class="hidden">
+                        <label for="rate4" class="cursor-pointer">★</label>
+                        <input type="radio" name="rating" id="rate3" value="3" class="hidden" checked>
+                        <label for="rate3" class="cursor-pointer">★</label>
+                        <input type="radio" name="rating" id="rate2" value="2" class="hidden">
+                        <label for="rate2" class="cursor-pointer">★</label>
+                        <input type="radio" name="rating" id="rate1" value="1" class="hidden">
+                        <label for="rate1" class="cursor-pointer">★</label>
+                    </div>
+</div>
+
                 </div>
                 <hr class="border-gray-200">
                 <div id="detail-images-container" class="py-8" style="display: none;">
