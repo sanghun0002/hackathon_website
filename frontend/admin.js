@@ -1,7 +1,7 @@
 // This script handles all the administrative functions for the booking management page.
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Authentication Check ---
-    const ADMIN_PASSWORD = '0000';
+    const ADMIN_PASSWORD = '123456';
     const password = prompt("관리자 비밀번호를 입력하세요.");
 
     if (password !== ADMIN_PASSWORD) {
