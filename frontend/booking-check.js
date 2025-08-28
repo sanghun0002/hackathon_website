@@ -69,30 +69,47 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         bookings.forEach(booking => {
-            
-            const bookingId = booking._id || booking.id; 
-            tableHTML += `
-                <tr class="bg-white border-b">
-                    <td class="px-6 py-4">${booking.bookingDate}</td>
-                    <td class="px-6 py-4">${booking.valley}</td>
-                    <td class="px-6 py-4">${booking.section}</td>
-                    <td class="px-6 py-4">${booking.deckName}</td>
-                    <td class="px-6 py-4">
-                    <a href="loadsearch.html" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
-                        길찾기
-                    </a>
-                    </td>
-                    <td class="px-6 py-4">${booking.status}</td>
-                    <td class="px-6 py-4">
-                        <button 
-                            class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
-                            data-id="${bookingId}">
-                            취소
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
+    const bookingId = booking._id || booking.id;
+
+    // ⭐ [추가] 예약 상태에 따라 취소 버튼의 HTML을 다르게 생성합니다.
+    let cancelButtonHTML = '';
+    if (booking.status === '사용 중') {
+        // 상태가 '사용 중'이면: 비활성화된 '취소 불가' 버튼을 만듭니다.
+        cancelButtonHTML = `
+            <button class="text-sm bg-gray-400 text-white py-1 px-3 rounded cursor-not-allowed" disabled>
+                취소 불가
+            </button>
+        `;
+    } else {
+        // 그 외의 상태이면: 원래의 '취소' 버튼을 만듭니다.
+        cancelButtonHTML = `
+            <button 
+                class="cancel-btn text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded" 
+                data-id="${bookingId}">
+                취소
+            </button>
+        `;
+    }
+
+    
+    tableHTML += `
+        <tr class="bg-white border-b">
+            <td class="px-6 py-4">${booking.bookingDate}</td>
+            <td class="px-6 py-4">${booking.valley}</td>
+            <td class="px-6 py-4">${booking.section}</td>
+            <td class="px-6 py-4">${booking.deckName}</td>
+            <td class="px-6 py-4">
+                <a href="loadsearch.html" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
+                    길찾기
+                </a>
+            </td>
+            <td class="px-6 py-4">${booking.status}</td>
+            <td class="px-6 py-4">
+                ${cancelButtonHTML}
+            </td>
+        </tr>
+    `;
+});
 
         tableHTML += `</tbody></table>`;
 
