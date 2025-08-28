@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전국 계곡 검색 서비스</title>
+    <style>
+        /* 기본적인 스타일링 추가 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        .search-box select, .search-box button {
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .search-box select {
+            flex: 1; /* select 태그가 가능한 많은 공간을 차지하도록 설정 */
+        }
+        .search-box button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+        #results-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+        }
+        .result-item a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🏞️ 전국 계곡 검색</h1>
+        <div class="search-box">
+            <select id="province-select">
+                <option value="">-- 도/특별시 선택 --</option>
+            </select>
+            <select id="valley-select">
+                <option value="">-- 계곡 선택 --</option>
+            </select>
+            <button id="search-btn">검색</button>
+        </div>
+        
+        <div id="results-container">
+            <p>검색할 지역과 계곡을 선택해주세요.</p>
+        </div>
+    </div>
+
+    <!-- JavaScript 파일 연결 (파일 이름 변경) -->
+    <script src="loadsearch.js"></script>
+</body>
+</html>
