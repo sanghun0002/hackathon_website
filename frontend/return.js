@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
 
     // --- 💻 서버 주소 설정 ---
-    const aiServerUrl = 'https://image-analyzer-wduj.onrender.com/predict';
+    const aiServerUrl = 'https://9e27e17c280b.ngrok-free.app/predict';
     const bookingServerUrl = 'https://o70albxd7n.onrender.com';
 
     // '이전' 버튼 링크 설정
