@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     "무흘 계곡": {
         image_url: "/images/map_muhuel.png",
         sections: [
-            // 아래 좌표들은 이미지의 중심을 기준으로 한 정확한 비율 값입니다.
             { name: "제1곡 봉비암", top: "72%", left: "74%", width: "5%", height: "5%" },
             { name: "제2곡 한강대", top: "65%", left: "72%", width: "5%", height: "5%" },
             { name: "제3곡 무학정", top: "18%", left: "45%", width: "5%", height: "5%" },
@@ -24,11 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
- let selectedValley = localStorage.getItem('selectedValley');
+  // [수정] localStorage 대신 URL 파라미터에서 정보를 읽어옵니다.
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDate = urlParams.get('date');
+  let selectedValley = urlParams.get('valley');
+
   const displayElement = document.getElementById('selected-valley-display');
   const mapContainer = document.getElementById('image-map-container');
   const nextBtn = document.getElementById('next-step-btn');
   const loadingMsg = document.getElementById('loading-message');
+
+  // [수정] 이전 페이지로 돌아갈 때도 URL 파라미터를 유지합니다.
+  const prevBtn = document.querySelector('a[href="booking-step2.html"]');
+  if (prevBtn) {
+      prevBtn.href = `booking-step2.html?date=${selectedDate}`;
+  }
+
+  // 필수 정보가 없으면 첫 단계로 돌려보냅니다.
+  if (!selectedDate || !selectedValley) {
+    alert('필수 정보가 없습니다. 첫 단계부터 다시 시도해주세요.');
+    window.location.href = 'booking.html';
+    return;
+  }
 
   // 보정(공백 차이 등)
   if (!allValleyData[selectedValley]) {
@@ -39,25 +55,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (!selectedValley || !allValleyData[selectedValley]) {
     alert('이전 단계에서 유효한 계곡을 선택해주세요.');
-    window.location.href = 'booking-step2.html';
+    window.location.href = `booking-step2.html?date=${selectedDate}`;
     return;
   }
 
   const valley = allValleyData[selectedValley];
   displayElement.textContent = selectedValley;
 
-  // 선택 상태 관리
   let selectedSectionName = null;
   let prevSelectedBtn = null;
 
-  // 다음 버튼 클릭 시에만 이동
   nextBtn.addEventListener('click', () => {
     if (!selectedSectionName) {
       alert('구역을 먼저 선택해주세요.');
       return;
     }
-    localStorage.setItem('selectedSection', selectedSectionName);
-    window.location.href = 'booking-step4.html';
+    // [수정] URL 파라미터에 모든 정보를 담아 다음 페이지로 이동합니다.
+    const nextUrl = `booking-step4.html?date=${selectedDate}&valley=${encodeURIComponent(selectedValley)}&section=${encodeURIComponent(selectedSectionName)}`;
+    window.location.href = nextUrl;
   });
 
   const img = new Image();
@@ -76,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
       area.setAttribute('aria-label', section.name);
       area.title = section.name;
 
-      // 위치/크기
       area.style.position = 'absolute';
       area.style.top = section.top;
       area.style.left = section.left;
@@ -85,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
       area.style.transform = 'translate(-50%, -50%)';
       area.style.zIndex = '10';
 
-      // 클릭 시: 선택만 저장/강조 + 다음 버튼 활성화
       area.addEventListener('click', () => {
         if (prevSelectedBtn) {
           prevSelectedBtn.classList.remove('selected');
