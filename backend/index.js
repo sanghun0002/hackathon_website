@@ -389,11 +389,11 @@ app.get('/api/bookings/status', async (req, res) => {
     }
 });
 
+// POST: 현장 QR 인증 (상태를 '사용 중'으로 변경)
 app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
     const today = new Date().toISOString().split('T')[0];
     try {
-        const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
@@ -405,8 +405,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
                 status = '예약 완료'
             RETURNING *;
         `;
-        const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
-
+        const result = await pool.query(query, [pyeongsangId.replace(/\s|-/g, ''), name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
         if (result.rowCount > 0) {
             res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
         } else {
