@@ -417,6 +417,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     }
 });
 
+
 // GET: 평상 ID로 오늘 날짜의 예약 정보 조회 (return.js의 상태 확인용)
 app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
     const { pyeongsangId } = req.params;
