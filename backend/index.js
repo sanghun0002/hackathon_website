@@ -405,7 +405,7 @@ app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
     try {
         const query = `
             SELECT * FROM bookings 
-            WHERE REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND booking_date = $2
+            WHERE REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND booking_date = $2 AND completed_at IS NULL
         `;
         const result = await pool.query(query, [pyeongsangId.replace(/\s|-/g, ''), today]);
         if (result.rowCount === 0) {
