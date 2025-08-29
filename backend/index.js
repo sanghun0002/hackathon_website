@@ -32,8 +32,6 @@ const setupDatabase = async () => {
     try {
         await client.query('CREATE TABLE IF NOT EXISTS notices (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, department VARCHAR(100), content TEXT NOT NULL, is_sticky BOOLEAN DEFAULT false, views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
         await client.query('CREATE TABLE IF NOT EXISTS reviews (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, author VARCHAR(100), rating INTEGER, content TEXT, password VARCHAR(255) NOT NULL, images TEXT[], views INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW());');
-        // [추천] 장기적으로는 pyeongsang_id 컬럼을 추가하는 것이 좋습니다.
-        // 예: CREATE TABLE IF NOT EXISTS bookings (... , pyeongsang_id VARCHAR(255));
         await client.query('CREATE TABLE IF NOT EXISTS bookings (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, phone VARCHAR(100) NOT NULL, booking_date DATE NOT NULL, valley VARCHAR(100), section VARCHAR(100), deck_name VARCHAR(100), capacity INTEGER, status VARCHAR(50) DEFAULT \'예약 완료\', created_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ);');
         console.log('✅ 데이터베이스 테이블이 성공적으로 준비되었습니다.');
     } catch (err) {
@@ -65,9 +63,8 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // ===============================================================
-// ===== 공지사항 및 후기 API (변경 없음, 생략) =====
+// ===== 공지사항 및 후기 API =====
 // ===============================================================
-// (코드는 이전과 동일)
 app.get('/api/notices', async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = 10;
@@ -246,7 +243,7 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
     }
 });
 // ===============================================================
-// ===== 챗봇(Chatbot) API (Gemini 버전) (변경 없음) =====
+// ===== 챗봇(Chatbot) API  =====
 // ===============================================================
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -291,7 +288,7 @@ app.post('/api/ask', async (req, res) => {
 });
     
 // ===============================================================
-// ===== 예약(Booking) API (변경 없음) =====
+// ===== 예약(Booking) API  =====
 // ===============================================================
 app.post('/api/bookings', async (req, res) => {
     const { name, phone, bookingDate, valley, section, deckName, capacity } = req.body;
@@ -366,7 +363,7 @@ app.get('/api/bookings/status', async (req, res) => {
 });
 
 // ===============================================================
-// ===== ⭐️ 현장 QR 인증 API (수정된 부분) ⭐️ =====
+// ===== ⭐️ 현장 QR 인증 API  ⭐️ =====
 // ===============================================================
 app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
@@ -378,7 +375,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const cleanPhone = phone.replace(/\s|-/g, '');
 
     try {
-        // [수정된 부분] 데이터베이스의 값도 동일한 방식으로 정제하여 비교합니다.
+        //데이터베이스의 값도 동일한 방식으로 정제하여 비교
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
@@ -406,7 +403,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
 });
 
 // ===============================================================
-// ===== 예약 정보 조회 및 반납 API (변경 없음) =====
+// ===== 예약 정보 조회 및 반납 API  =====
 // ===============================================================
 app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
     const { pyeongsangId } = req.params;
@@ -475,6 +472,5 @@ app.get('/api/bookings/completed', async (req, res) => {
 // ===============================================================
 app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
-    console.log('✅ v2: 챗봇 기능이 포함된 서버가 시작되었습니다.');
     setupDatabase();
 });
