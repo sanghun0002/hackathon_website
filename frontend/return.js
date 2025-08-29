@@ -6,7 +6,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 document.addEventListener('DOMContentLoaded', () => {
     // HTML 요소 가져오기
     const urlParams = new URLSearchParams(window.location.search);
-    const pyeongsangId = urlParams.get('id');
+    let pyeongsangId = urlParams.get('id');
     const backBtn = document.getElementById('back-to-choice-btn');
     const imageInput = document.getElementById('imageInput');
     const imageInputLabel = document.getElementById('imageInputLabel');
