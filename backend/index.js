@@ -9,6 +9,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
+const OpenAI = require('openai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -244,7 +245,52 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
     }
 });
 
+// ===============================================================
+// ===== 챗봇(Chatbot) API =====
+// ===============================================================
 
+// OpenAI 클라이언트 설정 (API 키는 Render 환경변수에서 가져옵니다)
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+// 챗봇의 역할을 정의하는 시스템 메시지
+const systemPrompt = `
+    당신은 대한민국 계곡 평상 예약 사이트의 친절한 상담원 챗봇입니다. 
+    당신의 이름은 '계곡이'입니다. 항상 밝고 친절한 말투로 대답해주세요.
+    주요 업무는 예약 안내, 계곡 정보 제공, 날씨 기반 안전 정보 안내입니다.
+    모든 답변은 한국어로 해주세요.
+`;
+
+// '/api/ask' 경로로 POST 요청이 오면 챗봇이 답변합니다.
+app.post('/api/ask', async (req, res) => {
+    const userMessage = req.body.message;
+
+    if (!userMessage) {
+        return res.status(400).json({ error: '메시지가 없습니다.' });
+    }
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userMessage }
+            ],
+        });
+
+        const botReply = completion.choices[0].message.content;
+        res.json({ reply: botReply });
+
+    } catch (error) {
+        console.error('OpenAI API 오류:', error);
+        res.status(500).json({ error: 'AI 응답을 생성하는 중 오류가 발생했습니다.' });
+    }
+});
+
+
+
+    
 // ===============================================================
 // ===== 예약(Booking) API =====
 // ===============================================================
