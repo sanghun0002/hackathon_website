@@ -244,25 +244,21 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
         res.status(500).json({ message: '서버 오류' });
     }
 });
-
 // ===============================================================
-// ===== 챗봇(Chatbot) API =====
+// ===== 챗봇(Chatbot) API (Gemini 버전) =====
 // ===============================================================
 
-// OpenAI 클라이언트 설정 (API 키는 Render 환경변수에서 가져옵니다)
-const openai = new OpenAI();
+// Google AI 라이브러리 불러오기
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// 챗봇의 역할을 정의하는 시스템 메시지
-const systemPrompt = `
-    당신은 대한민국 계곡 평상 예약 사이트의 친절한 상담원 챗봇입니다. 
-    당신의 이름은 '계곡이'입니다. 항상 밝고 친절한 말투로 대답해주세요.
-    주요 업무는 예약 안내, 계곡 정보 제공, 날씨 기반 안전 정보 안내입니다.
-    모든 답변은 한국어로 해주세요.
-`;
+// Gemini 클라이언트 설정 (API 키는 Render 환경변수에서 가져옵니다)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// 챗봇의 역할을 정의하는 시스템 메시지 (Gemini에서는 역할 정의를 대화의 일부로 전달합니다)
+const systemPrompt = `당신은 대한민국 계곡 평상 예약 사이트의 친절한 상담원 챗봇입니다. 당신의 이름은 '계곡이'입니다. 항상 밝고 친절한 말투로 대답해주세요. 주요 업무는 예약 안내, 계곡 정보 제공, 날씨 기반 안전 정보 안내입니다. 모든 답변은 한국어로 해주세요.`;
 
 // '/api/ask' 경로로 POST 요청이 오면 챗봇이 답변합니다.
 app.post('/api/ask', async (req, res) => {
-    console.log('➡️ /api/ask 경로에 성공적으로 요청이 들어왔습니다.');
     const userMessage = req.body.message;
 
     if (!userMessage) {
@@ -270,19 +266,35 @@ app.post('/api/ask', async (req, res) => {
     }
 
     try {
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userMessage }
-            ],
-        });
+        // Gemini 모델을 선택합니다.
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        const botReply = completion.choices[0].message.content;
+        // Gemini는 채팅 기록(history)을 바탕으로 대화합니다.
+        const chat = model.startChat({
+            history: [
+                {
+                    role: "user",
+                    parts: [{ text: systemPrompt }], // 시스템 역할을 첫 번째 유저 메시지로 전달
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "네, 안녕하세요! 계곡 평상 예약 도우미 '계곡이'입니다. 무엇을 도와드릴까요?" }],
+                },
+            ],
+            generationConfig: {
+                maxOutputTokens: 1000,
+            },
+        });
+        
+        // 사용자 메시지를 전송하고 답변을 기다립니다.
+        const result = await chat.sendMessage(userMessage);
+        const response = await result.response;
+        const botReply = response.text();
+        
         res.json({ reply: botReply });
 
     } catch (error) {
-        console.error('OpenAI API 오류:', error);
+        console.error('Gemini API 오류:', error);
         res.status(500).json({ error: 'AI 응답을 생성하는 중 오류가 발생했습니다.' });
     }
 });
