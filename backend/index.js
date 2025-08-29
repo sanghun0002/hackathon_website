@@ -470,5 +470,6 @@ app.get('/api/bookings/completed', async (req, res) => {
 // ===============================================================
 app.listen(PORT, () => {
     console.log(`🚀 서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
+    console.log('✅ v2: 챗봇 기능이 포함된 서버가 시작되었습니다.');
     setupDatabase();
 });
