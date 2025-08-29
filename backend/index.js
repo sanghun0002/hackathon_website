@@ -333,9 +333,9 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
             UPDATE bookings 
             SET status = '사용 중' 
             WHERE 
-                REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
+                REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND 
                 REPLACE(name, ' ', '') = $2 AND 
-                REPLACE(phone, ' ', '') = $3 AND 
+                REPLACE(REPLACE(phone, ' ', ''), '-', '') = $3 AND 
                 booking_date = $4 AND
                 status = '예약 완료'
             RETURNING *;
@@ -360,7 +360,7 @@ app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
     try {
         const query = `
             SELECT * FROM bookings 
-            WHERE REPLACE(CONCAT(valley, '-', section, '-', deck_name), ' ', '') = $1 AND booking_date = $2
+            WHERE REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND booking_date = $2
         `;
         const result = await pool.query(query, [pyeongsangId.replace(/\s|-/g, ''), today]);
         if (result.rowCount === 0) {
@@ -385,9 +385,9 @@ app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
             UPDATE bookings 
             SET status = '반납 완료', completed_at = NOW()
             WHERE
-                REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
-                REPLACE(name, ' ', '') = $2 AND 
-                REPLACE(phone, ' ', '') = $3 AND 
+                REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND 
+                REPLACE(REPLACE(name, ' ', ''), '-', '') = $2 AND 
+                REPLACE(REPLACE(phone, ' ', ''), '-', '') = $3 AND 
                 booking_date = $4 AND
                 status = '사용 중'
             RETURNING *;
