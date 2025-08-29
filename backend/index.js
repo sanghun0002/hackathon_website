@@ -264,6 +264,7 @@ const systemPrompt = `
 
 // '/api/ask' 경로로 POST 요청이 오면 챗봇이 답변합니다.
 app.post('/api/ask', async (req, res) => {
+    console.log('➡️ /api/ask 경로에 성공적으로 요청이 들어왔습니다.');
     const userMessage = req.body.message;
 
     if (!userMessage) {
