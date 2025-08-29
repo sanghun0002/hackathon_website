@@ -71,13 +71,25 @@
         .result-item a:hover {
             text-decoration: underline;
         }
+        .main-header {
+            width: 100%; /* 너비를 100%로 설정하여 부모 컨테이너 너비를 따라가게 함 */
+            max-width: 1300px; /* 다른 콘텐츠와 동일한 너비로 통일 */
+            margin: 20px auto; /* 중앙 정렬 */
+            display: flex; /* flex를 사용하여 내부 요소 정렬 */
+            justify-content: center; /* 로고(쉬어가~계곡) 중앙 정렬 */
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body>
     <header class="main-header">
         <div class="logo">쉬어가~ 계곡</div>
     </header>
-    
+
     <div class="container">
         <h1>🏞️ 전국 계곡 검색</h1>
         <div class="search-box">
