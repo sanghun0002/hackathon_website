@@ -266,7 +266,7 @@ app.post('/api/ask', async (req, res) => {
 
     try {
         // Gemini 모델을 선택합니다.
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.0pro" });
 
         // Gemini는 채팅 기록(history)을 바탕으로 대화합니다.
         const chat = model.startChat({
