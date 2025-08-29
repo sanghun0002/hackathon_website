@@ -1,41 +1,88 @@
-// firebase-config.js에서 auth와 db 객체를 가져옵니다.
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 관리</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="admin-guard.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <header class="main-header">
+        <div class="logo">쉬어가~ 계곡</div>
+    </header>
 
-/**
- * 이 스크립트는 관리자 페이지를 보호하는 '문지기' 역할을 합니다.
- * admin.html의 <head> 태그에서 호출되어 페이지 내용이 표시되기 전에 실행됩니다.
- */
-onAuthStateChanged(auth, async (user) => {
-    // 1. 사용자가 로그인했는지 확인합니다.
-    if (user) {
-        try {
-            // 2. 로그인된 사용자의 UID를 사용하여 Firestore에서 사용자 정보를 조회합니다.
-            const userDocRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userDocRef);
-
-            // 3. 사용자 정보가 존재하고, 'isAdmin' 필드가 true인지 확인합니다.
-            if (docSnap.exists() && docSnap.data().isAdmin === true) {
-                // 모든 조건을 통과하면 관리자로 확인됩니다.
-                console.log("Admin Guard: 접근 허용. 관리자입니다:", user.email);
-            } else {
-                // 로그인했지만 관리자가 아닌 경우, 오류를 발생시켜 접근을 차단합니다.
-                throw new Error("관리자 권한이 없습니다.");
-            }
-        } catch (error) {
-            // Firestore 조회 중 에러가 발생하거나 관리자가 아닌 경우, 여기서 처리됩니다.
-            console.error("Admin Guard: 접근 거부.", error);
-            alert("관리자만 접근할 수 있는 페이지입니다.");
-            window.location.href = 'index.html'; // 메인 페이지로 쫓아냅니다.
-        }
-    } else {
-        // 4. 로그아웃 상태인 경우, 접근을 차단합니다.
-        console.log("Admin Guard: 접근 거부. 로그인이 필요합니다.");
-        alert("관리자 로그인이 필요한 페이지입니다.");
+    <main class="container mx-auto max-w-[1300px] bg-white p-6 rounded-lg shadow-lg">
+        <div class="flex items-center gap-4 mb-4">
+            <h1 class="text-3xl font-bold">예약 관리</h1>
+            <a href="admin-return.html" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 transition-colors">반납 리스트</a>
+        </div>
         
-        // 관리자 페이지로 가려던 원래 목적지를 저장해두고 로그인 페이지로 보냅니다.
-        sessionStorage.setItem('redirectTo', window.location.href);
-        window.location.href = 'login.html';
-    }
-});
+        <div class="filters grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 rounded-lg bg-gray-50">
+            <div>
+                <label for="filter-date" class="block text-sm font-medium text-gray-700">날짜</label>
+                <input type="date" id="filter-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="filter-valley" class="block text-sm font-medium text-gray-700">계곡</label>
+                <select id="filter-valley" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">전체</option>
+                    </select>
+            </div>
+            <div>
+                <label for="filter-section" class="block text-sm font-medium text-gray-700">구역</label>
+                <select id="filter-section" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">전체</option>
+                    </select>
+            </div>
+            <div>
+                <label for="search-name" class="block text-sm font-medium text-gray-700">이름</label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                    <input type="text" id="search-name" placeholder="이름 검색" class="block w-full rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <button id="search-btn" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none">
+                        검색
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold">예약 현황</h2>
+            <div class="flex items-center gap-4">
+                <button id="delete-selected-btn" class="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 transition-colors">선택 삭제</button>
+                <div class="text-gray-600">총 예약 건수: <span id="total-bookings" class="font-bold">0</span>건</div>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                            <input type="checkbox" id="select-all-checkbox">
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">날짜</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">계곡</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">구역</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">평상</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전화번호</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-table-body" class="bg-white divide-y divide-gray-200">
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="pagination-controls" class="flex justify-center mt-6">
+            </div>
+    </main>
+    <div class="buttons">
+        <a href="index.html" class="btn btn-secondary">← 홈으로</a>
+    </div>
+    <footer class="main-footer"></footer>
+    <script src="admin.js"></script>
+</body>
+</html>
