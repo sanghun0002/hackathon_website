@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>전국 계곡 검색 서비스</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -51,14 +52,12 @@
             background-color: #0056b3;
         }
         #results-container {
-            margin-top: 20px;
             padding: 20px;
             background-color: #e9ecef;
             border-radius: 5px;
         }
         .result-item {
             padding: 15px;
-            margin-bottom: 10px;
             background-color: #fff;
             border-left: 5px solid #007bff;
             border-radius: 5px;
@@ -79,24 +78,28 @@
         <div class="logo">쉬어가~ 계곡</div>
     </header>
 
-    <div class="container">
-        <h1>🏞️ 계곡 주소 목록 🏞️</h1>
-        <div class="search-box">
-            <select id="province-select">
-                <option value="">-- 도/특별시 선택 --</option>
-            </select>
-            <select id="valley-select" disabled>
-                <option value="">-- 계곡 선택 --</option>
-            </select>
-            <button id="search-btn">검색</button>
-        </div>
-        
-        <div id="results-container">
-            <p>검색할 지역과 계곡을 선택해주세요.</p>
+    <div class="board-container">
+        <header class="board-header">
+            <a href="index.html" class="home-link"><i class="fas fa-home"></i> 홈</a>
+        </header>
+
+        <div class="container">
+            <h1>🏞️ 계곡 주소 목록 🏞️</h1>
+            <div class="search-box">
+                <select id="province-select">
+                    <option value="">-- 도/특별시 선택 --</option>
+                </select>
+                <select id="valley-select" disabled>
+                    <option value="">-- 계곡 선택 --</option>
+                </select>
+                <button id="search-btn">검색</button>
+            </div>
+            <div id="results-container">
+                <p>검색할 지역과 계곡을 선택해주세요.</p>
+            </div>
         </div>
     </div>
 
-    <!-- JavaScript 파일 연결 -->
     <script src="loadsearch.js"></script>
 </body>
 </html>
