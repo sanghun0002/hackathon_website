@@ -1,12 +1,7 @@
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 document.addEventListener('DOMContentLoaded', () => {
     // URL에서 평상 ID 값을 읽어옵니다.
     const urlParams = new URLSearchParams(window.location.search);
     const pyeongsangId = urlParams.get('id');
-    console.log('[checkQR.js] URL에서 읽은 평상 ID:', pyeongsangId);
 
     // '이전' 버튼 링크 설정
     const backBtn = document.getElementById('back-to-choice-btn');
@@ -42,17 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const phone = phoneInput.value;
 
         try {
-            const requestBody = { pyeongsangId, name, phone };
-            console.log('[checkQR.js] 서버로 보낼 데이터:', requestBody);
-
             const response = await fetch(backendUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pyeongsangId, name, phone }),
             });
 
             const data = await response.json();
-            console.log('[checkQR.js] 서버로부터 받은 데이터:', data);
 
             // [수정된 부분] 서버가 보내주는 메시지를 그대로 출력
             if (data.status === 'success') {
