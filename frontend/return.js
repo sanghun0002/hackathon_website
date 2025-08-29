@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${bookingServerUrl}/api/bookings/${pyeongsangId}`);
+            const response = await fetch(`${bookingServerUrl}/api/bookings/by-pyeongsang/${pyeongsangId}`);
             if (!response.ok) {
                 throw new Error(response.status === 404 ? '해당 평상에 대한 유효한 예약이 없습니다.' : '예약 정보 조회 실패');
             }
