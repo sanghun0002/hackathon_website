@@ -1,257 +1,46 @@
-// This script handles all the administrative functions for the booking management page.
-document.addEventListener('DOMContentLoaded', async () => {
-    // --- Authentication Check ---
-    const ADMIN_PASSWORD = '123456'; 
-    const password = prompt("관리자 비밀번호를 입력하세요.");
+// firebase-config.js에서 auth와 db 객체를 가져옵니다.
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    if (password !== ADMIN_PASSWORD) {
-        document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen text-center text-gray-500 font-bold">관리자만 접근할 수 있는 페이지입니다.</div>';
-        alert("비밀번호가 올바르지 않습니다.");
-        return;
-    }
-    
-    // --- Get DOM elements ---
-    const filterDate = document.getElementById('filter-date');
-    const filterValley = document.getElementById('filter-valley');
-    const filterSection = document.getElementById('filter-section');
-    const searchName = document.getElementById('search-name');
-    const searchBtn = document.getElementById('search-btn');
-    const totalBookingsSpan = document.getElementById('total-bookings');
-    const tableBody = document.getElementById('booking-table-body');
-    const paginationControls = document.getElementById('pagination-controls');
-    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+// admin.js 파일에서 내보낸 함수를 가져옵니다.
+import { initAdminPage } from './admin.js';
 
-    // Server URL
-    const serverUrl = 'https://o70albxd7n.onrender.com';
-
-    let allBookings = [];
-    let filteredBookings = [];
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    
-    // --- Fetch booking data from the backend API ---
-    const fetchAllBookings = async () => {
+/**
+ * 이 스크립트는 관리자 페이지를 보호하는 '문지기' 역할을 합니다.
+ * admin.html의 <head> 태그에서 호출되어 페이지 내용이 표시되기 전에 실행됩니다.
+ */
+onAuthStateChanged(auth, async (user) => {
+    // 1. 사용자가 로그인했는지 확인합니다.
+    if (user) {
         try {
-            const response = await fetch(`${serverUrl}/api/bookings`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch booking data');
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching booking data:', error);
-            alert('예약 데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
-            return [];
-        }
-    };
+            // 2. 로그인된 사용자의 UID를 사용하여 Firestore에서 사용자 정보를 조회합니다.
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
 
-    // --- Dynamic Filter Options ---
-    const populateValleyFilter = (bookings) => {
-        filterValley.innerHTML = '<option value="">전체</option>';
-        const valleys = [...new Set(bookings.map(b => b.valley))].sort();
-        valleys.forEach(valley => {
-            const opt = document.createElement('option');
-            opt.value = valley;
-            opt.textContent = valley;
-            filterValley.appendChild(opt);
-        });
-    };
-    
-    const populateSectionOptions = (valley) => {
-        filterSection.innerHTML = '<option value="">전체</option>';
-        if (valley) {
-            const sectionsInValley = [...new Set(allBookings.filter(b => b.valley === valley).map(b => b.section))].sort();
-            sectionsInValley.forEach(section => {
-                const opt = document.createElement('option');
-                opt.value = section;
-                opt.textContent = section;
-                filterSection.appendChild(opt);
-            });
-            filterSection.disabled = false;
-        } else {
-            filterSection.disabled = true;
-        }
-    };
-
-    // --- Filtering and Rendering Logic ---
-    const applyFilters = () => {
-        const date = filterDate.value;
-        const valley = filterValley.value;
-        const section = filterSection.value;
-        const name = searchName.value.toLowerCase();
-
-        filteredBookings = allBookings.filter(booking => {
-            // [수정] 서버에서 받은 날짜 데이터(시간 포함)에서 날짜 부분만 잘라내어 비교
-            const matchesDate = !date || (booking.booking_date && booking.booking_date.split('T')[0] === date);
-            const matchesValley = !valley || booking.valley === valley;
-            const matchesSection = !section || booking.section === section;
-            const matchesName = !name || booking.name.toLowerCase().includes(name);
-            return matchesDate && matchesValley && matchesSection && matchesName;
-        });
-        
-        totalBookingsSpan.textContent = filteredBookings.length;
-        currentPage = 1;
-        renderTable();
-        renderPagination();
-    };
-
-    const getStatusClass = (status) => {
-        const lowerCaseStatus = status ? status.toLowerCase() : 'pending';
-        if (lowerCaseStatus.includes('완료')) {
-            return 'completed';
-        }
-        if (lowerCaseStatus.includes('사용중')) {
-            return 'using';
-        }
-        return 'pending';
-    };
-
-    const renderTable = () => {
-        tableBody.innerHTML = '';
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const bookingsToRender = filteredBookings.slice(start, end);
-
-        if (bookingsToRender.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">조건에 맞는 예약 내역이 없습니다.</td></tr>`;
-            return;
-        }
-
-        bookingsToRender.forEach(booking => {
-            const row = document.createElement('tr');
-            const status = booking.status || '대기';
-            const statusClass = getStatusClass(status);
-            
-            const displayDate = booking.booking_date ? booking.booking_date.split('T')[0] : '';
-
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <input type="checkbox" class="booking-checkbox" data-id="${booking.id}">
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${displayDate}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.valley}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.section}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.deck_name}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${booking.name}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${booking.phone}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="status-badge status-${statusClass}">${status}</span>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    };
-
-    const renderPagination = () => {
-        paginationControls.innerHTML = '';
-        const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
-        if (totalPages <= 1) return;
-
-        const prevBtn = document.createElement('button');
-        prevBtn.textContent = '← 이전';
-        prevBtn.disabled = currentPage === 1;
-        prevBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
-        prevBtn.addEventListener('click', () => {
-            currentPage--;
-            renderTable();
-            renderPagination();
-        });
-        paginationControls.appendChild(prevBtn);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.textContent = i;
-            pageBtn.className = `px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
-            pageBtn.addEventListener('click', () => {
-                currentPage = i;
-                renderTable();
-            });
-            paginationControls.appendChild(pageBtn);
-        }
-
-        const nextBtn = document.createElement('button');
-        nextBtn.textContent = '다음 →';
-        nextBtn.disabled = currentPage === totalPages;
-        nextBtn.className = 'px-3 py-1 mx-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50';
-        nextBtn.addEventListener('click', () => {
-            currentPage++;
-            renderTable();
-            renderPagination();
-        });
-        paginationControls.appendChild(nextBtn);
-    };
-
-    const deleteBookings = async (ids) => {
-        if (ids.length === 0) {
-            alert('삭제할 예약 내역을 선택해주세요.');
-            return;
-        }
-
-        if (!confirm(`${ids.length}개의 예약 내역을 정말로 삭제하시겠습니까?`)) {
-            return;
-        }
-        
-        const deletePromises = ids.map(id => {
-            return fetch(`${serverUrl}/api/bookings/cancel/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-            });
-        });
-
-        try {
-            const responses = await Promise.all(deletePromises);
-            const successfulDeletions = responses.filter(r => r.ok).length;
-            
-            if (successfulDeletions > 0) {
-                alert(`${successfulDeletions}개의 예약 내역을 삭제했습니다.`);
-                await init();
+            // 3. 사용자 정보가 존재하고, 'isAdmin' 필드가 true인지 확인합니다.
+            if (docSnap.exists() && docSnap.data().isAdmin === true) {
+                // 모든 조건을 통과하면 관리자로 확인됩니다.
+                console.log("Admin Guard: 접근 허용. 관리자입니다:", user.email);
+                // Firebase 인증이 성공한 후, admin.js의 페이지 초기화 함수를 호출합니다.
+                initAdminPage();
             } else {
-                alert('예약 내역 삭제에 실패했습니다. 서버 로그를 확인해주세요.');
+                // 로그인했지만 관리자가 아닌 경우, 오류를 발생시켜 접근을 차단합니다.
+                throw new Error("관리자 권한이 없습니다.");
             }
         } catch (error) {
-            console.error('예약 삭제 중 오류 발생:', error);
-            alert('예약 삭제에 실패했습니다.');
+            // Firestore 조회 중 에러가 발생하거나 관리자가 아닌 경우, 여기서 처리됩니다.
+            console.error("Admin Guard: 접근 거부.", error);
+            alert("관리자만 접근할 수 있는 페이지입니다.");
+            window.location.href = 'index.html'; // 메인 페이지로 쫓아냅니다.
         }
-    };
-    
-    // --- Initial setup ---
-    const init = async () => {
-        tableBody.innerHTML = '<tr><td colspan="8" class="py-4 text-center text-gray-500">예약 목록을 불러오는 중...</td></tr>';
-        allBookings = await fetchAllBookings();
-        populateValleyFilter(allBookings);
-        applyFilters();
-    };
-
-    // --- Event Listeners ---
-    filterDate.addEventListener('change', applyFilters);
-    filterValley.addEventListener('change', () => {
-        const selectedValley = filterValley.value;
-        populateSectionOptions(selectedValley);
-        applyFilters();
-    });
-    filterSection.addEventListener('change', applyFilters);
-    searchBtn.addEventListener('click', applyFilters);
-    searchName.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') applyFilters();
-    });
-    deleteSelectedBtn.addEventListener('click', () => {
-        const selectedCheckboxes = document.querySelectorAll('.booking-checkbox:checked');
-        const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
-
-        if (idsToDelete.length === 0) {
-            alert('삭제할 예약 내역을 선택해주세요.');
-            return;
-        }
+    } else {
+        // 4. 로그아웃 상태인 경우, 접근을 차단합니다.
+        console.log("Admin Guard: 접근 거부. 로그인이 필요합니다.");
+        alert("관리자 로그인이 필요한 페이지입니다.");
         
-        deleteBookings(idsToDelete);
-    });
-    
-    selectAllCheckbox.addEventListener('change', (e) => {
-        const checkboxes = document.querySelectorAll('.booking-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = e.target.checked;
-        });
-    });
-
-    init();
+        // 관리자 페이지로 가려던 원래 목적지를 저장해두고 로그인 페이지로 보냅니다.
+        sessionStorage.setItem('redirectTo', window.location.href);
+        window.location.href = 'login.html';
+    }
 });
