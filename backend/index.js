@@ -9,7 +9,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
-const OpenAI = require('openai');
+const { OpenAI } = require('openai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -250,9 +250,7 @@ app.post('/api/reviews/:id/verify', async (req, res) => {
 // ===============================================================
 
 // OpenAI 클라이언트 설정 (API 키는 Render 환경변수에서 가져옵니다)
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI();
 
 // 챗봇의 역할을 정의하는 시스템 메시지
 const systemPrompt = `
