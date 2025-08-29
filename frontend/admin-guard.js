@@ -3,6 +3,9 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// admin.js 파일에서 내보낸 함수를 가져옵니다.
+import { initAdminPage } from './admin.js';
+
 /**
  * 이 스크립트는 관리자 페이지를 보호하는 '문지기' 역할을 합니다.
  * admin.html의 <head> 태그에서 호출되어 페이지 내용이 표시되기 전에 실행됩니다.
@@ -19,6 +22,8 @@ onAuthStateChanged(auth, async (user) => {
             if (docSnap.exists() && docSnap.data().isAdmin === true) {
                 // 모든 조건을 통과하면 관리자로 확인됩니다.
                 console.log("Admin Guard: 접근 허용. 관리자입니다:", user.email);
+                // Firebase 인증이 성공한 후, admin.js의 페이지 초기화 함수를 호출합니다.
+                initAdminPage();
             } else {
                 // 로그인했지만 관리자가 아닌 경우, 오류를 발생시켜 접근을 차단합니다.
                 throw new Error("관리자 권한이 없습니다.");
