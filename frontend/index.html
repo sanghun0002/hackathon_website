@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* 헤더 전체를 감싸는 컨테이너 */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -18,9 +17,9 @@
             width: 100%;
             padding: 10px 20px;
             box-sizing: border-box;
+            gap: 10px;
         }
-        
-        /* 로고를 감싸는 메인 박스 */
+
         .logo-box {
             flex-grow: 1;
             text-align: center;
@@ -31,7 +30,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* 관리자/로그인 버튼을 감싸는 작은 박스 */
         .header-button-box {
             width: 120px;
             padding: 10px;
@@ -42,7 +40,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 40px;
+            height: 60px;
+            width: 40px;
         }
         .header-button-box a {
             text-decoration: none;
@@ -52,7 +51,6 @@
             font-size: 14px;
         }
 
-        /* 후기 슬라이더 카드 스타일 */
         .review-slider-card {
             width: 100%;
             height: 100%;
@@ -71,7 +69,6 @@
         .review-slider-card .content { font-size: 0.95rem; color: #666; flex-grow: 1; }
         .review-slider-card .author { font-size: 0.9rem; color: #888; text-align: right; margin-top: 15px; }
         
-        /* 슬라이더 레이아웃 문제 해결 */
         .content-section {
             display: flex;
             gap: 20px;
@@ -84,7 +81,6 @@
             flex: 1;
         }
 
-        /* ----- 스와이퍼 화살표 스타일 추가 및 조정 ----- */
         .review-swiper {
             position: relative; /* 자식 요소인 화살표의 위치를 위해 필요 */
             padding: 0 40px; /* 화살표 공간 확보 */
