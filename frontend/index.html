@@ -266,5 +266,170 @@
     </script>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="auth.js"></script>    
+
+    <style>
+    /* 챗봇 스타일 */
+    #chat-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: #007bff;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 999;
+    }
+    #chat-window {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: none; /* 기본은 숨김 */
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+    }
+    #chat-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        text-align: center;
+    }
+    #chat-messages {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .message {
+        padding: 10px 15px;
+        border-radius: 18px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        line-height: 1.4;
+    }
+    .user-message {
+        background-color: #007bff;
+        color: white;
+        align-self: flex-end;
+    }
+    .bot-message {
+        background-color: #f1f1f1;
+        color: #333;
+        align-self: flex-start;
+    }
+    #chat-input-container {
+        display: flex;
+        border-top: 1px solid #eee;
+        padding: 10px;
+    }
+    #chat-input {
+        flex-grow: 1;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        padding: 10px 15px;
+        outline: none;
+    }
+    #chat-send {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+</style>
+
+<div id="chat-button">💬</div>
+
+<div id="chat-window">
+    <div id="chat-header">계곡 챗봇</div>
+    <div id="chat-messages">
+        <div class="message bot-message">안녕하세요! 계곡 평상 예약에 대해 궁금한 점을 물어보세요.</div>
+    </div>
+    <div id="chat-input-container">
+        <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
+        <button id="chat-send">➤</button>
+    </div>
+</div>
+
+<script>
+    const chatButton = document.getElementById('chat-button');
+    const chatWindow = document.getElementById('chat-window');
+    const messagesContainer = document.getElementById('chat-messages');
+    const input = document.getElementById('chat-input');
+    const sendButton = document.getElementById('chat-send');
+
+    // 백엔드 서버 주소 (Render에 배포 후 얻은 주소로 변경하세요!)
+    const BACKEND_URL = "https://your-render-backend-url.onrender.com/ask";
+
+    // 챗봇 창 열고 닫기
+    chatButton.addEventListener('click', () => {
+        chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    const sendMessage = async () => {
+        const messageText = input.value.trim();
+        if (messageText === '') return;
+
+        // 사용자 메시지 화면에 추가
+        addMessage(messageText, 'user');
+        input.value = '';
+
+        try {
+            // 백엔드에 메시지 전송 및 답변 요청
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: messageText })
+            });
+            
+            if (!response.ok) {
+                throw new Error('서버와 통신 중 오류가 발생했습니다.');
+            }
+
+            const data = await response.json();
+            const botReply = data.reply;
+
+            // 챗봇 답변 화면에 추가
+            addMessage(botReply, 'bot');
+
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('죄송합니다. 답변을 가져오는 중 문제가 발생했어요.', 'bot');
+        }
+    };
+
+    // 메시지를 채팅창에 추가하는 함수
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+        // 스크롤을 맨 아래로 이동
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
 </body>
 </html>
