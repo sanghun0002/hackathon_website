@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    pyeongsangId = pyeongsangId.replace(/\s|-/g, ''); 
+
     // 페이지 로드 시 예약 상태를 확인하는 함수
     async function checkBookingStatus(user) {
         if (!pyeongsangId) {
