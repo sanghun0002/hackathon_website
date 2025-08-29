@@ -389,7 +389,7 @@ app.get('/api/bookings/status', async (req, res) => {
     }
 });
 
-app.post('/api/bookings/verifyonsite', async (req, res) => {
+app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
     const today = new Date().toISOString().split('T')[0];
     try {
