@@ -393,10 +393,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
     const today = new Date().toISOString().split('T')[0];
     try {
-        const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
-        const nameClean = name.replace(/\s|-/g, '');
-        const phoneClean = phone.replace(/\s|-/g, '');
-        
+        const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');        
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
