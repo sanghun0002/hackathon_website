@@ -5,16 +5,27 @@
     <title>예약 정보 확인 및 입력</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body class="bg-gray-100 p-8">
-    <header class="main-header"><div class="logo">쉬어가~ 계곡</div></header>
+    <header class="main-header">
+        <div class="logo">쉬어가~ 계곡</div>
+    </header>
+
+    <div class="board-container">
+        <header class="board-header">
+            <a href="index.html" class="home-link"><i class="fas fa-home"></i> 홈</a>
+        </header>
+    </div>
+
     <main class="booking-container">
-        <h1 class="text-3xl font-bold text-center mb-6">최종 예약 정보 확인</h1>
+        <h1 class="text-2xl font-bold text-center mb-6">최종 예약 정보</h1>
         <div id="final-booking-summary" class="bg-white p-6 rounded-lg shadow mb-6">
             <p class="text-center text-gray-500">예약 정보를 불러오는 중...</p>
         </div>
         <form id="confirm-form" class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold mb-4">예약자 정보를 입력해주세요.</h2>
+            <h2 class="text-xl font-semibold mb-4">예약자 정보 입력</h2>
             <div class="mb-4">
                 <label for="user-name" class="block mb-2">이름</label>
                 <input type="text" id="user-name" class="w-full p-2 border rounded" required>
