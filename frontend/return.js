@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${bookingServerUrl}/bookings/return/${pyeongsangId}`);
+            const response = await fetch(`${bookingServerUrl}/api/bookings/return/${pyeongsangId}`);
             if (!response.ok) {
                 throw new Error(response.status === 404 ? '해당 평상에 대한 유효한 예약이 없습니다.' : '예약 정보 조회 실패');
             }
@@ -161,15 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const { name, phone } = docSnap.data();
                     
-                    const cancelUrl = `${bookingServerUrl}/api/bookings/${pyeongsangId}`;
-                    const cancelResponse = await fetch(cancelUrl, {
-                        method: 'DELETE',
+                    const returnUrl = `${bookingServerUrl}/api/bookings/return/${pyeongsangId}`;
+                    const returnResponse = await fetch(returnUrl, {
+                        method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, phone })
                     });
                     
-                    if (!cancelResponse.ok) {
-                        const errorData = await cancelResponse.json();
+                    if (!returnResponse.ok) {
+                        const errorData = await returnResponse.json();
                         throw new Error(`예약 삭제 실패: ${errorData.message}`);
                     }
                     
