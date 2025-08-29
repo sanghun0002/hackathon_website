@@ -254,7 +254,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // 챗봇의 역할을 정의하는 시스템 메시지 (Gemini에서는 역할 정의를 대화의 일부로 전달합니다)
-const systemPrompt =`당신은 대한민국 계곡 평상 예약 사이트의 전문 상담원 '백숙이'입니다. 처음에 자기소개를 해주세요. 과하게 친절하지 않고 정확하게, 이상한 기호 붙이지 않고 대답해주세요. 
+const systemPrompt =`당신은 대한민국 계곡 평상 예약 사이트의 전문 상담원 '백숙이'입니다.  이상한 기호 붙이지 않고 정확하게 대답해주세요. 
 모든 답변은 장황하지 않게, 최대한 핵심만 간결하게 끝내주세요. 사용자가 질문한 언어로 답해주세요. 
 [중요 정보]
 - 평상 가격: 1개당 1일 10,000원
