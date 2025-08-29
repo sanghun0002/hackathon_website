@@ -344,7 +344,7 @@ body {
 .step-indicator {
     display: flex;
     justify-content: space-around;
-    width: 100%; margin-bottom: 30px; }
+    width: 100%; max-width: 1100px; margin-bottom: 30px; }
 .step {
     display: flex; align-items: center; color: #868e96; font-weight: 500; }
 .step.active {
