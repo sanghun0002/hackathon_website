@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     // --- 💻 서버 주소 설정 ---
-    const aiServerUrl = 'https://19c1f9e26416.ngrok-free.app/predict';
+    const aiServerUrl = 'https://d848912a0028.ngrok-free.app/predict';
     const bookingServerUrl = 'https://o70albxd7n.onrender.com';
 
     // '이전' 버튼 링크 설정
