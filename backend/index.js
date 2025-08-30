@@ -413,7 +413,10 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
 // ===============================================================
 app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
     const { pyeongsangId } = req.params;
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstDate = new Date(now.getTime() + kstOffset);
+    const today = kstDate.toISOString().split('T')[0];
     try {
         const query = `
             SELECT * FROM bookings 
@@ -433,7 +436,10 @@ app.get('/api/bookings/by-pyeongsang/:pyeongsangId', async (req, res) => {
 app.put('/api/bookings/return/:pyeongsangId', async (req, res) => {
     const { pyeongsangId } = req.params;
     const { name, phone } = req.body;
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstDate = new Date(now.getTime() + kstOffset);
+    const today = kstDate.toISOString().split('T')[0];
     
     try {
         const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
