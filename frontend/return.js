@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // HTML 요소 가져오기
     const urlParams = new URLSearchParams(window.location.search);
     let pyeongsangId = urlParams.get('id');
+    pyeongsangId = pyeongsangId.replace(/\s|-/g, ''); 
     const backBtn = document.getElementById('back-to-choice-btn');
     const imageInput = document.getElementById('imageInput');
     const imageInputLabel = document.getElementById('imageInputLabel');
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadButton = document.getElementById('uploadButton');
     const resultDiv = document.getElementById('result');
 
-    pyeongsangId = pyeongsangId.replace(/\s|-/g, ''); 
+    
 
     // --- 💻 서버 주소 설정 ---
     const aiServerUrl = 'https://19c1f9e26416.ngrok-free.app/predict';
