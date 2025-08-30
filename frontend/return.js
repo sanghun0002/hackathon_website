@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadButton = document.getElementById('uploadButton');
     const resultDiv = document.getElementById('result');
 
+    pyeongsangId = pyeongsangId.replace(/\s|-/g, ''); 
+
     // --- 💻 서버 주소 설정 ---
     const aiServerUrl = 'https://19c1f9e26416.ngrok-free.app/predict';
     const bookingServerUrl = 'https://o70albxd7n.onrender.com';
@@ -43,8 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             disableAllFeatures('로그인 후 이용해주세요.');
         }
     });
-
-    pyeongsangId = pyeongsangId.replace(/\s|-/g, ''); 
 
     // 페이지 로드 시 예약 상태를 확인하는 함수
     async function checkBookingStatus(user) {
