@@ -177,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     resultDiv.textContent = '반납이 완료되었습니다. 환불은 3-7일이 소요됩니다.';
-                    disableAllFeatures('반납이 완료되어 더 이상 작업을 수행할 수 없습니다.'); // 모든 버튼 비활성화
 
                 } else if (predictData.status === 'DIRTY') {
                     resultDiv.textContent = '❌ 다시 청소한 후 인증 부탁드립니다.';
