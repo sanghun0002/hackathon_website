@@ -367,12 +367,18 @@ app.get('/api/bookings/status', async (req, res) => {
 // ===============================================================
 app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
-    const today = new Date().toISOString().split('T')[0];
+
+    const now = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstDate = new Date(now.getTime() + kstOffset);
+    const today = kstDate.toISOString().split('T')[0];
+
     try {
         const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
+
         const query = `
             UPDATE bookings 
-            SET status = '사용 중' 
+            SET status = '사용 중'
             WHERE 
                 REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
                 REPLACE(name, ' ', '') = $2 AND 
@@ -381,7 +387,13 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
                 status = '예약 완료'
             RETURNING *;
         `;
-        const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
+
+        const result = await pool.query(query, [
+            pyeongsangIdClean, 
+            name.replace(/\s|-/g, ''), 
+            phone.replace(/\s|-/g, ''), 
+            today
+        ]);
 
         if (result.rowCount > 0) {
             res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
@@ -393,6 +405,8 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
         res.status(500).json({ message: '서버 오류' });
     }
 });
+
+
 
 // ===============================================================
 // ===== 예약 정보 조회 및 반납 API  =====
