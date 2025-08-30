@@ -368,38 +368,24 @@ app.get('/api/bookings/status', async (req, res) => {
 app.post('/api/bookings/verify-on-site', async (req, res) => {
     const { pyeongsangId, name, phone } = req.body;
     const today = new Date().toISOString().split('T')[0];
-
-    //입력값에서 공백과 하이픈을 모두 제거
-    const cleanPyeongsangId = pyeongsangId.replace(/\s|-/g, '');
-    const cleanName = name.replace(/\s|-/g, '');
-    const cleanPhone = phone.replace(/\s|-/g, '');
-
-    console.log('--- 현장 인증 시도 ---');
-    console.log('프론트에서 받은 평상 ID (정제 후):', cleanPyeongsangId);
-    console.log('프론트에서 받은 이름 (정제 후):', cleanName);
-    console.log('프론트에서 받은 전화번호 (정제 후):', cleanPhone);
-    console.log('오늘 날짜:', today);
-
     try {
-        //데이터베이스의 값도 동일한 방식으로 정제하여 비교
+        const pyeongsangIdClean = pyeongsangId.replace(/\s|-/g, '');
         const query = `
             UPDATE bookings 
             SET status = '사용 중' 
             WHERE 
-                REPLACE(REPLACE(CONCAT(valley, section, deck_name), ' ', ''), '-', '') = $1 AND 
-                REPLACE(REPLACE(name, ' ', ''), '-', '') = $2 AND 
-                REPLACE(REPLACE(phone, ' ', ''), '-', '') = $3 AND 
+                REPLACE(CONCAT(valley, section, deck_name), ' ', '') = $1 AND 
+                REPLACE(name, ' ', '') = $2 AND 
+                REPLACE(phone, ' ', '') = $3 AND 
                 booking_date = $4 AND
                 status = '예약 완료'
             RETURNING *;
         `;
-        const result = await pool.query(query, [cleanPyeongsangId, cleanName, cleanPhone, today]);
+        const result = await pool.query(query, [pyeongsangIdClean, name.replace(/\s|-/g, ''), phone.replace(/\s|-/g, ''), today]);
 
         if (result.rowCount > 0) {
             res.json({ status: 'success', message: '현장 인증이 정상적으로 처리되었습니다.' });
         } else {
-            // 실패 원인을 더 정확히 파악하기 위해, 어떤 조건이 맞지 않았는지 확인하는 로직을 추가할 수 있습니다.
-            // 여기서는 기존 메시지를 유지합니다.
             res.status(404).json({ status: 'failure', message: '정보가 일치하지 않거나 이미 처리된 예약입니다.' });
         }
     } catch (err) {
