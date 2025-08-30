@@ -370,7 +370,7 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
     // 입력값에서 공백과 하이픈을 모두 제거
-    const cleanPyeongsangId = pyeongsangId.replace(/\s|-/g, '');
+    //const cleanPyeongsangId = pyeongsangId.replace(/\s|-/g, '');
     const cleanName = name.replace(/\s|-/g, '');
     const cleanPhone = phone.replace(/\s|-/g, '');
 
