@@ -374,6 +374,12 @@ app.post('/api/bookings/verify-on-site', async (req, res) => {
     const cleanName = name.replace(/\s|-/g, '');
     const cleanPhone = phone.replace(/\s|-/g, '');
 
+    console.log('--- 현장 인증 시도 ---');
+    console.log('프론트에서 받은 평상 ID (정제 후):', cleanPyeongsangId);
+    console.log('프론트에서 받은 이름 (정제 후):', cleanName);
+    console.log('프론트에서 받은 전화번호 (정제 후):', cleanPhone);
+    console.log('오늘 날짜:', today);
+
     try {
         //데이터베이스의 값도 동일한 방식으로 정제하여 비교
         const query = `
