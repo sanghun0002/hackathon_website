@@ -151,10 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!predictResponse.ok) throw new Error('AI 서버 응답 오류');
                 const predictData = await predictResponse.json();
 
-                    // --- [핵심 추가] ---
-                // 서버가 보내준 시각화 이미지 URL로 미리보기 이미지를 업데이트합니다.
-                const aiServerBaseUrl = new URL(aiServerUrl).origin; // ngrok 주소 (예: https://....ngrok-free.app)
-                preview.src = aiServerBaseUrl + predictData.image_url;
 
                 // 2. AI 분석 결과가 'CLEAN'일 때만 예약 삭제 절차 진행
                 if (predictData.status === 'CLEAN') {
